@@ -8,6 +8,7 @@
     "balance": "node sims/balance_check.js",
     "stamina": "node sims/stamina_tune.js",
     "smoke": "node sims/smoke.js",
+    "grid": "node sims/grid_search.js",
     "gates": "node sims/balance_check.js 400 && node sims/smoke.js"
   },
   "devDependencies": {

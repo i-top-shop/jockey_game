@@ -1,0 +1,16 @@
+{
+  "name": "jockey-sim",
+  "version": "1.0.0",
+  "private": true,
+  "description": "蹄音 -ジョッキーの判断- 開発用スクリプト（ゲーム本体 jockey_game.html はゼロ依存の単一HTML）",
+  "type": "commonjs",
+  "scripts": {
+    "balance": "node sims/balance_check.js",
+    "stamina": "node sims/stamina_tune.js",
+    "smoke": "node sims/smoke.js",
+    "gates": "node sims/balance_check.js 400 && node sims/smoke.js"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1"
+  }
+}

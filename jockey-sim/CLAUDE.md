@@ -111,10 +111,11 @@ docs/jockey_game_design.md  … 初期設計書
 1. **物理・固有・距離を触ったら**: `node sims/balance_check.js`（レンジは§3）。
    スタミナ系は `node sims/stamina_tune.js` も。
 2. **構文**: ブラウザで開く前に `node --check`（インライン<script>を抽出して検証）。
-3. **見た目・手触り**: 必ず実ブラウザでプレイ確認。**Playwright MCP導入を強く推奨**
+3. **無頭スモーク**: `npm run smoke`（jsdom）でロード時実行・DOM結線・画面遷移・**無頭レース完走＋永続化**を自動検証（要素ID参照ミス／ロード時例外を機械検出）。`npm run gates` で balance_check＋smoke を一括実行。※jsdom は devDependency（`npm i`）。ゲーム本体はゼロ依存の単一HTMLのまま。
+4. **見た目・手触り**: スモークが緑でも、最終は必ず実ブラウザでプレイ確認（描画・カメラ・音はWebGL/WebAudioが要るためjsdomでは見えない）。**Playwright MCP導入を強く推奨**
    （スクリーンショット＋consoleエラー確認まで自動化できる）。
-4. 文字化け検査: 過去にハングル1文字混入事故あり。非日本語CJKの混入をgrepで確認。
-5. 配布形態: claude.aiアーティファクトで配るなら **localStorage禁止**（動かない）。
+5. 文字化け検査: 過去にハングル1文字混入事故あり。非日本語CJKの混入をgrepで確認。
+6. 配布形態: claude.aiアーティファクトで配るなら **localStorage禁止**（動かない）。
    ローカル/自社サイト配布なら localStorage/IndexedDB 使用可（フェーズ2の永続化はこちら）。
 
 ## 9. フェーズ2ロードマップ（docs/jockey_sim_redesign.md 詳細）

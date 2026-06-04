@@ -26,29 +26,45 @@ function encodePNG(w, h, rgba) {
   return Buffer.concat([sig, chunk("IHDR", ihdr), chunk("IDAT", idat), chunk("IEND", Buffer.alloc(0))]);
 }
 
-// --- 蹄鉄を描く（4xスーパーサンプリングで縁を滑らかに） ---
-const BG = [0x0c, 0x12, 0x18], GOLD = [0xe8, 0xb8, 0x4b], HOLE = [0x0a, 0x0e, 0x12];
+// --- 蹄鉄を描く（金属の陰影＋黄昏背景＋縁取り＋釘穴。4xスーパーサンプリング） ---
 const DEG = Math.PI / 180;
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+// 黄昏のラジアル背景（ゲーム本体の radial-gradient at 50% -10% に合わせる）
+const BG_TOP = [0x1a, 0x2b, 0x36], BG_BOT = [0x09, 0x0e, 0x13];
+// 金（芯=ハイライト→縁=暗）。ゲームの --gold #e8b84b を中間色に
+const G_HI = [0xff, 0xe3, 0x90], G_MID = [0xe8, 0xb8, 0x4b], G_LO = [0x7c, 0x53, 0x1b];
+const OUTLINE = [0x05, 0x08, 0x0b], HOLE = [0x0b, 0x0f, 0x15];
+
+// 蹄鉄への帰属と「縁からの厚み」e(0=芯..1=縁)を返す
+function shoeAt(x, y, cx, cy, R, halfW, gap, heels) {
+  const d = Math.hypot(x - cx, y - cy);
+  const fromTop = Math.abs(Math.atan2(y - cy, x - cx) / DEG + 90);
+  let t = Infinity, member = false;
+  if (fromTop > gap / 2) { const dd = Math.abs(d - R); if (dd < halfW) { member = true; t = dd; } }   // リング本体（上は開ける）
+  for (const a of heels) { const hc = Math.hypot(x - (cx + Math.cos(a * DEG) * R), y - (cy + Math.sin(a * DEG) * R)); if (hc < halfW && hc < t) { member = true; t = hc; } } // ヒール
+  return member ? { member: true, e: t / halfW } : { member: false };
+}
+
 function draw(size) {
-  const SS = 4, S = size * SS;
-  const buf = Buffer.alloc(S * S * 4);
-  const cx = S / 2, cy = S * 0.53, R = S * 0.30, W = S * 0.108, gap = 64;  // 半径/太さ/上の開き角
+  const SS = 4, S = size * SS, buf = Buffer.alloc(S * S * 4);
+  const cx = S * 0.5, cy = S * 0.50, R = S * 0.30, W = S * 0.124, hw = W / 2, gap = 66, edge = S * 0.013;
   const heels = [-90 + gap / 2, -90 - gap / 2];
+  const holes = []; for (let k = 0; k < 6; k++) { const a = -90 + (gap / 2 + 13) + k * ((360 - gap - 26) / 5); holes.push([cx + Math.cos(a * DEG) * R, cy + Math.sin(a * DEG) * R]); }
   for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
     const i = (y * S + x) * 4;
-    let col = BG;
-    const dx = x - cx, dy = y - cy, d = Math.hypot(dx, dy);
-    const ang = Math.atan2(dy, dx) / DEG;                 // 右=0,下=90,上=-90
-    const fromTop = Math.abs(ang + 90);
-    if (Math.abs(d - R) < W / 2 && fromTop > gap / 2) col = GOLD;   // リング本体（上は開ける）
-    for (const a of heels) {                              // ヒール（両端の丸み）
-      if (Math.hypot(x - (cx + Math.cos(a * DEG) * R), y - (cy + Math.sin(a * DEG) * R)) < W / 2) col = GOLD;
-    }
-    if (col === GOLD) {                                   // 釘穴
-      for (let k = 0; k < 6; k++) {
-        const a = -90 + (gap / 2 + 10) + k * ((360 - gap - 20) / 5);
-        if (Math.hypot(x - (cx + Math.cos(a * DEG) * R), y - (cy + Math.sin(a * DEG) * R)) < W * 0.17) col = HOLE;
-      }
+    // 背景：上中央を光源にした黄昏グラデーション
+    const gd = Math.hypot((x - S * 0.5) / (S * 0.62), (y + S * 0.10) / (S * 0.62));
+    let col = lerp(BG_TOP, BG_BOT, clamp(gd, 0, 1));
+    const s = shoeAt(x, y, cx, cy, R, hw, gap, heels);
+    if (s.member) {
+      const core = 1 - s.e;                               // 0縁..1芯
+      const vert = clamp(1.12 - (y / S) * 1.22, 0, 1);    // 上ほど明るい（金属の照り）
+      const m = clamp(core * 0.76 + vert * 0.30, 0, 1);
+      col = m < 0.5 ? lerp(G_LO, G_MID, m / 0.5) : lerp(G_MID, G_HI, (m - 0.5) / 0.5);
+      for (const [hx, hy] of holes) { if (Math.hypot(x - hx, y - hy) < W * 0.145) { col = HOLE; break; } } // 釘穴
+    } else if (shoeAt(x, y, cx, cy, R, hw + edge, gap, heels).member) {
+      col = lerp(col, OUTLINE, 0.8);                      // 縁取り（背景から分離）
     }
     buf[i] = col[0]; buf[i + 1] = col[1]; buf[i + 2] = col[2]; buf[i + 3] = 255;
   }

@@ -14,3 +14,9 @@ Desktop.ini
 # 一時生成物（構文チェック等）
 .__syntax_check.js
 *.tmp
+.sc.js
+.syntax_check.js
+
+# 配布ビルド出力（build.js で再生成。コミット不要）
+jockey-sim/dist/
+dist/

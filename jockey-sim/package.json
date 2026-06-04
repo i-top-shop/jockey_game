@@ -9,7 +9,9 @@
     "stamina": "node sims/stamina_tune.js",
     "smoke": "node sims/smoke.js",
     "grid": "node sims/grid_search.js",
-    "gates": "node sims/balance_check.js 400 && node sims/smoke.js"
+    "gates": "node sims/balance_check.js 400 && node sims/smoke.js",
+    "build": "node build.js",
+    "serve": "npx --yes serve -l 8080 ."
   },
   "devDependencies": {
     "jsdom": "^29.1.1"

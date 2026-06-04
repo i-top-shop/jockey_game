@@ -1,0 +1,40 @@
+name: Deploy to GitHub Pages
+
+# jockey-sim/build.js で dist/ を組み立て GitHub Pages へ公開する。
+# 有効化手順: リポジトリをGitHubへpush → Settings → Pages → Source を「GitHub Actions」に設定。
+# 以降 main/master への push（または手動実行）で自動デプロイ。公開URL = https://<user>.github.io/<repo>/
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build dist/
+        working-directory: jockey-sim
+        run: node build.js
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: jockey-sim/dist
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -2237,9 +2237,11 @@ function animStartGate(){
 let camBtnBuilt=false;
 function buildCamButton(){
   if(camBtnBuilt) return; camBtnBuilt=true;
-  const b=document.createElement("button"); b.className="cam-btn"; b.textContent="視点：チェイス";
-  b.addEventListener("click", ()=>{ camMode = (camMode==="chase")?"overhead":"chase";
-    b.textContent = "視点："+(camMode==="chase"?"チェイス":"俯瞰"); });
+  const b=document.createElement("button"); b.className="cam-btn"; b.textContent="視点："+CAM_LABEL[camMode];
+  b.addEventListener("click", ()=>{
+    const i=CAM_MODES.indexOf(camMode); camMode=CAM_MODES[(i+1)%CAM_MODES.length];
+    b.textContent="視点："+CAM_LABEL[camMode]; camInit=false;   // モード切替で新アングルへスナップ
+  });
   const wrap=$("track").parentNode; if(wrap) wrap.appendChild(b);
 }
 
@@ -2329,42 +2331,45 @@ function resizeCanvas(){
 }
 window.addEventListener("resize", ()=>{ if(state.screen==="race") resizeCanvas(); });
 
-function _lerpV(a,b,k){ a.x+=(b.x-a.x)*k; a.y+=(b.y-a.y)*k; a.z+=(b.z-a.z)*k; }
-function updateCamera(){
+// フレームレート非依存の指数平滑（rate=1秒あたりの追従の速さ）。60fps前提の固定kを廃止。
+function _lerpV(a,b,rate,dt){ const k=1-Math.exp(-rate*Math.max(0,dt||0.016)); a.x+=(b.x-a.x)*k; a.y+=(b.y-a.y)*k; a.z+=(b.z-a.z)*k; }
+const CAM_MODES=["chase","jockey","overhead"];
+const CAM_LABEL={ chase:"チェイス", jockey:"ジョッキー視点", overhead:"俯瞰" };
+function updateCamera(dt){
+  dt = dt || 0.016;
   const p=state.player; if(!p) return;
   const sS=(state.race&&state.race.startS)||0;
   const w=laneWorld(sS + p.dist, p.lane);
   const hx=Math.cos(w.heading), hz=Math.sin(w.heading);
   const inStraight = p.dist >= (CFG.straightDist||1200);
-  let dpos, dtgt;
+  let dpos, dtgt, posRate, tgtRate, fovT, shake=false;
   if(camMode==="overhead"){
     dpos=new THREE.Vector3(w.x - hx*5, 60, w.z - hz*5);
     dtgt=new THREE.Vector3(w.x + hx*8, 0, w.z + hz*8);
-  } else if(inStraight){
-    // 直線：低く、迫力のあるアングル
-    dpos=new THREE.Vector3(w.x - hx*9.5, 4.6, w.z - hz*9.5);
-    dtgt=new THREE.Vector3(w.x + hx*17, 1.4, w.z + hz*17);
-  } else {
-    dpos=new THREE.Vector3(w.x - hx*11, 6.3, w.z - hz*11);
-    dtgt=new THREE.Vector3(w.x + hx*16, 1.3, w.z + hz*16);
+    posRate=9; tgtRate=10; fovT=56;
+  } else if(camMode==="jockey"){
+    // 一人称：騎手の目線。ストライド連動の微かな上下動・前方注視・スピードFOV（快適度で上下動を抑制）
+    const ph=p.dist*1.55, sp=clamp(p.speed/17,0,1.3), comfort=(state.camComfort!=null?state.camComfort:0.6);
+    const bob=(Math.sin(ph)*0.05 + Math.abs(Math.sin(ph*0.5))*0.03)*sp*comfort;
+    dpos=new THREE.Vector3(w.x - hx*0.2, 2.02 + bob, w.z - hz*0.2);
+    dtgt=new THREE.Vector3(w.x + hx*18, 1.35, w.z + hz*18);
+    posRate=16; tgtRate=14;
+    fovT=66 + (p.gear>=6?4:0) + ((p.gear>=7||p.whipTimer>0)?3:0) + (inStraight?2:0);
+  } else { // chase（追走）
+    if(inStraight){ dpos=new THREE.Vector3(w.x - hx*9.5, 4.6, w.z - hz*9.5); dtgt=new THREE.Vector3(w.x + hx*17, 1.4, w.z + hz*17); posRate=11; tgtRate=12; }
+    else          { dpos=new THREE.Vector3(w.x - hx*11, 6.3, w.z - hz*11); dtgt=new THREE.Vector3(w.x + hx*16, 1.3, w.z + hz*16); posRate=8;  tgtRate=9;  }
+    fovT=56 + (p.gear>=6?4:0) + ((p.gear>=7||p.whipTimer>0)?3:0) + (inStraight?1.5:0); shake=true;
   }
   if(!camInit){ camState.pos.copy(dpos); camState.tgt.copy(dtgt); camInit=true; }
-  else { _lerpV(camState.pos, dpos, inStraight?0.16:0.12); _lerpV(camState.tgt, dtgt, inStraight?0.18:0.14); }
+  else { _lerpV(camState.pos, dpos, posRate, dt); _lerpV(camState.tgt, dtgt, tgtRate, dt); }
   camera.position.copy(camState.pos);
-  if(camMode!=="overhead"){
-    const tt=performance.now()*0.001;       // 中継カメラ風の微かな手ぶれ
+  if(shake){
+    const tt=performance.now()*0.001;       // 中継カメラ風の微かな手ぶれ（追走のみ）
     camera.position.x += Math.sin(tt*1.7)*0.06;
     camera.position.y += Math.sin(tt*2.3)*0.05;
   }
   camera.lookAt(camState.tgt);
-  // FOVパンチ：高ギア/全力/ムチで視野が広がりスピード感UP
-  let fovT = 56;
-  if(camMode!=="overhead"){
-    if(p.gear>=6) fovT += 4;
-    if(p.gear>=7 || p.whipTimer>0) fovT += 3;
-    if(inStraight) fovT += 1.5;
-  }
-  camera.fov += (fovT - camera.fov)*0.1;
+  camera.fov += (fovT - camera.fov)*(1-Math.exp(-10*dt));
   camera.updateProjectionMatrix();
 }
 
@@ -2452,7 +2457,7 @@ function drawTrack(){
     updateSunShadow(w.x, w.z);                   // 影の視錐台を主役へ追従
   }
   animStartGate();
-  updateCamera();
+  updateCamera(dt);
   renderer.render(scene, camera);
 }
 // 文字色判定用：背景色が明るいか

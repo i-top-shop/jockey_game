@@ -1007,6 +1007,7 @@ function makeHorse(o){
     ability:o.ability, coat:o.coat||"kage", markings:o.markings||{blaze:0,socks:[0,0,0,0]},
     // 動的状態
     dist:0, lane:rand(pref[0],pref[1]), targetLane:rand(pref[0],pref[1]),
+    laneBias:rand(-0.9,0.9),          // 馬ごとの置き所の癖（隊列に幅を出す。平均は不変）
     speed:0, stamina:100, composure:100,
     mode:"cruise",         // （AIの内部状態。プレイヤーはギアで制御）
     gear:4,                // プレイヤーのスピードギア（1〜7、4=巡航）
@@ -1417,16 +1418,16 @@ function stepRace(dt){
     const groundFactor = 1 - h.lane*gl;
     h.dist += h.speed * groundFactor * dt;
 
-    // --- AIの進路判断（道中の駆け引き） ---
+    // --- AIの進路判断（道中の駆け引き）。馬ごとの置き所バイアス laneBias で隊列に幅を持たせ「棒状」を解消 ---
     if(!h.isPlayer){
       const onBend = pose.curve!==0;
       if(h.blocked) h.blockTimer+=dt; else h.blockTimer=Math.max(0,h.blockTimer-dt*0.5);
-      // 詰まったら持ち出す（コーナーでは無駄な大外を嫌い控えめ）
+      // 詰まったら持ち出す（コーナーでは無駄な大外を嫌い控えめ）＝原版の差し・追込の生命線を維持
       if(h.blockTimer>0.5){ h.targetLane=Math.min(onBend?4.5:6, h.targetLane+ (onBend?0.6:1.0)); h.blockTimer=0; }
       const st=STYLES[h.style];
       if((CFG.DIST - h.dist) > 480){
-        // 道中：逃げ・先行はインの経済コースを確保。差し・追込は中目。わずかにばらつく
-        const home = (st.cruiseGain>0) ? 0.6 : 2.4;
+        // 道中：逃げ・先行はインの経済コース、差し・追込は中目。馬ごとに横へ散らす（平均は不変＝balance保存）
+        const home = clamp(((st.cruiseGain>0) ? 0.6 : 2.4) + (h.laneBias||0), 0, 6);
         h.targetLane += clamp(home - h.targetLane, -0.5,0.5)*dt*0.5 + (Math.random()-0.5)*dt*0.4;
       } else {
         // 勝負所：差し・追込は最終コーナーで外へ持ち出してクリアな進路を作る

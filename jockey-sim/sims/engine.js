@@ -50,7 +50,7 @@ function race(DIST, P){
     const cr=Math.random(), cond=cr<0.22?1.04:cr<0.74?1.0:cr<0.90?0.985:0.965;
     const pref=STYLES[style].pref;
     const h={id:i,style,ab,stats:s,p:derive(s,ab,DIST,cond),dist:0,lane:rnd(pref[0],pref[1]),target:(pref[0]+pref[1])/2,
-             speed:0,stamina:100,minSta:100,committed:false,finished:false,ft:0};
+             speed:0,stamina:100,minSta:100,committed:false,finished:false,ft:0,laneBias:rnd(-0.9,0.9)};
     h.commitDist=DIST-STYLES[style].cr+rnd(-55,55);
     let q=Math.random()<0.18?"good":Math.random()>0.85?"slow":"ok"; if(ab==="rocket"&&q==="slow")q="ok";
     let off=q==="good"?rnd(1.5,3):q==="slow"?-rnd(2,4):rnd(-0.5,1); off+=h.p.gatePow*1.2;
@@ -98,7 +98,7 @@ function race(DIST, P){
         if(gap>0&&gap<bg&&Math.abs(o.lane-h.lane)<0.95){ cap=Math.min(cap,o.speed); blk=true; } }
       let v=h._v; if(blk)v=Math.min(v,cap); h.speed=v;
       const sW=startS+h.dist, onBend=curveAt(sW)!==0, cg=STYLES[h.style].cg;
-      if((DIST-h.dist)>480){ const home=cg>0?0.6:2.4; h.target+=clamp(home-h.target,-0.5,0.5)*dt*0.5; }
+      if((DIST-h.dist)>480){ const home=clamp((cg>0?0.6:2.4)+h.laneBias,0,6); h.target+=clamp(home-h.target,-0.5,0.5)*dt*0.5; }
       else{ if((h.style==="sashi"||h.style==="oikomi")&&h.target<3.4)h.target+=dt*0.9;
             if(cg>0&&h.target>1.4)h.target-=dt*0.5; }
       if(blk) h.target=Math.min(onBend?4.5:6, h.target+(onBend?0.6:1.0)*dt);

@@ -108,6 +108,19 @@ function race(DIST, P){
       h.dist+=h.speed*(1-h.lane*gl)*dt;
       if(!h.finished&&h.dist>=DIST){ const over=h.dist-DIST, ve=Math.max(0.1,h.speed*(1-h.lane*gl)); h.ft=t-over/ve; h.finished=true; }
     }
+    // パスC：馬体接触の解消（本体 stepRace と同一・位置のみ＝速度/スタミナ不変。パワーで押し勝つ）
+    const BL=2.6, ML=0.85, kB=clamp(10*dt,0,1);
+    for(let i=0;i<F.length;i++){ const a=F[i]; if(a.finished)continue;
+      for(let j=i+1;j<F.length;j++){ const b=F[j]; if(b.finished)continue;
+        const dd=a.dist-b.dist; if(dd>BL||dd<-BL)continue;
+        const dl=a.lane-b.lane, effML=ML*(1-Math.abs(dd)/BL);
+        if(Math.abs(dl)>=effML)continue;
+        const dir=dl!==0?(dl>0?1:-1):((a.id>b.id)?1:-1), overlap=effML-Math.abs(dl);
+        const pa=a.stats.power, pb=b.stats.power, sum=pa+pb;
+        a.lane=clamp(a.lane+dir*overlap*(pb/sum)*kB,0,7);
+        b.lane=clamp(b.lane-dir*overlap*(pa/sum)*kB,0,7);
+      }
+    }
   }
   const r=[...F].sort((a,b)=>a.ft-b.ft); r.forEach((h,i)=>h.rank=i+1);
   return { F, win:r[0] };

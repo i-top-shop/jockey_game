@@ -591,6 +591,10 @@ const CFG = {
   blockGap: 6.5,         // 前の馬との縦距離がこれ未満でブロック対象
   blockLane: 0.95,       // 横の近さがこれ未満で同一進路とみなす
   blockSideGap: 4.2,     // 横にこの距離内で並走されると進路を変えにくい（袋に入る）
+  // 接触（馬体ぶつかり）：横に重ならないよう押し分ける。位置のみ＝速度/スタミナの縦には触れない（balance保存）
+  bumpDistGap: 2.6,      // 縦にこの距離内なら馬体が並ぶ＝接触判定の対象
+  bumpLaneGap: 0.85,     // 確保したい横の最小間隔(レーン)。縦が重なるほどこの幅を要求（楕円の体当たり）
+  bumpRate: 10,          // 押し分けの速さ(1/秒)。パワー差で押し勝つ側ほど動かない
   // スタミナ
   staFatigue: 24,        // この値を下回ると失速し始める
   // 折り合い
@@ -712,6 +716,19 @@ const COATS = {
   shiro:  { name:"白毛",   body:0xe9e6df, points:0xd8d3c9 },   // 6色目（希少）
 };
 const COAT_KEYS = Object.keys(COATS);
+
+/* ---------- JRA 枠番カラー（騎手の帽子色）＋発走ゲートの整列 ----------
+   帽子の色は枠番で決まる（JRA標準）：1白/2黒/3赤/4青/5黄/6緑/7橙/8桃。
+   12頭は8枠に割り振られ、外側の枠から2頭詰めになる（singles=16-N枠が1頭）。 */
+const CAP_COLORS = ["#f2f4f5","#1a1a1a","#e23b3b","#2a6fd6","#f5d000","#2faf4f","#f08a1d","#ec84b0"];
+function bracketOf(num, n){
+  if(n<=8) return num;                       // 1頭ずつ＝馬番=枠番
+  const singles = 16 - n;                    // 1頭だけの枠数（内側）。外側は2頭詰め
+  return num<=singles ? num : singles + Math.ceil((num - singles)/2);
+}
+function capColor(num, n){ return CAP_COLORS[(bracketOf(num,n)-1)%8] || "#f2f4f5"; }
+// 発走ゲートの馬房レーン：馬番順に内(0)→外(7)へ等間隔。1ゲート1頭で重ならない。
+function gateLaneOf(num, n){ return (num-0.5)/n * 7; }
 
 
 // 各馬の個性を覚えてもらうため数値は固定。気性は「高いほど折り合いがつきやすい」。aptDist=得意距離。
@@ -1458,6 +1475,26 @@ function stepRace(dt){
     }
   });
 
+  // === パスC：馬体接触の解消（横に重ならないよう押し分ける。位置のみ＝速度/スタミナの縦は不変＝balance保存） ===
+  //   縦に馬体が並ぶ(|dd|<bumpDistGap)＆横が近い(|dl|<必要間隔)時、両馬をレーン軸で押し分ける。
+  //   パワー（地力）が高い馬ほど押されない＝「どちらかが軽く弾かれる」。必要間隔は縦の重なりが深いほど広い（楕円判定）。
+  const BL=CFG.bumpDistGap, ML=CFG.bumpLaneGap, kBump=clamp(CFG.bumpRate*dt,0,1);
+  for(let i=0;i<field.length;i++){
+    const a=field[i]; if(a.finished) continue;
+    for(let j=i+1;j<field.length;j++){
+      const b=field[j]; if(b.finished) continue;
+      const dd=a.dist-b.dist; if(dd>BL||dd<-BL) continue;          // 縦に離れていれば無関係
+      const dl=a.lane-b.lane;                                      // 横の差
+      const effML=ML*(1-Math.abs(dd)/BL);                          // 縦が重なるほど広い間隔を要求
+      if(Math.abs(dl)>=effML) continue;
+      const dir = dl!==0 ? (dl>0?1:-1) : ((a.num>b.num)?1:-1);     // 完全に重なったら馬番で決定的に分離
+      const overlap = effML-Math.abs(dl);
+      const pa=a.stats.power, pb=b.stats.power, sum=pa+pb;         // パワー比で押し勝つ（高い側ほど動かない）
+      a.lane = clamp(a.lane + dir*overlap*(pb/sum)*kBump, 0, 7);
+      b.lane = clamp(b.lane - dir*overlap*(pa/sum)*kBump, 0, 7);
+    }
+  }
+
   // === プレイヤーがゴール → 早送りフェーズへ ===
   if(state.player.finished && r.phase==="running"){
     r.phase="finishing";
@@ -2095,64 +2132,101 @@ function buildStand(){
   const roof=new THREE.Mesh(new THREE.BoxGeometry(len,1.0,20), mat); roof.position.set(0,9.4,zStand+1.5); scene.add(roof);
 }
 
-// --- サラブレッド3Dモデル（共通骨格＋毛色テクスチャ差し替え方式・ローポリ） ---
-function makeHorseMesh(silk, coatKey, markings, isPlayer){
+// --- サラブレッド3Dモデル（楕円体ベースの丸い馬体＋英国式の馬装。毛色は差し替え方式） ---
+//   ※アニメ rig は不変の契約：userData{ legs[{hip,knee,front}], neck=会釈する頭G, tail=揺れる尾G, rider, arms, cap, riderY }。
+//     脚は股関節(y=1.00)→膝(y=-0.52)の2関節、頭Gは poll で会釈、尾Gは付け根で揺れる（drawTrack が毎フレーム駆動）。
+function makeHorseMesh(silk, coatKey, markings, isPlayer, capCol){
   const coat = COATS[coatKey] || COATS.kage;
   const g=new THREE.Group();
-  const bodyMat = new THREE.MeshStandardMaterial({color:coat.body, roughness:.62, metalness:.02});
-  const pntMat  = new THREE.MeshStandardMaterial({color:coat.points, roughness:.8});
-  const whtMat  = new THREE.MeshStandardMaterial({color:0xf0ece4, roughness:.7});
-  const silkMat = new THREE.MeshStandardMaterial({color:silk, roughness:.5});
+  // マテリアル（PBR/IBL前提：毛は低roughnessで艶、差し毛points＝たてがみ/尾/脛、革/金具/白徴）
+  const bodyMat = new THREE.MeshStandardMaterial({color:coat.body,   roughness:.46, metalness:.05});
+  const pntMat  = new THREE.MeshStandardMaterial({color:coat.points, roughness:.58, metalness:.02});
+  const whtMat  = new THREE.MeshStandardMaterial({color:0xf1ede6, roughness:.6});
+  const silkMat = new THREE.MeshStandardMaterial({color:silk, roughness:.44});
+  const capMat  = new THREE.MeshStandardMaterial({color:(capCol!=null?capCol:silk), roughness:.4}); // 帽子＝枠番色（JRA標準）
+  const tackMat = new THREE.MeshStandardMaterial({color:0x4a3322, roughness:.5,  metalness:.06});    // 革（鞍・頭絡・腹帯）
+  const metMat  = new THREE.MeshStandardMaterial({color:0xc2c6cc, roughness:.32, metalness:.8});      // 金具（鐙・ハミ）
+  const hoofMat = new THREE.MeshStandardMaterial({color:0x2b2320, roughness:.5});
+  const eyeMat  = new THREE.MeshStandardMaterial({color:0x0d0a07, roughness:.25, metalness:.1});
+  const bootMat = new THREE.MeshStandardMaterial({color:0x14110e, roughness:.5});
+  const SPH = new THREE.SphereGeometry(0.5, 16, 12);    // 共有：全楕円体の素（mesh.scaleで成形）
+  const ell=(mat,x,y,z,sx,sy,sz,parent)=>{ const m=new THREE.Mesh(SPH,mat); m.position.set(x,y,z); m.scale.set(sx,sy,sz); (parent||g).add(m); return m; };
 
-  // 胴（細身）：胸〜バレル＋引き締まった後躯
-  const barrel=new THREE.Mesh(new THREE.BoxGeometry(1.55,0.60,0.50), bodyMat); barrel.position.set(0.10,1.02,0); g.add(barrel);
-  const chest =new THREE.Mesh(new THREE.BoxGeometry(0.45,0.58,0.46), bodyMat); chest.position.set(0.86,1.00,0); g.add(chest);
-  const hind  =new THREE.Mesh(new THREE.BoxGeometry(0.62,0.66,0.54), bodyMat); hind.position.set(-0.78,1.04,0); g.add(hind);
+  // --- 胴：楕円体を重ねて丸みのある体型（張った後躯・絞れた腹・厚い胸） ---
+  const barrel = ell(bodyMat,  0.06,1.05,0, 1.62,1.30,1.16);  // バレル
+  ell(bodyMat, -0.70,1.13,0, 1.06,1.04,0.94);                 // 後躯（高め・力強い）
+  ell(bodyMat,  0.82,1.07,0, 0.80,1.06,0.82);                 // 胸・肩
+  ell(bodyMat,  0.20,0.88,0, 1.40,0.82,1.04);                 // 腹のアンダーライン
 
-  // 首（前傾）＋たてがみ（points）
-  const neck=new THREE.Mesh(new THREE.BoxGeometry(0.72,0.40,0.30), bodyMat); neck.position.set(1.04,1.30,0); neck.rotation.z=-0.62; g.add(neck);
-  const mane=new THREE.Mesh(new THREE.BoxGeometry(0.74,0.13,0.16), pntMat); mane.position.set(1.02,1.49,0); mane.rotation.z=-0.62; g.add(mane);
+  // --- 首：張りのあるアーチ＋たてがみ（差し毛・片側へ流れる） ---
+  const neck=new THREE.Mesh(new THREE.CylinderGeometry(0.20,0.33,1.00,12), bodyMat);
+  neck.position.set(1.01,1.32,0); neck.rotation.z=-0.62; g.add(neck);
+  ell(bodyMat, 1.30,1.52,0, 0.44,0.48,0.42);                  // 喉元〜頬の繋ぎ
+  for(let i=0;i<5;i++){ const t=i/4;                          // たてがみ（crest沿い・やや右へ）
+    const mn=new THREE.Mesh(new THREE.BoxGeometry(0.20,0.22,0.07), pntMat);
+    mn.position.set(0.74+t*0.58, 1.04+t*0.60, 0.10); mn.rotation.z=-0.62; g.add(mn);
+  }
 
-  // 頭部（細く伸びた顔＋鼻）
-  const headG=new THREE.Group(); headG.position.set(1.40,1.46,0);
-  const head=new THREE.Mesh(new THREE.BoxGeometry(0.30,0.30,0.24), bodyMat); headG.add(head);
-  const muzz=new THREE.Mesh(new THREE.BoxGeometry(0.30,0.20,0.19), pntMat); muzz.position.set(0.27,-0.07,0); muzz.rotation.z=-0.25; headG.add(muzz);
-  const earL=new THREE.Mesh(new THREE.ConeGeometry(0.06,0.16,6), bodyMat); earL.position.set(-0.05,0.20,0.09); headG.add(earL);
-  const earR=new THREE.Mesh(new THREE.ConeGeometry(0.06,0.16,6), bodyMat); earR.position.set(-0.05,0.20,-0.09); headG.add(earR);
-  // 顔の白徴（流星/大流星/鼻白）
-  if(markings && markings.blaze>0){
-    const bw = markings.blaze===2?0.18:0.09;          // 大流星は太い
-    const bh = markings.blaze===3?0.14:0.30;          // 鼻白は鼻先のみ
-    const by = markings.blaze===3?-0.10:0.02;
-    const bx = markings.blaze===3?0.30:0.16;
-    const blz=new THREE.Mesh(new THREE.BoxGeometry(0.04,bh,bw), whtMat); blz.position.set(bx,by,0.13); headG.add(blz);
+  // --- 頭部（細面・暗い口・目・耳・前髪・頭絡）。ud.neck=headG が poll で会釈 ---
+  const headG=new THREE.Group(); headG.position.set(1.42,1.56,0); headG.rotation.z=-0.04;
+  ell(bodyMat, 0,0,0, 0.46,0.52,0.40, headG);                              // 頭蓋
+  ell(bodyMat, 0.15,-0.13,0, 0.40,0.34,0.34, headG);                      // 頬・顎
+  const muzz=new THREE.Mesh(new THREE.CylinderGeometry(0.10,0.115,0.30,10), pntMat);
+  muzz.position.set(0.30,-0.14,0); muzz.rotation.z=Math.PI/2-0.28; headG.add(muzz); // 鼻面（暗い）
+  const earL=new THREE.Mesh(new THREE.ConeGeometry(0.055,0.18,7), bodyMat); earL.position.set(-0.10,0.25,0.09);  earL.rotation.x=-0.18; headG.add(earL);
+  const earR=new THREE.Mesh(new THREE.ConeGeometry(0.055,0.18,7), bodyMat); earR.position.set(-0.10,0.25,-0.09); earR.rotation.x=0.18;  headG.add(earR);
+  const eyeL=new THREE.Mesh(new THREE.SphereGeometry(0.045,8,8), eyeMat); eyeL.position.set(0.09,0.07,0.135);  headG.add(eyeL);
+  const eyeR=new THREE.Mesh(new THREE.SphereGeometry(0.045,8,8), eyeMat); eyeR.position.set(0.09,0.07,-0.135); headG.add(eyeR);
+  const fore=new THREE.Mesh(new THREE.BoxGeometry(0.10,0.10,0.13), pntMat); fore.position.set(0.0,0.21,0); headG.add(fore); // 前髪
+  const nose=new THREE.Mesh(new THREE.TorusGeometry(0.13,0.018,6,14), tackMat); nose.position.set(0.20,-0.06,0); nose.rotation.y=Math.PI/2; headG.add(nose); // 鼻革
+  const cheek=new THREE.Mesh(new THREE.BoxGeometry(0.30,0.025,0.022), tackMat); cheek.position.set(0.07,0.0,0.135); cheek.rotation.z=0.55; headG.add(cheek); // 頬革
+  const bit=new THREE.Mesh(new THREE.CylinderGeometry(0.012,0.012,0.30,6), metMat); bit.position.set(0.30,-0.13,0); headG.add(bit); // ハミ
+  if(markings && markings.blaze>0){                                       // 顔の白徴（流星/大流星/鼻白）
+    const bw=markings.blaze===2?0.16:0.08, bh=markings.blaze===3?0.12:0.30, by=markings.blaze===3?-0.12:0.0, bx=markings.blaze===3?0.30:0.13;
+    const blz=new THREE.Mesh(new THREE.BoxGeometry(0.03,bh,bw), whtMat); blz.position.set(bx,by,0.18); headG.add(blz);
   }
   g.add(headG);
 
-  // 尾（points・長め）
-  const tail=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.66,0.20), pntMat); tail.geometry.translate(0,-0.33,0);
-  tail.position.set(-1.12,1.12,0); tail.rotation.z=0.7; g.add(tail);
+  // --- 尾（差し毛・房状）。ud.tail=tailG（付け根で揺れる。base 0.7） ---
+  const tailG=new THREE.Group(); tailG.position.set(-1.04,1.20,0); tailG.rotation.z=0.7;
+  const dock=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.06,0.30,8), pntMat); dock.position.y=-0.15; tailG.add(dock);
+  const tlow=new THREE.Mesh(new THREE.CylinderGeometry(0.055,0.12,0.58,8), pntMat); tlow.position.y=-0.56; tailG.add(tlow);
+  g.add(tailG);
 
-  // 脚×4（股関節＋膝の2関節。ギャロップで畳んで伸ばす）
+  // --- 脚×4（股関節＋膝の2関節。下肢は差し毛色＝bayの暗い脛。socksで白靴下） ---
   const legs=[];
   const order=[[0.80,0.27],[0.80,-0.27],[-0.80,0.27],[-0.80,-0.27]]; // FL,FR,BL,BR
   order.forEach(([lx,lz],i)=>{
     const hip=new THREE.Group(); hip.position.set(lx,1.00,lz);            // 股関節ピボット
-    const thigh=new THREE.Mesh(new THREE.CylinderGeometry(0.095,0.07,0.52,7), bodyMat); thigh.position.y=-0.26; hip.add(thigh);
+    const thigh=new THREE.Mesh(new THREE.CylinderGeometry(0.11,0.075,0.52,8), bodyMat); thigh.position.y=-0.26; hip.add(thigh);
     const knee=new THREE.Group(); knee.position.y=-0.52;                  // 膝ピボット
-    const sock = (markings && markings.socks && markings.socks[i]) ? whtMat : bodyMat;
-    const cannon=new THREE.Mesh(new THREE.CylinderGeometry(0.065,0.05,0.46,7), sock); cannon.position.y=-0.23; knee.add(cannon);
-    const hoof=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.075,0.1,7), pntMat); hoof.position.y=-0.46-0.05; knee.add(hoof);
+    const sockMat = (markings && markings.socks && markings.socks[i]) ? whtMat : pntMat;  // 下肢＝暗い差し毛 / 白徴なら白
+    const cannon=new THREE.Mesh(new THREE.CylinderGeometry(0.052,0.044,0.46,8), sockMat); cannon.position.y=-0.23; knee.add(cannon);
+    const hoof=new THREE.Mesh(new THREE.CylinderGeometry(0.058,0.072,0.11,8), hoofMat); hoof.position.y=-0.52; knee.add(hoof);
     hip.add(knee);
     g.add(hip); legs.push({hip, knee, front:(i<2)});
   });
 
-  // 騎手（シルクの胴＋ヘルメット）
-  const rider=new THREE.Mesh(new THREE.BoxGeometry(0.52,0.5,0.46), silkMat); rider.position.set(-0.05,1.48,0); rider.rotation.x=0.18; g.add(rider);
-  const arms =new THREE.Mesh(new THREE.BoxGeometry(0.32,0.16,0.5), silkMat); arms.position.set(0.30,1.40,0); g.add(arms);
-  const cap  =new THREE.Mesh(new THREE.SphereGeometry(0.17,12,10), silkMat); cap.position.set(-0.02,1.80,0); g.add(cap);
+  // --- 馬装：ゼッケン（シルク色）・鞍・腹帯・鐙 ---
+  const cloth=new THREE.Mesh(new THREE.BoxGeometry(0.98,0.08,0.88), silkMat); cloth.position.set(-0.04,1.31,0); g.add(cloth); // ゼッケン（シルク色＝識別）
+  ell(tackMat, -0.06,1.40,0, 0.64,0.18,0.58);                            // 鞍（座）
+  ell(tackMat,  0.20,1.45,0, 0.16,0.18,0.34);                            // 前橋（ポメル）
+  const girth=new THREE.Mesh(new THREE.TorusGeometry(0.35,0.03,6,16), tackMat); girth.position.set(0.06,1.03,0); girth.rotation.y=Math.PI/2; g.add(girth); // 腹帯
+  for(const sz of [0.30,-0.30]){
+    const lea=new THREE.Mesh(new THREE.BoxGeometry(0.03,0.34,0.04), tackMat); lea.position.set(-0.06,1.20,sz); g.add(lea);     // 鐙革
+    const iron=new THREE.Mesh(new THREE.TorusGeometry(0.05,0.018,6,10), metMat); iron.position.set(-0.06,1.02,sz); iron.rotation.x=Math.PI/2; g.add(iron); // 鐙
+  }
 
-  g.userData = { legs, body:barrel, neck:headG, tail, rider, arms, cap, riderY:1.48 };
+  // --- 騎手（シルクの胴＋腕＋枠番帽＋鞍に沿う脚）。rider/arms/cap は drawTrack が駆動 ---
+  for(const sz of [0.18,-0.18]){
+    const th=new THREE.Mesh(new THREE.BoxGeometry(0.34,0.14,0.16), silkMat); th.position.set(0.02,1.40,sz); th.rotation.z=0.22; g.add(th);
+    const bt=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.30,0.14), bootMat); bt.position.set(0.18,1.16,sz); g.add(bt);
+  }
+  const rider=ell(silkMat, -0.05,1.50,0, 0.5,0.54,0.46); rider.rotation.x=0.18;   // 胴（前傾）
+  const arms =new THREE.Mesh(new THREE.BoxGeometry(0.30,0.15,0.48), silkMat); arms.position.set(0.30,1.40,0); g.add(arms);
+  const cap  =new THREE.Mesh(new THREE.SphereGeometry(0.16,12,10), capMat); cap.position.set(-0.04,1.82,0); g.add(cap);
+
+  g.userData = { legs, body:barrel, neck:headG, tail:tailG, rider, arms, cap, riderY:1.50 };
   return g;
 }
 function makeNumberSprite(num, color){
@@ -2170,8 +2244,9 @@ function syncHorseMeshes(){
   horseMeshes.forEach(m=>{ scene.remove(m.group); scene.remove(m.sprite); if(m.blob) scene.remove(m.blob); });
   horseMeshes=[];
   if(playerRing){ scene.remove(playerRing); playerRing=null; }
+  const nField=state.field.length;
   state.field.forEach((h)=>{
-    const g=makeHorseMesh(h.color, h.coat, h.markings, h.isPlayer);
+    const g=makeHorseMesh(h.color, h.coat, h.markings, h.isPlayer, capColor(h.num, nField));
     g.traverse(o=>{ if(o.isMesh) o.castShadow=true; });   // 馬体は影を落とす
     scene.add(g);
     const sp=makeNumberSprite(String(h.num), h.color); scene.add(sp);
@@ -2184,26 +2259,28 @@ function syncHorseMeshes(){
   const ring=new THREE.Mesh(new THREE.RingGeometry(1.35,1.95,30),
     new THREE.MeshBasicMaterial({color:0xffffff, side:THREE.DoubleSide, transparent:true, opacity:0.85, toneMapped:false}));
   ring.rotation.x=-Math.PI/2; ring.position.y=0.07; playerRing=ring; scene.add(ring);
-  buildStartGate((state.race&&state.race.startS)||0);   // 発走ゲートを始点に設置（閉じた状態）
+  buildStartGate((state.race&&state.race.startS)||0, nField);   // 発走ゲートを始点に設置（馬房数＝頭数・閉じた状態）
   camInit=false; // 新レースでカメラを始点へスナップ
 }
 
 /* ---------- 発走ゲート（スタート地点に設置・発走で開いてフェード） ---------- */
 let startGate=null, gateDoors=[], gateAnim=-1;   // gateAnim<0:閉じて静止 / ≥0:開放アニメ進行
-function buildStartGate(startS){
+function buildStartGate(startS, n){
+  n = n || (state.field&&state.field.length) || 8;   // 馬房数＝出走頭数（gateLaneOf と一致＝各馬が馬房中央）
   if(startGate){ scene.remove(startGate); startGate=null; }
   gateDoors=[]; gateAnim=-1;
   const grp=new THREE.Group();
   const p=trackPose(startS);
   grp.position.set(p.x, 0, p.z);
   grp.rotation.y = -p.heading;                    // local +X=進行方向, +Z=外側（レーン増加方向）
-  const H=2.4, z0=-0.7, z1=LANE_W*7+0.7, span=z1-z0;
+  const H=2.4, laneSpan=LANE_W*7;                 // 馬房グリッドはレーン0..7を頭数で等分
+  const z0=-0.7, z1=laneSpan+0.7, span=z1-z0;     // フレーム/レールは端に余白を付けた全幅
   const frameMat=()=>new THREE.MeshStandardMaterial({color:0x3a4048, roughness:.7, transparent:true, opacity:1});
   const metalMat=()=>new THREE.MeshStandardMaterial({color:0x9aa3ab, roughness:.5, metalness:.3, transparent:true, opacity:1});
   const doorMat =()=>new THREE.MeshStandardMaterial({color:0x2f6f3c, roughness:.7, transparent:true, opacity:1});
-  // 仕切りの支柱（前後）
-  for(let k=0;k<=8;k++){
-    const z=z0+span*(k/8);
+  // 仕切りの支柱（前後）：レーン0..7を n 等分
+  for(let k=0;k<=n;k++){
+    const z=(k/n)*laneSpan;
     const pf=new THREE.Mesh(new THREE.BoxGeometry(0.1,H,0.1), frameMat()); pf.position.set(0.55,H/2,z); grp.add(pf);
     const pb=new THREE.Mesh(new THREE.BoxGeometry(0.1,H,0.1), frameMat()); pb.position.set(-1.05,H/2,z); grp.add(pb);
     const side=new THREE.Mesh(new THREE.BoxGeometry(1.6,0.08,0.08), frameMat()); side.position.set(-0.25,H-0.2,z); grp.add(side);
@@ -2214,9 +2291,9 @@ function buildStartGate(startS){
   const rb=new THREE.Mesh(railGeo, metalMat()); rb.position.set(-1.05,H-0.05,(z0+z1)/2); grp.add(rb);
   const sign=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.34,span), new THREE.MeshStandardMaterial({color:0x152a3a, roughness:.8, transparent:true, opacity:1}));
   sign.position.set(0.62,H+0.18,(z0+z1)/2); grp.add(sign);
-  // 前扉（各馬房・上ヒンジで跳ね上がる）
-  for(let s=0;s<8;s++){
-    const zc=z0+span*((s+0.5)/8), w=span/8*0.9;
+  // 前扉（各馬房・上ヒンジで跳ね上がる）：扉中央が gateLaneOf(s+1,n)*LANE_W に一致
+  for(let s=0;s<n;s++){
+    const zc=((s+0.5)/n)*laneSpan, w=laneSpan/n*0.9;
     const door=new THREE.Group(); door.position.set(0.55, H-0.35, zc);
     const panel=new THREE.Mesh(new THREE.BoxGeometry(0.06,1.5,w), doorMat()); panel.position.y=-0.75; door.add(panel);
     grp.add(door); gateDoors.push(door);
@@ -2372,7 +2449,7 @@ function updateCamera(dt){
   dt = dt || 0.016;
   const p=state.player; if(!p) return;
   const sS=(state.race&&state.race.startS)||0;
-  const w=laneWorld(sS + p.dist, p.lane);
+  const w=laneWorld(sS + p.dist, p._rlane!=null?p._rlane:p.lane);   // 枠入り整列に追従（描画レーン）
   const hx=Math.cos(w.heading), hz=Math.sin(w.heading);
   const inStraight = p.dist >= (CFG.straightDist||1200);
   let dpos, dtgt, posRate, tgtRate, fovT, shake=false;
@@ -2426,8 +2503,15 @@ function drawTrack(){
   const running = state.race && (state.race.phase==="running" || state.race.phase==="finishing");
   // 砂煙：自分に近い数頭から（負荷を抑える）
   let pdist = p? p.dist : 0;
+  const nField=state.field.length;
+  const inGate = state.race && state.race.phase==="gate";   // 枠入り中だけ整列（発走後はdone含め実レーンへ）
   for(const m of horseMeshes){
-    const h=m.h; const w=laneWorld(sS + h.dist, h.lane);
+    const h=m.h;
+    // 発走ゲート整列：枠入り中は馬番順に1頭1馬房へ整列。発走後は実レーンへ約1秒で移行（描画のみ・物理 h.lane は不変）
+    const gl=gateLaneOf(h.num, nField);
+    h._gateBlend = inGate ? 0 : Math.min(1,(h._gateBlend||0)+dt/1.0);
+    h._rlane = gl + (h.lane - gl)*h._gateBlend;
+    const w=laneWorld(sS + h.dist, h._rlane);
     const sp=clamp(h.speed/17, 0, 1.35);
     const ph=h.dist*1.55;                                 // 走行位相（距離ベースで安定）
     const bob=Math.max(0,Math.sin(ph+0.3))*0.085*sp;      // バウンド（一完歩に一度の浮き）
@@ -2485,7 +2569,7 @@ function drawTrack(){
   }
   Dust.update(dt);
   if(playerRing && p){
-    const w=laneWorld(sS + p.dist, p.lane); playerRing.position.set(w.x, 0.07, w.z);
+    const w=laneWorld(sS + p.dist, p._rlane!=null?p._rlane:p.lane); playerRing.position.set(w.x, 0.07, w.z);
     playerRing.material.opacity = p.finished? 0.35 : (0.8 + 0.2*Math.sin(performance.now()*0.006));
     updateSunShadow(w.x, w.z);                   // 影の視錐台を主役へ追従
   }

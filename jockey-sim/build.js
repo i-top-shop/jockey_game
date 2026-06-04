@@ -15,6 +15,12 @@ fs.mkdirSync(distVendor, { recursive: true });
 const copies = [
   ["jockey_game.html", path.join(dist, "index.html")],          // エントリ名を index.html へ
   ["vendor/three.min.js", path.join(distVendor, "three.min.js")],
+  // PWA（インストール可能アプリ化）
+  ["manifest.webmanifest", path.join(dist, "manifest.webmanifest")],
+  ["sw.js", path.join(dist, "sw.js")],
+  ["icon-192.png", path.join(dist, "icon-192.png")],
+  ["icon-512.png", path.join(dist, "icon-512.png")],
+  ["apple-touch-icon.png", path.join(dist, "apple-touch-icon.png")],
 ];
 for (const [src, dest] of copies) {
   const s = path.join(root, src);
@@ -38,4 +44,4 @@ if (!/<script[^>]+src=["']vendor\/three\.min\.js["']/.test(html)) {
 console.log("\nBUILD OK → dist/");
 console.log("  itch.io   : dist/ の中身（index.html と vendor/）をzipにしてアップロード→「This file will be played in the browser」を指定");
 console.log("  GitHub Pages: リポジトリをpushし Settings→Pages→Source=GitHub Actions（.github/workflows/pages.yml が dist/ をデプロイ）");
-console.log("  ローカル確認: npm run serve → http://localhost:8080/dist/");
+console.log("  ローカル確認: npm run serve → http://localhost:8080/（PWA/インストール確認）");

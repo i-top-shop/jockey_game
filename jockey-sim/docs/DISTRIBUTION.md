@@ -25,7 +25,7 @@ npm run build       # → dist/ に index.html と vendor/ を組み立て（CDN
 
 ローカル確認：
 ```
-npm run serve       # → http://localhost:8080/dist/ をブラウザで開く
+npm run serve       # → http://localhost:8080/ をブラウザで開く
 ```
 
 ---
@@ -74,9 +74,9 @@ npm run serve       # → http://localhost:8080/dist/ をブラウザで開く
 
 ```
 cd jockey-sim
-npm run serve                      # http://localhost:8080/dist/
+npm run serve                      # http://localhost:8080/
 ```
-同じWi-Fiのスマホからは、PCのローカルIP（例 `http://192.168.x.x:8080/dist/`）で開けます。
+同じWi-Fiのスマホからは、PCのローカルIP（例 `http://192.168.x.x:8080/`）で開けます。
 外部の人に一時公開するなら `npx --yes ngrok http 8080` 等のトンネルでURLを発行。
 
 ---
@@ -85,6 +85,20 @@ npm run serve                      # http://localhost:8080/dist/
 
 `dist/` フォルダ（`index.html` + `vendor/`）を zip で送り、`index.html` をブラウザで開いてもらうだけ。
 ネット不要で描画まで動きます（フォントのみOSフォールバック）。
+
+---
+
+## 5. PWA（インストール可能アプリ）
+
+GitHub Pages（HTTPS）/ ローカルサーバ（`npm run serve`）経由なら、**ホーム画面/デスクトップに"アプリ"として追加**でき、
+オフラインでも起動します（Service Worker がアプリシェルをキャッシュ）。
+
+- **Android/PC (Chrome/Edge)**: アドレスバーの「インストール」アイコン、または ⋮ →「アプリをインストール」
+- **iOS (Safari)**: 共有 → 「ホーム画面に追加」
+- 構成: `manifest.webmanifest`（縦画面・standalone・テーマ色）/ `sw.js`（オフラインキャッシュ）/ `icon-192/512.png`・`apple-touch-icon.png`
+- **アイコン再生成**: `npm run icons`（`tools/make-icons.js`が蹄鉄PNGを出力。デザインはこのスクリプトを編集）
+- 注意: PWA/SW は **HTTPS か localhost が必須**（`file://` 直開きでは登録されない＝描画は動くがインストール不可）。
+  キャッシュを更新したら `sw.js` の `CACHE`（`hizumeoto-v1`）のバージョンを上げる。
 
 ---
 

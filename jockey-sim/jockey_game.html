@@ -11,6 +11,22 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
 
+<!-- PWA：インストール可能なアプリ化（相対パス＝GitHub Pages のサブパスでも動く） -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0c1218">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="蹄音">
+<script>
+  // Service Worker 登録（オフライン＆インストール）。未対応環境やfile://では無害にスキップ。
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(()=>{}); });
+  }
+</script>
+
 <style>
 /* ========================================================================
    テーマ変数（黄昏の競馬中継：深いティールの芝 / 黒スレートUI / 金・緋の差し色）

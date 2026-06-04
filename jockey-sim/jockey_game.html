@@ -709,6 +709,7 @@ const COATS = {
   kuri:   { name:"栗毛",   body:0x9c5a2a, points:0xb9824a },
   ao:     { name:"青鹿毛", body:0x2e2319, points:0x14100b },
   ashi:   { name:"芦毛",   body:0xb6b0a8, points:0x8d877f },
+  shiro:  { name:"白毛",   body:0xe9e6df, points:0xd8d3c9 },   // 6色目（希少）
 };
 const COAT_KEYS = Object.keys(COATS);
 
@@ -1030,7 +1031,8 @@ function makeHorse(o){
 // ランダムな顔・脚の白徴（流星/ソックス等）を生成
 function randMarkings(){
   const b=Math.random(); const blaze = b<0.34?0 : b<0.62?1 : b<0.82?2 : 3; // 0無/1流星/2大流星/3鼻白
-  const socks=[0,1,2,3].map(()=> Math.random()<0.22?1:0);
+  // 四白（しろあし＝四肢とも白）を命名パターンとして時々出す。それ以外は脚ごとにランダム白徴
+  const socks = (Math.random()<0.06) ? [1,1,1,1] : [0,1,2,3].map(()=> Math.random()<0.20?1:0);
   return { blaze, socks };
 }
 
@@ -1983,10 +1985,19 @@ function buildSky(){
   const mat=new THREE.MeshBasicMaterial({ map:makeSkyTex(), side:THREE.BackSide, fog:false });
   scene.add(new THREE.Mesh(new THREE.SphereGeometry(900,24,16), mat));
 }
+let sunLight=null;
 function buildLights(){
-  scene.add(new THREE.HemisphereLight(0xc2d2ee, 0x33301f, 0.72));
-  scene.add(new THREE.AmbientLight(0x3e475c, 0.28));
-  const sun=new THREE.DirectionalLight(0xffcf8a, 1.45); sun.position.set(-240,150,120); scene.add(sun);
+  // IBL(scene.environment)が間接光を担うぶん、環境光は控えめにして陰影を締める
+  scene.add(new THREE.HemisphereLight(0xc2d2ee, 0x33301f, 0.52));
+  scene.add(new THREE.AmbientLight(0x3e475c, 0.16));
+  const sun=new THREE.DirectionalLight(0xffcf8a, 1.5); sun.position.set(-240,150,120); scene.add(sun);
+  sunLight=sun;
+  // 影：主役周辺だけを覆う狭めのオルソ視錐台。フレームごとにプレイヤーへ追従させる（updateSunShadow）
+  sun.castShadow=true;
+  sun.shadow.mapSize.set(1024,1024);
+  sun.shadow.bias=-0.0008; sun.shadow.normalBias=0.02;
+  const sc=sun.shadow.camera; sc.near=1; sc.far=520; sc.left=-46; sc.right=46; sc.top=46; sc.bottom=-46; sc.updateProjectionMatrix();
+  scene.add(sun.target);                                   // DirectionalLight.target はシーンに入れる必要がある
   const rim=new THREE.DirectionalLight(0x86a0f0, 0.5); rim.position.set(190,90,-180); scene.add(rim);
   const fill=new THREE.DirectionalLight(0xffe2b4, 0.22); fill.position.set(70,40,210); scene.add(fill);
 }
@@ -2000,14 +2011,31 @@ function buildSun(){
   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t, transparent:true, depthWrite:false, depthTest:false, blending:THREE.AdditiveBlending, fog:false, toneMapped:false}));
   sp.scale.set(260,260,1); sp.position.set(-360,150,-520); scene.add(sp);
 }
+// 環境マップ（IBL）：地平のグラデーションをPMREMで前計算し scene.environment へ。
+// MeshStandardMaterial に物理的な映り込み・間接光が乗る（馬体の艶・ゲート金属・シルク）。
+function buildEnv(){
+  const c=document.createElement("canvas"); c.width=64; c.height=32; const x=c.getContext("2d");
+  const g=x.createLinearGradient(0,0,0,32);
+  g.addColorStop(0.00,"#26405e");   // 上空
+  g.addColorStop(0.45,"#62748c");
+  g.addColorStop(0.50,"#d59a63");   // 地平の残照（黄昏）
+  g.addColorStop(0.54,"#5a4d3a");
+  g.addColorStop(1.00,"#1b2a1e");   // 芝の照り返し
+  x.fillStyle=g; x.fillRect(0,0,64,32);
+  const tex=new THREE.CanvasTexture(c); tex.mapping=THREE.EquirectangularReflectionMapping;
+  const pmrem=new THREE.PMREMGenerator(renderer); pmrem.compileEquirectangularShader();
+  scene.environment = pmrem.fromEquirectangular(tex).texture;
+  tex.dispose(); pmrem.dispose();
+}
 function buildTrack(){
   // 外周の地面
   const ground=new THREE.Mesh(new THREE.PlaneGeometry(2400,2400),
     new THREE.MeshStandardMaterial({color:0x14241a, roughness:1}));
-  ground.rotation.x=-Math.PI/2; ground.position.y=-0.12; scene.add(ground);
-  // 芝（流れる刈り目ストライプ）
-  scene.add(buildBand(-0.7, TRK_OUT+0.7, 0,
-    new THREE.MeshStandardMaterial({map:makeStripeTex(), roughness:.96, side:THREE.DoubleSide}), 14));
+  ground.rotation.x=-Math.PI/2; ground.position.y=-0.12; ground.receiveShadow=true; scene.add(ground);
+  // 芝（流れる刈り目ストライプ）。影を受ける
+  const turf=buildBand(-0.7, TRK_OUT+0.7, 0,
+    new THREE.MeshStandardMaterial({map:makeStripeTex(), roughness:.96, side:THREE.DoubleSide}), 14);
+  turf.receiveShadow=true; scene.add(turf);
   // インフィールド（中心からの扇形で塗りつぶし）
   buildInfield();
   // 内ラチ・外ラチ（白）
@@ -2143,7 +2171,9 @@ function syncHorseMeshes(){
   horseMeshes=[];
   if(playerRing){ scene.remove(playerRing); playerRing=null; }
   state.field.forEach((h)=>{
-    const g=makeHorseMesh(h.color, h.coat, h.markings, h.isPlayer); scene.add(g);
+    const g=makeHorseMesh(h.color, h.coat, h.markings, h.isPlayer);
+    g.traverse(o=>{ if(o.isMesh) o.castShadow=true; });   // 馬体は影を落とす
+    scene.add(g);
     const sp=makeNumberSprite(String(h.num), h.color); scene.add(sp);
     const blob=new THREE.Mesh(new THREE.PlaneGeometry(2.6,1.5),
       new THREE.MeshBasicMaterial({map:blobTex(), transparent:true, depthWrite:false, opacity:0.5, toneMapped:false}));
@@ -2276,12 +2306,14 @@ function ensureThree(){
   renderer.setClearColor(0x0a0e14, 1);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;   // フィルミックな階調
   renderer.toneMappingExposure = 1.16;
+  renderer.shadowMap.enabled = true;                    // リアルタイム影（太陽光）
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;     // 柔らかい接地影
   scene=new THREE.Scene();
   scene.fog=new THREE.Fog(0x202a3a, 150, 600);
   camera=new THREE.PerspectiveCamera(56, 1, 0.5, 2000);
   camState.pos=new THREE.Vector3(TRK_SL/2-12, 7, TRK_R-2);
   camState.tgt=new THREE.Vector3(TRK_SL/2, 1, TRK_R);
-  buildSky(); buildLights(); buildSun(); buildTrack(); buildStand(); Dust.init(); buildCamButton();
+  buildEnv(); buildSky(); buildLights(); buildSun(); buildTrack(); buildStand(); Dust.init(); buildCamButton();
   // 自発光・空などの「素の色」はトーンマップ対象外にして発色を維持
   scene.traverse(o=>{ if(o.material && o.material.isMeshBasicMaterial) o.material.toneMapped=false; });
   threeReady=true;
@@ -2336,6 +2368,14 @@ function updateCamera(){
   camera.updateProjectionMatrix();
 }
 
+// 影の視錐台を主役の現在地へ追従させる（狭いオルソで解像度を確保）
+function updateSunShadow(px,pz){
+  if(!sunLight || !sunLight.castShadow) return;
+  sunLight.position.set(px-180, 150, pz+95);   // 黄昏：左後方やや上から
+  sunLight.target.position.set(px, 0, pz);
+  sunLight.target.updateMatrixWorld();
+}
+
 /* render() から呼ばれる描画本体（名称は drawTrack のまま） */
 let _drawPrev=0;
 function drawTrack(){
@@ -2388,7 +2428,7 @@ function drawTrack(){
       m.blob.position.set(w.x, 0.04, w.z);
       m.blob.rotation.z = -w.heading;
       const st=1+sp*0.5; m.blob.scale.set(st,1,1);
-      m.blob.material.opacity = 0.5 - sp*0.12;
+      m.blob.material.opacity = 0.26 - sp*0.08;   // リアル影と重ねる接地AO（弱め）
     }
     // 砂煙：走行中、近い馬の後脚から
     if(running && !h.finished && h.speed>11){
@@ -2409,6 +2449,7 @@ function drawTrack(){
   if(playerRing && p){
     const w=laneWorld(sS + p.dist, p.lane); playerRing.position.set(w.x, 0.07, w.z);
     playerRing.material.opacity = p.finished? 0.35 : (0.8 + 0.2*Math.sin(performance.now()*0.006));
+    updateSunShadow(w.x, w.z);                   // 影の視錐台を主役へ追従
   }
   animStartGate();
   updateCamera();

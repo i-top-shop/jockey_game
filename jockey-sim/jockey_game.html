@@ -2293,6 +2293,38 @@ function blobTex(){
   x.fillStyle=g; x.fillRect(0,0,64,64); _blobTex=new THREE.CanvasTexture(c); return _blobTex;
 }
 
+/* ---------- レンダリング予算オーケストレーター（60FPS維持の常設インフラ） ----------
+   フレーム時間EMAを監視し、重ければ 動的解像度→影 を段階的に下げ、余裕があれば戻す（ヒステリシス）。
+   以降のビジュアル施策（ポストFX等）はこのノブにぶら下げる規約。実挙動の確認は実機計測が前提。
+   AAAロードマップ Phase1「予算オーケストレーター(常設L)」。 */
+const Budget = {
+  levels:[
+    { name:"高", prCap:2.0, shadow:true,  shMap:1024 },
+    { name:"中", prCap:1.5, shadow:true,  shMap:768  },
+    { name:"低", prCap:1.0, shadow:false, shMap:512  },
+  ],
+  lvl:0, ema:16, _acc:0,
+  apply(){
+    if(!renderer) return;
+    const L=this.levels[this.lvl];
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, L.prCap));
+    if(typeof sunLight!=="undefined" && sunLight){
+      sunLight.castShadow=L.shadow;
+      if(L.shadow){ sunLight.shadow.mapSize.set(L.shMap,L.shMap); if(sunLight.shadow.map){ sunLight.shadow.map.dispose(); sunLight.shadow.map=null; } }
+    }
+    if(threeReady) resizeCanvas();   // pixelRatio変更を反映
+  },
+  reset(){ this.lvl=0; this.ema=16; this._acc=0; this.apply(); },
+  tick(ms){
+    if(ms>0 && ms<200) this.ema += (ms - this.ema)*0.1;   // フレーム時間EMA（スパイクは無視）
+    this._acc += (ms||16)/1000;
+    if(this._acc < 0.8) return;                            // 0.8s毎に判定（チャタリング防止）
+    this._acc = 0;
+    if(this.ema > 19 && this.lvl < this.levels.length-1){ this.lvl++; this.apply(); }   // 重い→格下げ
+    else if(this.ema < 13 && this.lvl > 0){ this.lvl--; this.apply(); }                 // 余裕→格上げ
+  },
+};
+
 function ensureThree(){
   if(threeReady) return true;
   if(typeof THREE==="undefined"){
@@ -2319,6 +2351,7 @@ function ensureThree(){
   // 自発光・空などの「素の色」はトーンマップ対象外にして発色を維持
   scene.traverse(o=>{ if(o.material && o.material.isMeshBasicMaterial) o.material.toneMapped=false; });
   threeReady=true;
+  Budget.reset();      // 予算オーケストレーター起動（初期=高）
   return true;
 }
 
@@ -2459,6 +2492,7 @@ function drawTrack(){
   animStartGate();
   updateCamera(dt);
   renderer.render(scene, camera);
+  Budget.tick(dt*1000);   // フレーム時間を監視し品質を自動調整（60FPS維持）
 }
 // 文字色判定用：背景色が明るいか
 function isLight(hex){

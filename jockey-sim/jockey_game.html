@@ -800,6 +800,34 @@ const CANDIDATES = [
     stats:{ speed:88, stamina:72, instant:88, temper:82, power:80, guts:74, aptDist:1400 } },
 ];
 
+/* ---------- 能力ステータス拡張（出脚・コーナリング）＋騎乗候補を30頭へ ---------- */
+// 既存12頭に出脚(gate)・コーナリング(corner)を補完。固有で味付けし固定値（再現性のため乱数なし）。
+//   出脚＝発走の出（gatePow）／コーナリング＝コーナーの距離ロス軽減（cornerSkill）。従来はpower依存だった2軸を独立。
+CANDIDATES.forEach(h=>{
+  if(h.stats.gate==null)   h.stats.gate   = clamp(h.stats.power + (h.ability==="rocket"?9:0), 50, 99);
+  if(h.stats.corner==null) h.stats.corner = clamp(h.stats.power + (h.ability==="corner"?9:0), 50, 99);
+});
+// 騎乗候補を30頭まで増設（出走頭数CFG.Nは不変）。固有/毛色/脚質/数値はランダム＝開くたび新顔。
+const CAND_EXTRA = ["アマドゥバカヨコ","キングロードサフォ","リツボークン","モモチャン","チャパツユウマ","アラシヤマブキ","ヒスイノツバサ","コガネマサムネ","ヨイヤミレーヴ","シラベノオト","タカネフブキ","ミナギルダイヤ","ソウゲンノカゼ","クレナイホシ","ヤグルマシオン","トキワノホコリ","ナギサファング","ライメイオーザ"];
+const CAND_PAL = ["#d98a3a","#7a6fd0","#41a86b","#d56f9a","#5fb0b0","#b08a3a","#6f86df","#cf5a50","#5aa86b","#a06fc4","#d8b13a","#4f8fd0","#cf5fa0","#7aa83a","#c47a4a","#9a9aab","#3fb0a0","#c060c0"];
+(function padCandidates(){
+  const abK=Object.keys(ABILITIES), stK=Object.keys(STYLES), aptOpts=[1200,1400,1600,1800,2000];
+  while(CANDIDATES.length < 30){
+    const i=CANDIDATES.length-12, ability=abK[i%abK.length], power=randInt(64,92);
+    CANDIDATES.push({
+      name:CAND_EXTRA[i%CAND_EXTRA.length], color:CAND_PAL[i%CAND_PAL.length], silk:CAND_PAL[i%CAND_PAL.length],
+      coat:choice(COAT_KEYS), ability, bestStyle:[choice(stK)],
+      desc:"新進気鋭の挑戦者。"+ABILITIES[ability].name+"を武器に上を狙う。",
+      stats:{
+        speed:randInt(66,93), stamina:randInt(64,92), instant:randInt(64,93), temper:randInt(52,90),
+        power, guts:randInt(60,92), aptDist:choice(aptOpts),
+        gate:clamp(power+(ability==="rocket"?9:0)+randInt(-6,6),50,99),
+        corner:clamp(power+(ability==="corner"?9:0)+randInt(-6,6),50,99),
+      },
+    });
+  }
+})();
+
 /* ---------- ライバル馬名プール（すべて架空） ---------- */
 const RIVAL_NAMES = [
   "ハルカゼロード","ミネノキセキ","アサヒレガロ","ヨゾラノオウジャ","ナナホシボーイ",
@@ -855,6 +883,8 @@ function renderHorseList(){
       ${statRow("スタミナ",h.stats.stamina)}
       ${statRow("瞬発力",h.stats.instant)}
       ${statRow("パワー",h.stats.power)}
+      ${statRow("出脚",h.stats.gate)}
+      ${statRow("コーナリング",h.stats.corner)}
       ${statRow("根性",h.stats.guts)}
       ${statRow("気性",h.stats.temper)}
     `;
@@ -944,6 +974,8 @@ function deriveParams(stats, ability){
   const aptF = clamp(0.45 - mismatch/650, -0.7, 0.45);   // +0.45(ピッタリ)〜−0.7(大きく外れる)
   const pow = (stats.power!=null)? stats.power : 74;
   const guts = (stats.guts!=null)? stats.guts : 74;
+  const gateS = (stats.gate!=null)? stats.gate : pow;       // 出脚（無ければ従来どおりpower）
+  const cornerS = (stats.corner!=null)? stats.corner : pow; // コーナリング（無ければpower）
   let keen = clamp((76-stats.temper)/20, 0, 1.5);
   if(ability==="hotblood") keen = clamp(keen+0.45, 0, 1.9);     // 気性難：折り合いがさらに難しい
   return {
@@ -957,9 +989,9 @@ function deriveParams(stats, ability){
     drainResist: clamp((0.74 + (stats.stamina-72)*0.014) * (1+aptF*0.12), 0.52, 1.55),
     keenScore: keen,
     whipPow: 1.25 + (stats.instant-70)*0.020,
-    // パワー：ゲートの出・コーナーの距離ロス軽減
-    gatePow: clamp((pow-70)/30, -0.4, 1.0),
-    cornerSkill: clamp((pow-72)/45, 0, 0.55),
+    // 出脚：ゲートの出（発走の前付け・初速） / コーナリング：コーナーの距離ロス軽減
+    gatePow: clamp((gateS-70)/30, -0.4, 1.0),
+    cornerSkill: clamp((cornerS-72)/45, 0, 0.55),
     // 根性：接戦での粘り（叩き合い）
     gutsF: clamp((guts-70)/30, 0, 1.2),
   };
@@ -988,10 +1020,13 @@ function buildField(){
   names.forEach((nm,i)=>{
     const st = choice(styleKeys);
     const ab = choice(RIVAL_ABILITIES);
+    const power=randInt(62,92);
     const stats = {
       speed:randInt(66,93), stamina:randInt(66,93),
       instant:randInt(64,92), temper:randInt(55,90),
-      power:randInt(62,92), guts:randInt(60,92), aptDist:choice([1200,1400,1600,1800,2000]),
+      power, guts:randInt(60,92), aptDist:choice([1200,1400,1600,1800,2000]),
+      gate:clamp(power+(ab==="rocket"?9:0)+randInt(-6,6),50,99),
+      corner:clamp(power+(ab==="corner"?9:0)+randInt(-6,6),50,99),
     };
     if(ab==="hotblood"){ stats.speed+=4; stats.instant+=4; }   // 気性難＝素の能力は高い
     field.push(makeHorse({

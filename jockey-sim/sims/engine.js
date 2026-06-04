@@ -29,8 +29,8 @@ function derive(s,ab,DIST,cond){
     kickInst:(s.instant-72)*0.052,
     accelUp:1.5+(s.instant-70)*0.030+(s.power-72)*0.006,
     drainResist:clamp((0.74+(s.stamina-72)*0.014)*(1+aptF*0.12),0.52,1.55)*cond,
-    keen, gatePow:clamp((s.power-70)/30,-0.4,1),
-    cornerSkill:clamp((s.power-72)/45,0,0.55),
+    keen, gatePow:clamp(((s.gate!=null?s.gate:s.power)-70)/30,-0.4,1),
+    cornerSkill:clamp(((s.corner!=null?s.corner:s.power)-72)/45,0,0.55),
     gutsF:clamp((s.guts-70)/30,0,1.2),
   };
 }
@@ -45,7 +45,9 @@ function race(DIST, P){
   const F=[];
   for(let i=0;i<12;i++){
     const style=ch(SK), ab=ch(ABK);
-    const s={speed:ri(66,93),stamina:ri(66,93),instant:ri(64,92),temper:ri(55,90),power:ri(62,92),guts:ri(60,92),aptDist:ch([1200,1400,1600,1800,2000])};
+    const power=ri(62,92);
+    const s={speed:ri(66,93),stamina:ri(66,93),instant:ri(64,92),temper:ri(55,90),power,guts:ri(60,92),aptDist:ch([1200,1400,1600,1800,2000]),
+             gate:clamp(power+(ab==="rocket"?9:0)+ri(-6,6),50,99), corner:clamp(power+(ab==="corner"?9:0)+ri(-6,6),50,99)};
     if(ab==="hotblood"){s.speed+=4;s.instant+=4;}
     const cr=Math.random(), cond=cr<0.22?1.04:cr<0.74?1.0:cr<0.90?0.985:0.965;
     const pref=STYLES[style].pref;

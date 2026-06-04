@@ -46,7 +46,7 @@ check("Save.ok=true（localStorage有効）", () => window.Save && window.Save.o
 check("新規DOM要素が存在", () => ["lane-ind","li-in","li-front","li-out","result-jockey","sta-lab","comp-lab"].every(id=>!!$(id)));
 
 console.log("\n=== 画面遷移フロー ===");
-check("タイトル→馬選択→12枚", () => { click("btn-to-select"); return $("horse-list").children.length===12; });
+check("タイトル→馬選択→30枚", () => { click("btn-to-select"); return $("horse-list").children.length===30; });
 check("馬選択→作戦", () => { $("horse-list").children[2].dispatchEvent(new window.Event("click",{bubbles:true})); click("btn-to-tactic"); return $("screen-tactic").classList.contains("active"); });
 check("距離2000＋差し選択→出走可", () => {
   Array.from($("dist-grid").children).find(b=>/2000/.test(b.textContent)).dispatchEvent(new window.Event("click",{bubbles:true}));

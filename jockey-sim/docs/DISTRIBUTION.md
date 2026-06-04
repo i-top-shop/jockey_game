@@ -52,17 +52,17 @@ npm run serve       # → http://localhost:8080/ をブラウザで開く
 
 ### 初回セットアップ
 1. GitHub で**新規リポジトリを作成**（例 `hizumeoto`）
-2. ローカルから push：
+2. ローカルから push（**現在の作業ブランチ `feat/aaa-phase1` がそのまま自動デプロイ対象**）：
    ```
    git remote add origin https://github.com/<user>/<repo>.git
-   git push -u origin master        # ← 監視ブランチは main / master
+   git push -u origin feat/aaa-phase1
    ```
 3. GitHub の **Settings → Pages → Build and deployment → Source** を **「GitHub Actions」**に設定
-4. 以降、main/master に push するたびに自動ビルド＆デプロイ
+4. 以降、`main` / `master` / `feat/aaa-phase1` に push するたびに自動ビルド＆デプロイ（手動実行も可）
 5. 公開URL：**`https://<user>.github.io/<repo>/`**
 
 > ワークフローが `jockey-sim/build.js` を実行し `jockey-sim/dist/` を Pages へ配信します（依存ゼロ・`npm install` 不要）。
-> 現在の作業ブランチ `feat/aaa-phase1` で動かすなら、`pages.yml` の `branches:` にそのブランチ名を足すか、master へマージしてください。
+> 監視ブランチは `pages.yml` の `branches:` で管理（現在 `main, master, feat/aaa-phase1`）。本筋へ寄せる時は master へマージ。
 
 ### 手早く試すだけなら（ビルド/Action無し）
 リポジトリ root から Pages を有効化し、`https://<user>.github.io/<repo>/jockey-sim/jockey_game.html` を直接開いてもOK

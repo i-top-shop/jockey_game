@@ -1,0 +1,2426 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<!-- スマホ縦持ち最適化：ピンチズーム無効・セーフエリア対応 -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>蹄音(ひづめおと) -ジョッキーの判断-</title>
+
+<!-- 和の中継風フォント（表示用：Dela Gothic One / 本文：Zen Kaku Gothic New） -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+<style>
+/* ========================================================================
+   テーマ変数（黄昏の競馬中継：深いティールの芝 / 黒スレートUI / 金・緋の差し色）
+   I-TOP向けメモ：色やバランスはここを変えれば全画面に反映されます
+   ======================================================================== */
+:root{
+  --bg:#0c1218;            /* 画面外背景 */
+  --panel:#121b24;         /* パネル */
+  --panel-2:#0e161d;       /* パネル濃いめ */
+  --line:#23323f;          /* 罫線 */
+  --turf:#16412f;          /* 芝 */
+  --turf-2:#1d5239;        /* 芝ハイライト */
+  --ink:#eef3f0;           /* 主要文字 */
+  --ink-dim:#9fb1ad;       /* 副文字 */
+  --gold:#e8b84b;          /* 金（アクセント） */
+  --gold-2:#caa033;
+  --crimson:#d23b3b;       /* 緋（仕掛け/ムチ系） */
+  --blue:#4aa3df;          /* 折り合い */
+  --green:#3fbf6f;         /* スタミナ良 */
+  --amber:#f0a93b;         /* 注意 */
+  --red:#e2473e;           /* 危険 */
+  --shadow:0 10px 30px rgba(0,0,0,.45);
+}
+
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body{ margin:0; padding:0; height:100%; }
+body{
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #15222c 0%, var(--bg) 60%),
+    var(--bg);
+  color:var(--ink);
+  font-family:"Zen Kaku Gothic New", system-ui, sans-serif;
+  overscroll-behavior:none;
+  touch-action:manipulation;          /* ダブルタップ拡大の遅延を排除 */
+  -webkit-user-select:none; user-select:none;
+}
+
+/* アプリ本体：スマホ幅に固定、縦100% */
+#app{
+  position:relative;
+  max-width:480px; margin:0 auto;
+  height:100vh; height:100dvh;        /* iOS等のアドレスバー対策 */
+  overflow:hidden;
+  background:var(--panel-2);
+  box-shadow:var(--shadow);
+  display:flex; flex-direction:column;
+}
+
+/* 画面切替：.screen を .active で表示 */
+.screen{ display:none; flex:1; min-height:0; }
+.screen.active{ display:flex; flex-direction:column; animation:screenIn .4s ease; }
+@keyframes screenIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+
+/* スクロールする画面（タイトル/選択/結果） */
+.scroll{ flex:1; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:22px 18px 28px; }
+
+h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; letter-spacing:.02em; }
+.dim{ color:var(--ink-dim); }
+.center{ text-align:center; }
+
+/* ====== 汎用ボタン ====== */
+.btn{
+  appearance:none; border:none; cursor:pointer;
+  font-family:"Zen Kaku Gothic New", sans-serif; font-weight:700;
+  color:var(--ink); background:#1b2a35; border:1px solid var(--line);
+  border-radius:14px; padding:16px 18px; font-size:16px;
+  transition:transform .05s ease, background .15s ease, border-color .15s ease;
+}
+.btn:active{ transform:translateY(1px) scale(.99); }
+.btn.primary{
+  background:linear-gradient(180deg, var(--gold) 0%, var(--gold-2) 100%);
+  color:#1a1206; border-color:#8a6c1d; font-family:"Dela Gothic One",sans-serif;
+  box-shadow:0 8px 18px rgba(232,184,75,.25);
+}
+.btn.ghost{ background:transparent; }
+.btn.block{ width:100%; }
+
+/* ====== タイトル画面 ====== */
+.title-wrap{ flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:18px; padding:24px; }
+.logo{
+  text-align:center; line-height:1.05;
+}
+.logo .sub{ font-family:"Zen Kaku Gothic New"; font-weight:500; font-size:13px; color:var(--gold); letter-spacing:.35em; margin-bottom:10px; }
+.logo .main{ font-family:"Dela Gothic One"; font-size:46px; color:var(--ink);
+  text-shadow:0 2px 0 #000, 0 0 24px rgba(232,184,75,.18); }
+.logo .en{ font-family:"Dela Gothic One"; font-size:13px; color:var(--ink-dim); letter-spacing:.45em; margin-top:8px; }
+.title-badge{
+  margin-top:6px; font-size:12px; color:var(--ink-dim);
+  border:1px solid var(--line); border-radius:999px; padding:6px 14px;
+}
+.gallop-deco{
+  width:100%; max-width:320px; height:74px; opacity:.9;
+}
+
+/* ====== 選択カード ====== */
+.section-title{ display:flex; align-items:baseline; gap:10px; margin-bottom:14px; }
+.section-title .no{ font-family:"Dela Gothic One"; color:var(--gold); font-size:22px; }
+.section-title h2{ font-size:18px; }
+.section-title .note{ margin-left:auto; font-size:11px; color:var(--ink-dim); }
+
+.card{
+  background:var(--panel); border:1px solid var(--line); border-radius:16px;
+  padding:14px; margin-bottom:12px; position:relative; overflow:hidden;
+  transition:border-color .15s ease, transform .05s ease;
+}
+.card:active{ transform:scale(.997); }
+.card.selected{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold) inset, 0 8px 20px rgba(0,0,0,.35); }
+.card .silk{ position:absolute; right:-18px; top:-18px; width:84px; height:84px; border-radius:50%; opacity:.16; }
+.card .row1{ display:flex; align-items:center; gap:10px; }
+.card .hname{ font-family:"Dela Gothic One"; font-size:18px; }
+.card .htag{ font-size:11px; color:#1a1206; background:var(--gold); padding:3px 8px; border-radius:6px; font-weight:700; }
+.card .style-tag{ font-size:11px; color:var(--ink); background:#22323f; border:1px solid var(--line); padding:3px 8px; border-radius:6px; }
+.abil-line{ display:flex; align-items:center; gap:7px; margin:8px 0 4px; flex-wrap:wrap; }
+.abil-line b{ font-size:13px; color:#f0c862; }
+.abil-badge{ font-size:10px; font-weight:700; color:#1a1407; background:linear-gradient(180deg,#f0c862,#d8a93f); padding:2px 7px; border-radius:5px; }
+.abil-desc{ font-size:11px; color:var(--ink-dim); }
+.apt-badge{ font-size:10px; font-weight:700; color:#06243a; background:linear-gradient(180deg,#76c6e8,#3f9fd0); padding:2px 7px; border-radius:5px; }
+.section-sub{ font-size:13px; font-weight:700; color:var(--ink); margin:4px 2px 8px; }
+.section-sub .dim2{ font-weight:400; font-size:11px; color:var(--ink-dim); }
+.dist-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.dist-btn .t-name{ font-family:"Dela Gothic One"; font-size:17px; }
+.card .desc{ font-size:12.5px; color:var(--ink-dim); margin:8px 0 10px; line-height:1.5; }
+
+/* ステータスバー（小） */
+.stat{ display:grid; grid-template-columns:62px 1fr 30px; align-items:center; gap:8px; margin:5px 0; }
+.stat .lab{ font-size:12px; color:var(--ink-dim); }
+.stat .meter{ height:8px; background:#0c151c; border-radius:6px; overflow:hidden; border:1px solid var(--line); }
+.stat .meter > i{ display:block; height:100%; border-radius:6px;
+  background:linear-gradient(90deg,#2e6f9e,#4aa3df); }
+.stat .val{ font-size:12px; text-align:right; color:var(--ink); font-variant-numeric:tabular-nums; }
+
+/* 作戦選択 */
+.tactic-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.tactic{
+  background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 12px;
+  text-align:left; transition:border-color .15s ease, transform .05s ease;
+}
+.tactic:active{ transform:scale(.98); }
+.tactic.selected{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold) inset; }
+.tactic .t-name{ font-family:"Dela Gothic One"; font-size:16px; }
+.tactic .t-kana{ font-size:11px; color:var(--gold); margin-bottom:6px; }
+.tactic .t-desc{ font-size:11.5px; color:var(--ink-dim); line-height:1.45; }
+.fit{ font-size:11px; margin-top:6px; }
+.fit.good{ color:var(--green); }
+.fit.mid{ color:var(--amber); }
+.fit.bad{ color:var(--red); }
+
+/* ====== レース画面 ====== */
+#screen-race.active{ display:flex; flex-direction:column; }
+
+/* 上部HUD */
+.hud{
+  padding:8px 12px 6px; background:linear-gradient(180deg,#0e161d,#0c1319);
+  border-bottom:1px solid var(--line);
+}
+.hud .top{ display:flex; align-items:center; gap:10px; font-size:12px; }
+.hud .course{ color:var(--gold); font-weight:700; }
+.hud .pace{ margin-left:auto; color:var(--ink-dim); }
+.hud .pace b{ color:var(--ink); }
+.rankbox{ display:flex; align-items:baseline; gap:6px; }
+.rankbox .r{ font-family:"Dela Gothic One"; font-size:26px; line-height:1; color:var(--gold); }
+.rankbox .of{ font-size:12px; color:var(--ink-dim); }
+
+/* 進行ゲージ（残り距離） */
+.progress{ margin-top:7px; height:12px; background:#0a1117; border:1px solid var(--line);
+  border-radius:8px; position:relative; overflow:hidden; }
+.progress > .fill{ position:absolute; left:0; top:0; bottom:0; width:0%;
+  background:linear-gradient(90deg,#2c6f4c,#3fbf6f); }
+.progress > .mark400{ position:absolute; top:-3px; bottom:-3px; left:75%; width:2px; background:var(--gold); }
+.progress > .mark400::after{ content:"残400"; position:absolute; top:-13px; left:-14px; font-size:9px; color:var(--gold); white-space:nowrap; }
+.distlabel{ display:flex; justify-content:space-between; font-size:11px; color:var(--ink-dim); margin-top:3px; }
+.distlabel b{ color:var(--ink); font-variant-numeric:tabular-nums; }
+
+/* キャンバス（コース） */
+.track-wrap{ position:relative; flex:1; min-height:0; background:#0a0e14; }
+#track{ width:100%; height:100%; display:block; }
+.cam-btn{ position:absolute; top:10px; right:56px; z-index:6; font-family:"Zen Kaku Gothic New"; font-size:11px; font-weight:700;
+  color:#dfe7ee; background:rgba(12,18,24,.62); border:1px solid rgba(255,255,255,.18); border-radius:8px;
+  padding:7px 10px; backdrop-filter:blur(4px); cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.cam-btn:active{ transform:scale(.95); }
+.sound-btn{ position:fixed; top:9px; right:9px; z-index:60; width:38px; height:38px; border-radius:10px;
+  border:1px solid rgba(255,255,255,.18); background:rgba(12,18,24,.72); color:#fff; font-size:17px;
+  cursor:pointer; -webkit-tap-highlight-color:transparent; backdrop-filter:blur(4px); }
+.sound-btn:active{ transform:scale(.94); }
+.sound-btn.off{ opacity:.55; }
+/* レース中の各種オーバーレイ */
+.overlay-center{ position:absolute; inset:0; z-index:8; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; pointer-events:none; text-align:center; }
+.gate-text{ font-family:"Dela Gothic One"; font-size:40px; color:var(--ink);
+  text-shadow:0 3px 0 #000, 0 0 30px rgba(0,0,0,.6); }
+.gate-sub{ font-size:13px; color:var(--ink-dim); margin-top:8px; }
+.go-flash{ font-family:"Dela Gothic One"; font-size:64px; color:var(--gold);
+  text-shadow:0 0 30px rgba(232,184,75,.5); animation:pop .25s ease; }
+@keyframes pop{ from{ transform:scale(.6); opacity:0 } to{ transform:scale(1); opacity:1 } }
+.flash-msg{ position:absolute; top:10px; left:50%; transform:translateX(-50%);
+  background:rgba(210,59,59,.92); color:#fff; padding:6px 14px; border-radius:999px;
+  font-size:13px; font-weight:700; opacity:0; transition:opacity .2s ease; pointer-events:none; }
+.flash-msg.show{ opacity:1; }
+.straight-banner{ position:absolute; top:8px; left:50%; transform:translateX(-50%);
+  font-family:"Dela Gothic One"; font-size:18px; color:var(--gold); letter-spacing:.2em;
+  opacity:0; transition:opacity .3s ease; text-shadow:0 2px 8px #000; }
+.straight-banner.show{ opacity:1; }
+.going b{ color:#cfe0ff; }
+.myinfo{ display:flex; gap:8px; margin-top:7px; }
+.chip{ font-size:11px; font-weight:700; padding:3px 9px; border-radius:7px; border:1px solid var(--line); }
+.chip-style{ color:#e7eef4; background:#22323f; }
+.chip-abil{ color:#1a1407; background:linear-gradient(180deg,#f0c862,#d8a93f); border-color:#caa23a; }
+.abil-msg{ position:absolute; top:46%; left:50%; transform:translate(-50%,-50%) scale(.7);
+  font-family:"Dela Gothic One"; font-size:26px; color:#1a1407; letter-spacing:.04em;
+  background:linear-gradient(180deg,#ffdf8a,#e8b84b); padding:8px 22px; border-radius:12px;
+  box-shadow:0 6px 24px rgba(0,0,0,.5), 0 0 0 3px rgba(255,255,255,.35) inset;
+  opacity:0; transition:opacity .18s ease, transform .18s ease; pointer-events:none; white-space:nowrap; }
+.abil-msg.show{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+
+/* マイ馬ゲージ（スタミナ・折り合い） */
+.gauges{ display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:7px 12px;
+  background:#0e161d; border-top:1px solid var(--line); }
+.gauge .glab{ font-size:11px; color:var(--ink-dim); display:flex; justify-content:space-between; margin-bottom:3px; }
+.gauge .glab b{ font-variant-numeric:tabular-nums; }
+.gbar{ height:12px; background:#0a1117; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+.gbar > i{ display:block; height:100%; width:50%; border-radius:8px; transition:width .12s linear, background .2s linear; }
+
+/* 操作ボタン群（親指で押しやすい配置：下部固定） */
+.controls{ background:linear-gradient(180deg,#0e161d,#0a1117); border-top:1px solid var(--line);
+  padding:8px 10px calc(10px + env(safe-area-inset-bottom)); }
+.ctrl-row{ display:grid; gap:8px; }
+.ctrl-row.pos{ grid-template-columns:1fr 1fr; margin-bottom:8px; }
+.ctrl-row.gear{ grid-template-columns:1fr 1fr; }
+.ctrl-row.whip{ grid-template-columns:1fr; margin-top:8px; }
+.cbtn.whip{ background:linear-gradient(180deg,#e0a23a,#c4842a); color:#1a1206; border-color:#8a6c1d; min-height:50px; }
+.cbtn.whip .ja{ font-size:16px; letter-spacing:.12em; }
+.cbtn.whip .en{ color:#5a4310; }
+.cbtn.whip:disabled{ background:#2a2620; color:#6b6457; border-color:#3a342a; }
+.cbtn.whip:disabled .en{ color:#6b6457; }
+.cbtn.whip.cooling{ filter:brightness(.8) saturate(.7); }
+.cbtn{
+  appearance:none; border:1px solid var(--line); border-radius:14px;
+  color:var(--ink); background:#1a2935; font-family:"Zen Kaku Gothic New"; font-weight:700;
+  font-size:15px; padding:14px 6px; min-height:58px; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+  transition:transform .05s ease, background .12s ease, border-color .12s ease, opacity .12s;
+}
+.cbtn:active{ transform:translateY(1px) scale(.98); }
+.cbtn:disabled{ opacity:.4; }
+.cbtn .ja{ font-size:17px; }
+.cbtn .en{ font-size:9px; color:var(--ink-dim); letter-spacing:.1em; }
+.cbtn.pos{ background:#15303a; border-color:#1f4a56; }
+.cbtn.gdown{ background:#163a52; border-color:#1f5b78; }
+.cbtn.gup{ background:#3a2a16; border-color:#7a5a1d; }
+.cbtn.gup .ja{ color:#f0c862; }
+/* スピードメーター */
+.speedo{ position:absolute; top:8px; left:8px; z-index:6; width:128px;
+  background:rgba(8,12,18,.66); border:1px solid rgba(255,255,255,.12); border-radius:12px;
+  padding:6px 8px 7px; backdrop-filter:blur(4px); text-align:center; }
+.speedo .sp-svg{ width:100%; height:50px; display:block; }
+.speedo .sp-read{ margin-top:-26px; line-height:1; }
+.speedo .sp-read b{ font-family:"Dela Gothic One"; font-size:23px; color:#fff; }
+.speedo .sp-read span{ font-size:9px; color:var(--ink-dim); display:block; margin-top:2px; letter-spacing:.1em; }
+.speedo .sp-gearbox{ margin-top:5px; display:flex; align-items:baseline; justify-content:center; gap:4px; }
+.speedo .sp-gearbox span{ font-size:10px; color:var(--ink-dim); }
+.speedo .sp-gearbox b{ font-family:"Dela Gothic One"; font-size:18px; color:#f0c862; }
+.speedo .sp-gearbox small{ font-size:10px; color:#cfe0ff; }
+.speedo .gear-pips{ display:flex; gap:3px; justify-content:center; margin-top:5px; }
+.speedo .gear-pips .pip{ flex:1; height:5px; border-radius:2px; background:rgba(255,255,255,.13); }
+.speedo .gear-pips .pip.on{ background:#5fb0b0; }
+.speedo .gear-pips .pip.push{ background:#e0a23a; }
+.speedo .gear-pips .pip.hot{ background:#d23b3b; }
+/* 実況 */
+.commentary{ position:absolute; left:8px; right:8px; bottom:8px; z-index:5; pointer-events:none;
+  background:rgba(8,12,18,.72); border:1px solid rgba(255,255,255,.1); border-radius:10px;
+  padding:7px 11px; font-size:12.5px; line-height:1.45; color:#e7eef4; backdrop-filter:blur(4px);
+  min-height:18px; opacity:0; transition:opacity .25s ease; }
+.commentary.show{ opacity:1; }
+.commentary .lead{ color:#f0c862; font-weight:700; }
+/* 出走前カード（出馬表・展開予測） */
+.gate-card{ width:min(94%,420px); background:rgba(12,18,26,.92); border:1px solid rgba(255,255,255,.14);
+  border-radius:14px; padding:13px 15px; margin-bottom:14px; text-align:left; box-shadow:0 12px 40px rgba(0,0,0,.5); }
+.gate-card .gc-row{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin:3px 0; font-size:12.5px; }
+.gate-card .gc-row .k{ color:var(--ink-dim); }
+.gate-card .gc-pace{ font-family:"Dela Gothic One"; font-size:16px; color:#f0c862; }
+.gate-card .gc-read{ font-size:12px; color:#cfe0ff; margin-top:7px; line-height:1.5; border-top:1px solid rgba(255,255,255,.1); padding-top:7px; }
+.gate-card .gc-you{ margin-top:7px; font-size:12.5px; }
+.gate-card .gc-you b{ color:#fff; }
+.cbtn:disabled{ opacity:.35; pointer-events:none; }
+.cbtn.cooling{ opacity:.5; }
+
+/* スタートボタン（ゲート時のみ） */
+.start-zone{ padding:10px 14px calc(14px + env(safe-area-inset-bottom)); }
+#btn-start{
+  width:100%; min-height:64px; font-size:22px; font-family:"Dela Gothic One";
+  border-radius:16px; color:#1a1206;
+  background:linear-gradient(180deg,#e8b84b,#caa033); border:1px solid #8a6c1d;
+}
+#btn-start:disabled{ filter:grayscale(.6) brightness(.7); }
+
+/* ====== 結果画面 ====== */
+.result-head{ text-align:center; margin-bottom:14px; }
+.result-rank{ font-family:"Dela Gothic One"; font-size:64px; line-height:1; }
+.result-rank.win{ color:var(--gold); text-shadow:0 0 30px rgba(232,184,75,.4); }
+.result-rank.place{ color:var(--ink); }
+.result-rank.lose{ color:var(--ink-dim); }
+.result-sub{ font-size:13px; color:var(--ink-dim); margin-top:6px; }
+.result-reward{ margin-top:12px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+.result-reward .pill{ font-size:12px; font-weight:700; padding:5px 11px; border-radius:999px; border:1px solid var(--line); background:#161f2a; color:#e7eef4; }
+.result-reward .pill b{ color:var(--gold); }
+.result-reward .pill.up{ background:linear-gradient(180deg,#3a2f12,#2a2410); border-color:#caa23a; }
+.result-reward .pill.up b{ color:#ffdf8a; }
+/* シネマ用ビネット */
+.vignette{ position:absolute; inset:0; z-index:4; pointer-events:none;
+  box-shadow:inset 0 0 120px 24px rgba(0,0,0,.55); }
+/* スピードライン（高速で出る放射状の流線） */
+.speedlines{ position:absolute; inset:0; z-index:5; pointer-events:none; opacity:0; transition:opacity .2s ease;
+  background:repeating-conic-gradient(from 0deg at 50% 44%, rgba(255,255,255,0) 0deg 3.4deg, rgba(255,255,255,.11) 3.4deg 4deg);
+  -webkit-mask:radial-gradient(circle at 50% 44%, transparent 32%, #000 78%);
+          mask:radial-gradient(circle at 50% 44%, transparent 32%, #000 78%); }
+/* 実況の順位ボード */
+.order-board{ position:absolute; top:128px; left:8px; z-index:6; width:98px; display:none;
+  background:rgba(8,12,18,.62); border:1px solid rgba(255,255,255,.12); border-radius:9px; padding:5px 5px 6px; backdrop-filter:blur(4px); }
+.order-board .ob-head{ font-size:9px; letter-spacing:.18em; color:var(--ink-dim); text-align:center; margin-bottom:3px; }
+.order-board .ob-row{ display:flex; align-items:center; gap:5px; padding:2px 3px; border-radius:4px; font-size:11px; }
+.order-board .ob-row.me{ background:rgba(232,184,75,.22); }
+.order-board .ob-pos{ width:12px; font-family:"Dela Gothic One"; font-size:11px; color:var(--gold); text-align:center; }
+.order-board .ob-dot{ width:11px; height:11px; border-radius:3px; border:1px solid rgba(255,255,255,.5); flex:none; }
+.order-board .ob-num{ color:#e7eef4; font-weight:700; }
+/* 写真判定 */
+.photo-finish{ position:absolute; inset:0; z-index:9; display:none; align-items:center; justify-content:center; pointer-events:none; }
+.photo-finish.show{ display:flex; }
+.photo-finish .pf-label{ font-family:"Dela Gothic One"; font-size:30px; color:#fff; letter-spacing:.08em;
+  text-shadow:0 4px 24px #000; background:rgba(10,14,20,.5); padding:12px 26px; border-radius:14px; border:1px solid rgba(255,255,255,.25); animation:pfPulse 1s ease infinite; }
+@keyframes pfPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.06); } }
+.photo-finish .pf-flash{ position:absolute; inset:0; background:#fff; opacity:0; }
+.photo-finish .pf-flash.go{ animation:pfFlash .5s ease; }
+@keyframes pfFlash{ 0%{ opacity:.9; } 100%{ opacity:0; } }
+.advice{ background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--gold);
+  border-radius:10px; padding:12px 14px; margin:14px 0; font-size:13px; line-height:1.6; }
+.advice b{ color:var(--gold); }
+.result-table{ width:100%; border-collapse:collapse; font-size:13px; margin-top:6px; }
+.result-table th,.result-table td{ padding:8px 6px; border-bottom:1px solid var(--line); text-align:left; }
+.result-table th{ color:var(--ink-dim); font-weight:500; font-size:11px; }
+.result-table td.r{ font-family:"Dela Gothic One"; color:var(--gold); width:30px; }
+.result-table tr.me td{ background:rgba(232,184,75,.08); }
+.result-table tr.won td.r{ color:var(--gold); font-weight:800; }
+.result-table .num{ font-variant-numeric:tabular-nums; text-align:right; }
+.result-actions{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; }
+
+.hr{ height:1px; background:var(--line); margin:16px 0; border:none; }
+.foot-note{ font-size:10.5px; color:#6f7f7b; line-height:1.6; text-align:center; margin-top:14px; }
+.title-career{ margin-top:12px; font-size:12px; color:#cfe0ff; background:rgba(20,28,38,.6); border:1px solid var(--line); border-radius:999px; padding:7px 16px; }
+.title-career b{ color:var(--gold); }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+<div id="app">
+  <button id="btn-sound" class="sound-btn" aria-label="サウンド切替">🔊</button>
+
+  <!-- ============ 1. タイトル画面 ============ -->
+  <section id="screen-title" class="screen active">
+    <div class="title-wrap">
+      <div class="logo">
+        <div class="sub">日本競馬風 ジョッキー体験</div>
+        <div class="main">蹄音</div>
+        <div class="en">H I Z U M E O T O</div>
+      </div>
+      <!-- 装飾：疾走する馬群のシルエット（SVG） -->
+      <svg class="gallop-deco" viewBox="0 0 320 74" fill="none" aria-hidden="true">
+        <line x1="0" y1="60" x2="320" y2="60" stroke="#23323f" stroke-width="2"/>
+        <g fill="#1d5239">
+          <ellipse cx="60" cy="50" rx="18" ry="9"/><ellipse cx="120" cy="46" rx="18" ry="9"/>
+          <ellipse cx="185" cy="52" rx="18" ry="9"/><ellipse cx="248" cy="47" rx="18" ry="9"/>
+        </g>
+        <g fill="#e8b84b"><circle cx="120" cy="46" r="5"/></g>
+        <g stroke="#2c4a3c" stroke-width="2" opacity=".7">
+          <line x1="20" y1="40" x2="38" y2="40"/><line x1="14" y1="48" x2="34" y2="48"/>
+          <line x1="80" y1="34" x2="100" y2="34"/><line x1="150" y1="42" x2="168" y2="42"/>
+        </g>
+      </svg>
+      <button id="btn-to-select" class="btn primary block" style="max-width:280px;">レースに挑む</button>
+      <div class="title-badge">12頭立て ／ 芝1200・1600・2000m</div>
+      <div class="title-career" id="title-career" style="display:none;"></div>
+      <div class="foot-note">本ゲームの馬名・騎手名・競馬場名はすべて架空です。<br>実在のJRA・団体・人物とは一切関係ありません。</div>
+    </div>
+  </section>
+
+  <!-- ============ 2. 馬選択画面 ============ -->
+  <section id="screen-horse" class="screen">
+    <div class="scroll">
+      <div class="section-title"><span class="no">01</span><h2>騎乗する馬を選ぶ</h2><span class="note">脚質の向き不向きが変わる</span></div>
+      <div id="horse-list"></div>
+      <button id="btn-to-tactic" class="btn primary block" disabled>この馬で出走 →</button>
+      <button id="btn-back-title" class="btn ghost block" style="margin-top:10px;">← タイトルへ</button>
+    </div>
+  </section>
+
+  <!-- ============ 3. 作戦選択画面 ============ -->
+  <section id="screen-tactic" class="screen">
+    <div class="scroll">
+      <div class="section-title"><span class="no">02</span><h2>作戦（脚質）を決める</h2></div>
+      <div id="chosen-horse" class="card" style="margin-bottom:16px;"></div>
+      <div class="section-sub">距離を選ぶ <span class="dim2">― 馬の得意距離に合わせると有利</span></div>
+      <div class="dist-grid" id="dist-grid"></div>
+      <div class="section-sub" style="margin-top:16px;">脚質を選ぶ</div>
+      <div class="tactic-grid" id="tactic-grid"></div>
+      <div style="margin-top:14px;" class="dim center" id="tactic-hint">脚質を選ぶと相性が表示されます</div>
+      <button id="btn-to-race" class="btn primary block" style="margin-top:16px;" disabled>枠入り → レース開始</button>
+      <button id="btn-back-horse" class="btn ghost block" style="margin-top:10px;">← 馬を選び直す</button>
+    </div>
+  </section>
+
+  <!-- ============ 4. レース画面 ============ -->
+  <section id="screen-race" class="screen">
+    <!-- 上部HUD -->
+    <div class="hud">
+      <div class="top">
+        <span class="course">北嶺競馬場</span>
+        <span class="dim" id="race-dist-label">芝1600m</span>
+        <span class="going">馬場 <b id="going-val">—</b></span>
+        <span class="pace">ペース <b id="pace-val">—</b></span>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px; margin-top:6px;">
+        <div class="rankbox"><span class="r" id="rank-val">-</span><span class="of">/ <b id="rank-of">12</b>番手</span></div>
+        <div style="flex:1;">
+          <div class="progress">
+            <div class="fill" id="prog-fill"></div>
+            <div class="mark400"></div>
+          </div>
+          <div class="distlabel"><span>残り <b id="dist-val">1600</b> m</span><span id="phase-val">道中</span></div>
+        </div>
+      </div>
+      <div class="myinfo">
+        <span class="chip chip-style" id="my-style">脚質 —</span>
+        <span class="chip chip-abil" id="my-abil">固有 —</span>
+      </div>
+    </div>
+
+    <!-- コース（canvas） -->
+    <div class="track-wrap">
+      <canvas id="track"></canvas>
+      <div class="straight-banner" id="straight-banner">直 線！</div>
+      <div class="abil-msg" id="abil-msg">末脚爆発！</div>
+      <div class="flash-msg" id="flash-msg">前が壁！</div>
+      <div class="commentary" id="commentary"></div>
+      <div class="vignette"></div>
+      <div class="speedlines" id="speedlines"></div>
+      <div class="order-board" id="order-board"></div>
+      <div class="photo-finish" id="photo-finish"><div class="pf-flash" id="pf-flash"></div><div class="pf-label">📷 写真判定</div></div>
+      <div class="speedo" id="speedo">
+        <svg viewBox="0 0 120 64" class="sp-svg">
+          <path d="M 10 60 A 50 50 0 0 1 110 60" fill="none" stroke="rgba(255,255,255,.13)" stroke-width="9" stroke-linecap="round"/>
+          <path id="sp-arc" d="M 10 60 A 50 50 0 0 1 110 60" fill="none" stroke="#5fb0b0" stroke-width="9" stroke-linecap="round" stroke-dasharray="157.1" stroke-dashoffset="157.1"/>
+        </svg>
+        <div class="sp-read"><b id="sp-kmh">0</b><span>km/h</span></div>
+        <div class="sp-gearbox"><span>ギア</span><b id="sp-gear">4</b><small id="sp-gear-label">巡航</small></div>
+        <div class="gear-pips" id="gear-pips"><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i></div>
+      </div>
+      <div class="overlay-center" id="gate-overlay">
+        <div class="gate-card" id="gate-card"></div>
+        <div class="gate-text" id="gate-text">枠入り</div>
+        <div class="gate-sub" id="gate-sub">まもなくゲートが開きます</div>
+      </div>
+    </div>
+
+    <!-- マイ馬ゲージ -->
+    <div class="gauges">
+      <div class="gauge">
+        <div class="glab"><span>スタミナ</span><b id="sta-num">100</b></div>
+        <div class="gbar"><i id="sta-bar"></i></div>
+      </div>
+      <div class="gauge">
+        <div class="glab"><span>折り合い</span><b id="comp-num">100</b></div>
+        <div class="gbar"><i id="comp-bar"></i></div>
+      </div>
+    </div>
+
+    <!-- スタートゾーン（ゲート時のみ表示） -->
+    <div class="start-zone" id="start-zone">
+      <button id="btn-start" disabled>スタート</button>
+    </div>
+
+    <!-- 操作ボタン（レース中のみ表示） -->
+    <div class="controls" id="controls" style="display:none;">
+      <div class="ctrl-row pos">
+        <button class="cbtn pos" id="btn-in"><span class="ja">◀ 内</span><span class="en">RAIL</span></button>
+        <button class="cbtn pos" id="btn-out"><span class="ja">外 ▶</span><span class="en">WIDE</span></button>
+      </div>
+      <div class="ctrl-row gear">
+        <button class="cbtn gdown" id="btn-geardown"><span class="ja">▼ ギア</span><span class="en">DOWN</span></button>
+        <button class="cbtn gup" id="btn-gearup"><span class="ja">ギア ▲</span><span class="en">UP</span></button>
+      </div>
+      <div class="ctrl-row whip">
+        <button class="cbtn whip" id="btn-whip" disabled><span class="ja">ムチ</span><span class="en" id="whip-en">直線で追う</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5. 結果画面 ============ -->
+  <section id="screen-result" class="screen">
+    <div class="scroll">
+      <div class="result-head">
+        <div class="result-rank" id="result-rank">-</div>
+        <div class="result-sub" id="result-sub"></div>
+        <div class="result-reward" id="result-reward"></div>
+      </div>
+      <div class="advice" id="result-advice"></div>
+      <table class="result-table">
+        <thead><tr><th>着</th><th>馬名</th><th>脚質</th><th class="num">人気</th><th class="num">着差</th></tr></thead>
+        <tbody id="result-body"></tbody>
+      </table>
+      <div class="result-actions">
+        <button id="btn-replay" class="btn primary">同じ馬でもう一度</button>
+        <button id="btn-rehorse" class="btn">馬を選び直す</button>
+      </div>
+      <button id="btn-to-title2" class="btn ghost block" style="margin-top:10px;">タイトルへ戻る</button>
+      <div class="foot-note">馬名・騎手名・競馬場名はすべて架空です。</div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+"use strict";
+/* ========================================================================================
+   蹄音(HIZUMEOTO) — ジョッキー判断ゲーム MVP
+   設計方針：
+     見た目ではなく「いつ仕掛けるか／馬群をどうさばくか／折り合いをつけるか」で
+     着順が変わることを最優先。レースは物理モデルで毎フレーム計算する。
+   主要メカニクス：
+     - 折り合い(composure)：気性が荒い馬は道中で力む。抑えると回復、放置で力んでスタミナを浪費。
+     - スタミナ(stamina)  ：速く走るほど・仕掛けるほど・力むほど減る。尽きると失速。
+     - 馬群ブロック        ：前に馬がいると抜けない。内は混みやすく・外は距離ロス。
+     - 仕掛けタイミング    ：早すぎると直線で脚が上がる／遅すぎると届かない。瞬発力で最適点が変わる。
+     - ムチ                ：瞬間加速。スタミナと瞬発力に応じて反応。終盤で効く。
+   ======================================================================================== */
+
+/* ---------- 調整用パラメータ（ゲームバランスはここをいじる） ---------- */
+const CFG = {
+  DIST: 1600,            // レース距離(m)
+  N: 12,                 // 出走頭数（12頭立て）
+  cruiseBase: 18.8,      // 道中の基準巡航速度(m/s)。脚質の cruiseGain がこれに加減算される
+  dtCap: 0.06,           // 1フレームの最大時間（タブ復帰時の暴走防止）
+  finishMult: 5,         // 自分がゴール後、他馬決着を早送りする倍率
+  timeScale: 1.5,        // レース進行の時間倍率（体感を短縮しつつ、判断できる速さに）
+  laneRate: 1.9,         // 横移動速度(レーン/秒)
+  groundLossStraight: 0.0005, // 直線で外を回るロス（小さい）
+  groundLossBend: 0.0026,     // コーナーで外を回るロス（大きい＝イン取りの価値）
+  // ブロック判定
+  blockGap: 6.5,         // 前の馬との縦距離がこれ未満でブロック対象
+  blockLane: 0.95,       // 横の近さがこれ未満で同一進路とみなす
+  blockSideGap: 4.2,     // 横にこの距離内で並走されると進路を変えにくい（袋に入る）
+  // スタミナ
+  staFatigue: 24,        // この値を下回ると失速し始める
+  // 折り合い
+  compPull: 28,          // これ未満で「力む」ペナルティ発生
+  compRecover: 46,       // これ以上に回復したらペナルティ解除（ヒステリシス）
+  straightDist: 1200,    // 残り400m＝直線開始
+};
+
+/* ---------- 小物ユーティリティ ---------- */
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const rand=(a,b)=>a+Math.random()*(b-a);
+const randInt=(a,b)=>Math.floor(rand(a,b+1));
+const choice=arr=>arr[Math.floor(Math.random()*arr.length)];
+const $=id=>document.getElementById(id);
+
+/* ---------- 脚質定義 ---------- */
+// nige=逃げ, senko=先行, sashi=差し, oikomi=追込
+const STYLES = {
+  nige:   { name:"逃げ",   kana:"にげ",   prefLane:[0,1.6], cruiseGain:+0.55, staBurn:1.08, kickGain:0.62, commit:1080, commitRemain:520, desc:"先頭で押し切る。前残り狙い。飛ばすぶんスタミナ勝負。" },
+  senko:  { name:"先行",   kana:"せんこう",prefLane:[0.6,2.6],cruiseGain:+0.22, staBurn:1.00, kickGain:0.88, commit:1150, commitRemain:450, desc:"好位を確保。最も安定。立ち回り重視。" },
+  sashi:  { name:"差し",   kana:"さし",   prefLane:[1.4,4.0],cruiseGain:-0.22, staBurn:0.92, kickGain:1.08, commit:1230, commitRemain:370, desc:"中団で脚を溜め、直線で伸びる。瞬発力型。" },
+  oikomi: { name:"追込",   kana:"おいこみ",prefLane:[2.2,5.2],cruiseGain:-0.46,staBurn:0.84, kickGain:1.22, commit:1290, commitRemain:310, desc:"後方一気。末脚は最強だが届かぬ事も。" },
+};
+
+/* ---------- 固有能力（特殊能力）。補正は5〜15%程度＝単独で勝敗は決めない ---------- */
+const ABILITIES = {
+  rocket:   { name:"ロケットスタート", desc:"ゲートの出が速く、出遅れにくい" },
+  settle:   { name:"折り合い名人",    desc:"道中の掛かりロスを軽減する" },
+  burst:    { name:"末脚爆発",        desc:"残り400mで末脚が一段伸びる" },
+  breaker:  { name:"馬群突破",        desc:"前が詰まっても怯まず捌ける" },
+  corner:   { name:"コーナー巧者",    desc:"コーナーで距離ロスが小さい" },
+  stayer:   { name:"スタミナ王",      desc:"終盤の失速が小さい" },
+  fighter:  { name:"勝負根性",        desc:"接戦でもうひと伸びする" },
+  widerush: { name:"大外一気",        desc:"外を回しての追込が強い" },
+  frontsoul:{ name:"逃げ魂",          desc:"先頭に立つと闘志で上昇する" },
+  hotblood: { name:"気性難",          desc:"能力は高いが折り合いが難しい" },
+  mud:      { name:"雨の鬼",          desc:"重い馬場で一変する" },
+  fast:     { name:"高速巧者",        desc:"良い馬場で切れ味が増す" },
+};
+const RIVAL_ABILITIES = Object.keys(ABILITIES);
+
+/* ---------- 毛色（共通骨格＋色差し替え。points=たてがみ/尾/脚先の色） ---------- */
+const COATS = {
+  kage:   { name:"鹿毛",   body:0x6e4524, points:0x241712 },
+  kurokage:{name:"黒鹿毛", body:0x432c1d, points:0x1c120c },
+  kuri:   { name:"栗毛",   body:0x9c5a2a, points:0xb9824a },
+  ao:     { name:"青鹿毛", body:0x2e2319, points:0x14100b },
+  ashi:   { name:"芦毛",   body:0xb6b0a8, points:0x8d877f },
+};
+const COAT_KEYS = Object.keys(COATS);
+
+
+// 各馬の個性を覚えてもらうため数値は固定。気性は「高いほど折り合いがつきやすい」。aptDist=得意距離。
+const CANDIDATES = [
+  { name:"テッカコウガ", color:"#d23b3b", silk:"#d23b3b", coat:"kuri", ability:"frontsoul",
+    desc:"圧倒的なスピードで押し切る逃げ馬。スタミナは細く気性も激しいが、先頭に立つと闘志が燃える。短〜マイル向き。",
+    bestStyle:["nige","senko"],
+    stats:{ speed:94, stamina:66, instant:72, temper:44, power:82, guts:74, aptDist:1400 } },
+  { name:"シラユキレイ", color:"#cfd6da", silk:"#9fb1ad", coat:"ashi", ability:"settle",
+    desc:"突出はないがバランス型で素直な気性。折り合いに苦労せず、どの作戦・距離もこなせる万能馬。迷ったらこの馬。",
+    bestStyle:["senko","sashi"],
+    stats:{ speed:79, stamina:81, instant:80, temper:88, power:76, guts:82, aptDist:1600 } },
+  { name:"サツキアロー", color:"#4aa3df", silk:"#4aa3df", coat:"kage", ability:"burst",
+    desc:"破壊的な瞬発力が武器。中団〜後方で脚を溜め、直線一気で差し切る。仕掛けを我慢できれば末脚が爆発する。マイル向き。",
+    bestStyle:["sashi","oikomi"],
+    stats:{ speed:78, stamina:73, instant:96, temper:74, power:72, guts:78, aptDist:1600 } },
+  { name:"クロガネオウ", color:"#7d8c95", silk:"#3fbf6f", coat:"kurokage", ability:"stayer",
+    desc:"無尽蔵のスタミナを誇る馬。瞬発力は地味だが、早めに動くロングスパートで真価を発揮。中距離（2000m）向き。",
+    bestStyle:["oikomi","senko"],
+    stats:{ speed:75, stamina:96, instant:60, temper:86, power:84, guts:88, aptDist:2000 } },
+  { name:"ライカゲイザー", color:"#f0a23a", silk:"#f0a23a", coat:"kage", ability:"rocket",
+    desc:"短距離の申し子。ロケットスタートで一気にハナを奪う電撃戦が身上。スタミナは保たないので距離は短く。短距離向き。",
+    bestStyle:["nige","senko"],
+    stats:{ speed:92, stamina:60, instant:84, temper:58, power:86, guts:66, aptDist:1200 } },
+  { name:"ソフィアノーブル", color:"#b06fd0", silk:"#b06fd0", coat:"ashi", ability:"corner",
+    desc:"コーナーの立ち回りが絶品。インを立ち回ってロスなく運び、直線で抜け出す。器用なマイラー。マイル向き。",
+    bestStyle:["sashi","senko"],
+    stats:{ speed:80, stamina:82, instant:86, temper:80, power:84, guts:78, aptDist:1600 } },
+  { name:"ヤミカゼゴウ", color:"#3f6fc0", silk:"#3f6fc0", coat:"ao", ability:"hotblood",
+    desc:"能力は最上級だが折り合いが難しい曲者。御し切れれば誰も止められない。マイル〜中距離向き・上級者向け。",
+    bestStyle:["sashi","oikomi"],
+    stats:{ speed:90, stamina:78, instant:92, temper:40, power:74, guts:80, aptDist:1800 } },
+  { name:"テツジンマル", color:"#5aa86b", silk:"#5aa86b", coat:"kurokage", ability:"fighter",
+    desc:"勝負根性の塊。叩き合いになると一段伸びて先着する。スタミナ豊富で長い距離が合う。中距離（2000m）向き。",
+    bestStyle:["senko","sashi"],
+    stats:{ speed:78, stamina:90, instant:76, temper:82, power:82, guts:92, aptDist:2000 } },
+  { name:"ハヤテシューター", color:"#e8b040", silk:"#e8b040", coat:"kage", ability:"widerush",
+    desc:"後方一気の追込馬。最終コーナーで外へ持ち出し、大外から豪快に差し切る。瞬発力は屈指。中距離向き。",
+    bestStyle:["oikomi","sashi"],
+    stats:{ speed:80, stamina:80, instant:94, temper:76, power:76, guts:80, aptDist:1800 } },
+  { name:"スキマカイザー", color:"#2f9a8a", silk:"#2f9a8a", coat:"kurokage", ability:"breaker",
+    desc:"馬群を割って伸びる勝負師。前が壁でも怯まず、狭い進路をこじ開ける。器用で頼れるマイラー。マイル向き。",
+    bestStyle:["sashi","senko"],
+    stats:{ speed:82, stamina:78, instant:88, temper:78, power:86, guts:82, aptDist:1600 } },
+  { name:"アメフリオー", color:"#6a78b8", silk:"#6a78b8", coat:"ao", ability:"mud",
+    desc:"道悪巧者。良馬場では平凡でも、雨で渋った馬場で一変する重馬場の鬼。先行して粘る。マイル〜中距離向き。",
+    bestStyle:["senko","nige"],
+    stats:{ speed:84, stamina:84, instant:74, temper:80, power:86, guts:84, aptDist:1800 } },
+  { name:"コウソクヒメ", color:"#d06a96", silk:"#d06a96", coat:"ashi", ability:"fast",
+    desc:"高速馬場の申し子。良い馬場でこそ切れ味が際立つ、軽い走りのスピードスター。短〜マイル向き。",
+    bestStyle:["senko","sashi"],
+    stats:{ speed:88, stamina:72, instant:88, temper:82, power:80, guts:74, aptDist:1400 } },
+];
+
+/* ---------- ライバル馬名プール（すべて架空） ---------- */
+const RIVAL_NAMES = [
+  "ハルカゼロード","ミネノキセキ","アサヒレガロ","ヨゾラノオウジャ","ナナホシボーイ",
+  "セイランダッシュ","コハクノユメ","ライデンフウマ","ホクトシューター","ミナトブリーズ",
+  "ゲンブノタテ","スズカゲンセイ","フブキノオト","タイガクレスト","アオバノヒカリ",
+  "シノノメグロウ","ヤマトホマレ","リンドウクイン","カゲロウマイ","ソラノカケラ",
+];
+const RIVAL_COLORS = ["#e08a3a","#8e6fd0","#3fbf6f","#df6fa0","#5fb0b0","#b0833a","#6f86df","#c45050","#5aa86b","#a06fc4","#d8b13a","#4f8fd0","#cf5fa0","#7aa83a","#c47a4a","#9a9aa6"];
+
+/* ---------- ゲーム状態 ---------- */
+const state = {
+  screen:"title",
+  selectedHorseIdx:null,
+  selectedStyle:null,
+  selectedDistance:1600,   // 1200 / 1600 / 2000
+  field:[],          // 出走全馬
+  player:null,       // プレイヤー馬への参照
+  race:null,         // レース進行データ
+  raf:null,
+};
+
+/* ============================ 画面遷移 ============================ */
+function showScreen(id){
+  state.screen = id;
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  $("screen-"+id).classList.add("active");
+  if(id==="title"){
+    const C=state.career, el=$("title-career");
+    if(el){ if(C&&C.races>0){ el.style.display="block"; el.innerHTML=`騎手成績　<b>${C.wins}</b>勝 / ${C.races}戦　騎手P <b>${C.points}</b>　獲得賞金 <b>${C.funds}</b>万`; } else el.style.display="none"; }
+  }
+}
+
+/* ============================ 馬選択画面の描画 ============================ */
+function renderHorseList(){
+  const wrap = $("horse-list"); wrap.innerHTML="";
+  CANDIDATES.forEach((h,idx)=>{
+    const fit = h.bestStyle.map(s=>STYLES[s].name).join("・");
+    const abil = ABILITIES[h.ability];
+    const card = document.createElement("div");
+    card.className = "card" + (state.selectedHorseIdx===idx?" selected":"");
+    card.innerHTML = `
+      <div class="silk" style="background:${h.silk}"></div>
+      <div class="row1">
+        <span class="hname">${h.name}</span>
+        <span class="style-tag">${fit}向き</span>
+      </div>
+      <div class="abil-line"><span class="abil-badge">固有</span><b>${abil.name}</b><span class="abil-desc">${abil.desc}</span></div>
+      <div class="abil-line"><span class="apt-badge">適性</span><b>${aptLabel(h.stats.aptDist)}</b><span class="abil-desc">得意 ${h.stats.aptDist}m 前後</span></div>
+      <div class="desc">${h.desc}</div>
+      ${statRow("スピード",h.stats.speed)}
+      ${statRow("スタミナ",h.stats.stamina)}
+      ${statRow("瞬発力",h.stats.instant)}
+      ${statRow("パワー",h.stats.power)}
+      ${statRow("根性",h.stats.guts)}
+      ${statRow("気性",h.stats.temper)}
+    `;
+    card.addEventListener("click",()=>{
+      state.selectedHorseIdx = idx;
+      renderHorseList();
+      $("btn-to-tactic").disabled = false;
+    });
+    wrap.appendChild(card);
+  });
+}
+function statRow(label,val){
+  return `<div class="stat"><span class="lab">${label}</span>
+    <span class="meter"><i style="width:${val}%"></i></span>
+    <span class="val">${val}</span></div>`;
+}
+
+/* ============================ 作戦選択画面の描画 ============================ */
+const DISTANCES = [
+  { m:1200, name:"短距離", sub:"スピード勝負・前残り" },
+  { m:1600, name:"マイル", sub:"万能・最もバランス" },
+  { m:2000, name:"中距離", sub:"スタミナと我慢比べ" },
+];
+function aptLabel(d){ return d<=1200?"短距離":d<=1400?"マイル（短め）":d<=1600?"マイル":d<=1800?"マイル〜中距離":"中距離"; }
+function distFit(aptDist, m){ const d=Math.abs(m-aptDist); return d<=200?["good","◎ ピッタリ"]:d<=400?["mid","○ こなせる"]:["bad","△ 忙しい/長い"]; }
+function renderTacticScreen(){
+  const h = CANDIDATES[state.selectedHorseIdx];
+  // 選択中の馬カード（得意距離つき）
+  $("chosen-horse").innerHTML = `
+    <div class="silk" style="background:${h.silk}"></div>
+    <div class="row1"><span class="hname">${h.name}</span><span class="htag">騎乗馬</span></div>
+    <div class="abil-line"><span class="abil-badge">固有</span><b>${ABILITIES[h.ability].name}</b><span class="abil-desc">${ABILITIES[h.ability].desc}</span></div>
+    <div class="abil-line"><span class="apt-badge">適性</span><b>${aptLabel(h.stats.aptDist)}</b><span class="abil-desc">得意距離 ${h.stats.aptDist}m 前後</span></div>
+    <div class="desc">${h.desc}</div>`;
+  // 距離グリッド
+  const dg = $("dist-grid"); dg.innerHTML="";
+  DISTANCES.forEach(d=>{
+    const [fc,ft] = distFit(h.stats.aptDist, d.m);
+    const b = document.createElement("button");
+    b.className = "tactic dist-btn" + (state.selectedDistance===d.m?" selected":"");
+    b.innerHTML = `<div class="t-name">${d.m}m</div><div class="t-kana">${d.name}</div>
+      <div class="t-desc">${d.sub}</div><div class="fit ${fc}">${ft}</div>`;
+    b.addEventListener("click",()=>{ state.selectedDistance=d.m; renderTacticScreen(); });
+    dg.appendChild(b);
+  });
+  // 作戦グリッド
+  const grid = $("tactic-grid"); grid.innerHTML="";
+  Object.keys(STYLES).forEach(key=>{
+    const st = STYLES[key];
+    const t = document.createElement("button");
+    t.className = "tactic" + (state.selectedStyle===key?" selected":"");
+    t.innerHTML = `<div class="t-kana">${st.kana}</div>
+      <div class="t-name">${st.name}</div>
+      <div class="t-desc">${st.desc}</div>
+      <div class="fit ${fitClass(h,key)}">${fitText(h,key)}</div>`;
+    t.addEventListener("click",()=>{
+      state.selectedStyle = key;
+      renderTacticScreen();
+      $("btn-to-race").disabled = false;
+      $("tactic-hint").textContent = `${state.selectedDistance}m・「${st.name}」で出走します`;
+    });
+    grid.appendChild(t);
+  });
+}
+function fitClass(h,key){ return h.bestStyle.includes(key)?"good":(adjacentStyle(h,key)?"mid":"bad"); }
+function fitText(h,key){
+  if(h.bestStyle.includes(key)) return "◎ best：この馬に合う";
+  if(adjacentStyle(h,key)) return "○ 無難にこなせる";
+  return "△ 持ち味を出しにくい";
+}
+// 隣接脚質（ある程度こなせる）かどうかの簡易判定
+function adjacentStyle(h,key){
+  const order=["nige","senko","sashi","oikomi"];
+  const bi=h.bestStyle.map(s=>order.indexOf(s));
+  const ki=order.indexOf(key);
+  return bi.some(b=>Math.abs(b-ki)===1);
+}
+
+/* ============================ 馬ステータス → 走行パラメータ変換 ============================ */
+// スピード/スタミナ/瞬発力/気性 を実際の物理係数へ。
+function deriveParams(stats, ability){
+  // 距離適性：得意距離(aptDist)と当日距離(CFG.DIST)の差で決まる。
+  //   差0で最大ボーナス、離れるほどペナルティ＝「馬に合った距離を選ぶ」ことが重要に。
+  const aptDist = (stats.aptDist!=null)? stats.aptDist : 1600;
+  const raceDist = CFG.DIST || 1600;
+  const mismatch = Math.abs(raceDist - aptDist);
+  const aptF = clamp(0.45 - mismatch/650, -0.7, 0.45);   // +0.45(ピッタリ)〜−0.7(大きく外れる)
+  const pow = (stats.power!=null)? stats.power : 74;
+  const guts = (stats.guts!=null)? stats.guts : 74;
+  let keen = clamp((76-stats.temper)/20, 0, 1.5);
+  if(ability==="hotblood") keen = clamp(keen+0.45, 0, 1.9);     // 気性難：折り合いがさらに難しい
+  return {
+    // 全開時の素の最高速＝スピード依存（＋距離適性の補正）
+    baseTop: 19.4 + (stats.speed-78)*0.072 + aptF*0.30,
+    // 瞬発力による末脚の伸び（脚質 kickGain で増幅）
+    kickInst: (stats.instant-72)*0.052,
+    // 加速の鋭さ＝瞬発力＋パワー
+    accelUp: 1.5 + (stats.instant-70)*0.030 + (pow-72)*0.006,
+    // スタミナ持ち（距離適性が外れるとスタミナ面でも苦しくなる）
+    drainResist: clamp((0.74 + (stats.stamina-72)*0.014) * (1+aptF*0.12), 0.52, 1.55),
+    keenScore: keen,
+    whipPow: 1.25 + (stats.instant-70)*0.020,
+    // パワー：ゲートの出・コーナーの距離ロス軽減
+    gatePow: clamp((pow-70)/30, -0.4, 1.0),
+    cornerSkill: clamp((pow-72)/45, 0, 0.55),
+    // 根性：接戦での粘り（叩き合い）
+    gutsF: clamp((guts-70)/30, 0, 1.2),
+  };
+}
+// 直線での「末脚」の最高速＝素の最高速＋脚質×瞬発力（スタミナ枯渇でこの上限が下がる）
+function topSpeed(h){
+  return h.p.baseTop + STYLES[h.style].kickGain * h.p.kickInst;
+}
+
+/* ============================ 出走馬の生成 ============================ */
+function buildField(){
+  const field = [];
+  const player = CANDIDATES[state.selectedHorseIdx];
+
+  // 1) プレイヤー馬
+  field.push(makeHorse({
+    name:player.name, color:player.color, isPlayer:true,
+    style:state.selectedStyle, stats:{...player.stats},
+    ability:player.ability, coat:player.coat, markings:randMarkings(),
+  }));
+
+  // 2) ライバル（N-1頭）：ランダム脚質・能力・固有・毛色
+  const names = [...RIVAL_NAMES].sort(()=>Math.random()-0.5).slice(0,CFG.N-1);
+  const colors=[...RIVAL_COLORS].sort(()=>Math.random()-0.5);
+  const styleKeys = Object.keys(STYLES);
+  names.forEach((nm,i)=>{
+    const st = choice(styleKeys);
+    const ab = choice(RIVAL_ABILITIES);
+    const stats = {
+      speed:randInt(66,93), stamina:randInt(66,93),
+      instant:randInt(64,92), temper:randInt(55,90),
+      power:randInt(62,92), guts:randInt(60,92), aptDist:choice([1200,1400,1600,1800,2000]),
+    };
+    if(ab==="hotblood"){ stats.speed+=4; stats.instant+=4; }   // 気性難＝素の能力は高い
+    field.push(makeHorse({
+      name:nm, color:colors[i%colors.length], isPlayer:false, style:st,
+      stats, ability:ab, coat:choice(COAT_KEYS), markings:randMarkings(),
+    }));
+  });
+
+  // 3) 馬体重・調子（コンディション）を付与
+  field.forEach(h=>{
+    const cr=Math.random();
+    h.condition = cr<0.22? {label:"絶好調", f:1.04} : cr<0.74? {label:"普通", f:1.0}
+                : cr<0.90? {label:"地味", f:0.985} : {label:"不調", f:0.965};
+    const base = 440 + randInt(0,9)*8;                 // 440〜512kg
+    h.weight = base;
+    h.weightChange = randInt(-12,12);                  // 前走比 ±
+    // 調子を派生パラメータへ反映（±数%・単独で勝敗は決めない）
+    h.p.baseTop *= h.condition.f;
+    h.p.drainResist *= h.condition.f;
+  });
+
+  // 4) 人気（オッズ）を隠れ能力で算出 → 強い馬ほど人気（固有・調子も加味）
+  const abBonus = { burst:6, stayer:5, fighter:5, settle:4, corner:4, frontsoul:3, rocket:3, breaker:4, widerush:3, mud:0, fast:2, hotblood:7 };
+  field.forEach(h=>{
+    const s=h.stats;
+    h._ability = s.speed*0.8 + s.stamina*0.8 + s.instant*0.9 + s.power*0.35 + s.guts*0.45 + s.temper*0.15
+               + (abBonus[h.ability]||0) + (h.condition.f-1)*120 + rand(-9,9);
+  });
+  const byAbility=[...field].sort((a,b)=>b._ability-a._ability);
+  byAbility.forEach((h,i)=>{
+    h.popRank = i+1;                                   // 1番人気〜
+    h.odds = (1.7 + i*i*0.32 + rand(0,0.7)).toFixed(1);// それらしい単勝オッズ
+  });
+
+  // 5) ゼッケン番号（1〜N）を割り当て
+  field.forEach((h,i)=> h.num=i+1 );
+
+  state.field = field;
+  state.player = field.find(h=>h.isPlayer);
+}
+
+function makeHorse(o){
+  const p = deriveParams(o.stats, o.ability);
+  const pref = STYLES[o.style].prefLane;
+  return {
+    name:o.name, color:o.color, isPlayer:!!o.isPlayer,
+    style:o.style, stats:o.stats, p,                 // p=派生パラメータ
+    ability:o.ability, coat:o.coat||"kage", markings:o.markings||{blaze:0,socks:[0,0,0,0]},
+    // 動的状態
+    dist:0, lane:rand(pref[0],pref[1]), targetLane:rand(pref[0],pref[1]),
+    speed:0, stamina:100, composure:100,
+    mode:"cruise",         // （AIの内部状態。プレイヤーはギアで制御）
+    gear:4,                // プレイヤーのスピードギア（1〜7、4=巡航）
+    _gearChurn:0, _lastGearDir:0, // ギアの上げ下げの乱れ（悪天候で折り合いに響く）
+    pulling:false,         // 力んでいるか
+    committed:false,       // 仕掛け済みか
+    whipTimer:0, whipCd:0, // （旧ムチ・未使用）
+    // AI用：仕掛け地点は「ゴールまで commitRemain m」＝距離が変わってもスケールする
+    commitDist: (CFG.DIST||1600) - STYLES[o.style].commitRemain + rand(-55,55),
+    blockTimer:0,
+    // 固有能力の発動演出フラグ（一度だけ）
+    _ab:{},
+    // ゴール
+    finished:false, finishTime:0, rank:0,
+    // 計測（主にプレイヤーの講評用）
+    _commitAt:null, _compMin:100, _staAtStraight:null, _blockStraight:0, _whipUses:0,
+  };
+}
+// ランダムな顔・脚の白徴（流星/ソックス等）を生成
+function randMarkings(){
+  const b=Math.random(); const blaze = b<0.34?0 : b<0.62?1 : b<0.82?2 : 3; // 0無/1流星/2大流星/3鼻白
+  const socks=[0,1,2,3].map(()=> Math.random()<0.22?1:0);
+  return { blaze, socks };
+}
+
+/* ============================ レース初期化（ゲート） ============================ */
+function initRace(){
+  Sfx.stopCrowd(); Sfx.stopRumble(); Sfx.hoofPhase=0; Voice.stop();       // サウンドを初期化
+  // 当日距離を確定（コースは共通オーバル。ゴール固定でスタート地点を距離ぶん手前にずらす）
+  CFG.DIST = state.selectedDistance || 1600;
+  CFG.straightDist = CFG.DIST - 400;                              // 残り400m＝直線
+  const startS = ((TRK_P - (CFG.DIST % TRK_P)) % TRK_P);          // dist=DISTでゴール線(s=0)に来る開始s
+  // HUD距離表示・残400マーカー位置を更新
+  const dl=$("race-dist-label"); if(dl) dl.textContent = `芝${CFG.DIST}m`;
+  const m4=document.querySelector(".progress > .mark400"); if(m4) m4.style.left = ((CFG.DIST-400)/CFG.DIST*100)+"%";
+
+  buildField();
+  // 馬場状態（良/稍重/重）。重いほどスタミナ消耗が増える＝雨の鬼/高速巧者が活きる
+  const gr=Math.random();
+  const going = gr<0.62? {label:"良", drain:1.0, fast:true, bad:0}
+              : gr<0.85? {label:"稍重", drain:1.045, fast:false, bad:0.6}
+              :          {label:"重", drain:1.09, fast:false, heavy:true, bad:1.0};
+  state.race = {
+    phase:"gate",       // gate → running → finishing → done
+    raceTime:0,
+    lastTs:performance.now()/1000,
+    gateClock:0,
+    goTime:null,        // ゲートが開いた時刻
+    started:false,
+    going,
+    startS,             // コース上のスタート地点（距離で変わる）
+    leaderSpeedSmooth:CFG.cruiseBase,
+    finishedCount:0,
+    resultShown:false,
+  };
+  // 展開生成：前に行く馬の数からペースを予測（展開予測＝騎手の読み）
+  state.race.forecast = computePaceForecast(state.field);
+
+  // HUDリセット
+  $("controls").style.display="none";
+  $("start-zone").style.display="none";        // 反射神経のスタート押下は廃止（自動発走）
+  $("gate-overlay").style.display="flex";
+  renderGateCard();                            // 出馬表・展開予測カード
+  $("gate-text").textContent="枠入り";
+  $("gate-sub").textContent="まもなく発走です";
+  $("straight-banner").classList.remove("show");
+  const cm=$("commentary"); if(cm){ cm.classList.remove("show"); cm.innerHTML=""; }
+  const pf=$("photo-finish"); if(pf) pf.classList.remove("show");
+  resetPlayerControls();
+
+  showScreen("race");
+  resizeCanvas();          // ※display後に採寸（＋3Dシーン初期化）
+  syncHorseMeshes();       // 出走馬に合わせて3Dモデルを生成
+  // ループ開始
+  cancelAnimationFrame(state.raf);
+  state.race.lastTs = performance.now()/1000;
+  state.raf = requestAnimationFrame(loop);
+}
+
+// 展開予測：逃げ・先行の数とスピードからペースを読む
+function computePaceForecast(field){
+  const front = field.filter(h=> STYLES[h.style].cruiseGain>0);
+  const speedy = front.filter(h=> h.stats.speed>=84).length;
+  const n = front.length;
+  let pace, read;
+  if(n>=6 || speedy>=3){ pace="ハイ";   read="前に行く馬が多く、ハイペース必至。前は早めに苦しくなり、差し・追込が台頭しやすい。"; }
+  else if(n<=2){        pace="スロー"; read="逃げ・先行が手薄でスロー濃厚。前残り・先行有利。後方は届きづらく、早めの進出も一手。"; }
+  else {                pace="平均";   read="平均ペースの見込み。位置取りと仕掛けどころで決まる、紛れの少ない展開。"; }
+  return { pace, read, frontN:n };
+}
+// 出走前カード（出馬表サマリ＋展開予測）を描画
+function renderGateCard(){
+  const el=$("gate-card"); if(!el) return;
+  const r=state.race, p=state.player, fc=r.forecast;
+  const wc = p.weightChange>0? `+${p.weightChange}` : `${p.weightChange}`;
+  el.innerHTML = `
+    <div class="gc-row"><span class="k">レース</span><b>北嶺競馬場　芝${CFG.DIST}m　馬場:${r.going.label}</b></div>
+    <div class="gc-row"><span class="k">想定ペース</span><span class="gc-pace">${fc.pace}</span></div>
+    <div class="gc-read">${fc.read}</div>
+    <div class="gc-you">あなた：<b>${p.name}</b>（${p.num}番・${p.popRank}番人気/単勝${p.odds}倍）<br>
+      脚質 ${STYLES[p.style].name}　固有 ${ABILITIES[p.ability].name}　調子 ${p.condition.label}　馬体重 ${p.weight}kg(${wc})</div>`;
+}
+
+/* ============================ メインループ ============================ */
+/* ============================ サウンド（Web Audio 合成音） ============================ */
+const Sfx = {
+  ctx:null, master:null, on:true, _noise:null, crowdSrc:null, crowdGain:null, rumbleSrc:null, rumbleGain:null, hoofPhase:0,
+  init(){
+    if(this.ctx) return;
+    const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
+    try{
+      this.ctx = new AC();
+      this.master = this.ctx.createGain();
+      this.master.gain.value = this.on ? 0.85 : 0.0001;
+      this.master.connect(this.ctx.destination);
+    }catch(e){ this.ctx=null; }
+  },
+  resume(){ if(this.ctx && this.ctx.state==="suspended") this.ctx.resume(); },
+  noise(){
+    if(this._noise) return this._noise;
+    const ctx=this.ctx, n=Math.floor(ctx.sampleRate*1.0), buf=ctx.createBuffer(1,n,ctx.sampleRate), d=buf.getChannelData(0);
+    for(let i=0;i<n;i++) d[i]=Math.random()*2-1;
+    this._noise=buf; return buf;
+  },
+  hoof(vol, pitch){
+    if(!this.ctx||!this.on) return; const ctx=this.ctx, t=ctx.currentTime, pf=pitch||1;
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type="sine"; o.frequency.setValueAtTime(150*pf,t); o.frequency.exponentialRampToValueAtTime(64*pf,t+0.07);
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.46*vol,t+0.004); g.gain.exponentialRampToValueAtTime(0.0001,t+0.11);
+    o.connect(g).connect(this.master); o.start(t); o.stop(t+0.13);
+    const s=ctx.createBufferSource(); s.buffer=this.noise(); const ng=ctx.createGain(), nf=ctx.createBiquadFilter();
+    nf.type="bandpass"; nf.frequency.value=1500*pf; ng.gain.setValueAtTime(0.15*vol,t); ng.gain.exponentialRampToValueAtTime(0.0001,t+0.07);
+    s.connect(nf).connect(ng).connect(this.master); s.start(t); s.stop(t+0.08);
+  },
+  // ギャロップ＝4ビート（ダ・ダ・ダ・ダッ…と間）。本物の蹄音のリズム
+  gallopStride(vol){
+    if(!this.ctx||!this.on) return; const ctx=this.ctx, t0=ctx.currentTime;
+    const beats=[ [0,0.7,0.98],[0.075,0.85,1.04],[0.145,1.0,0.96],[0.215,0.78,1.08] ]; // [遅延, 音量, ピッチ]
+    for(const b of beats){
+      const t=t0+b[0];
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type="sine"; o.frequency.setValueAtTime(150*b[2],t); o.frequency.exponentialRampToValueAtTime(64*b[2],t+0.07);
+      g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.42*vol*b[1],t+0.004); g.gain.exponentialRampToValueAtTime(0.0001,t+0.1);
+      o.connect(g).connect(this.master); o.start(t); o.stop(t+0.12);
+      const s=ctx.createBufferSource(); s.buffer=this.noise(); const ng=ctx.createGain(), nf=ctx.createBiquadFilter();
+      nf.type="bandpass"; nf.frequency.value=1500; ng.gain.setValueAtTime(0.12*vol*b[1],t); ng.gain.exponentialRampToValueAtTime(0.0001,t+0.06);
+      s.connect(nf).connect(ng).connect(this.master); s.start(t); s.stop(t+0.07);
+    }
+  },
+  hoofTick(delta){
+    if(!this.ctx||!this.on||!state.player) return;
+    const sp=state.player.speed;
+    const stride=7.0; this.hoofPhase += delta; let guard=0;
+    while(this.hoofPhase>=stride && guard<4){ this.hoofPhase-=stride; guard++;
+      const vol=0.42+Math.min(0.55, Math.max(0,sp-10)/14);
+      this.gallopStride(vol);
+    }
+  },
+  // 馬群の地鳴り（低いノイズのループ。スピードで音量UP）
+  startRumble(){ if(!this.ctx||!this.on||this.rumbleSrc) return; const ctx=this.ctx;
+    const s=ctx.createBufferSource(); s.buffer=this.noise(); s.loop=true;
+    const f=ctx.createBiquadFilter(); f.type="lowpass"; f.frequency.value=180;
+    const g=ctx.createGain(); g.gain.value=0.0001;
+    s.connect(f).connect(g).connect(this.master); s.start(); this.rumbleSrc=s; this.rumbleGain=g;
+  },
+  setRumble(level){ if(this.rumbleGain&&this.ctx) this.rumbleGain.gain.setTargetAtTime(level, this.ctx.currentTime, 0.25); },
+  stopRumble(){ if(this.rumbleSrc){ try{this.rumbleSrc.stop();}catch(e){} this.rumbleSrc=null; this.rumbleGain=null; } },
+  whip(){ if(!this.ctx||!this.on) return; const ctx=this.ctx,t=ctx.currentTime;
+    const s=ctx.createBufferSource(); s.buffer=this.noise(); const g=ctx.createGain(), f=ctx.createBiquadFilter();
+    f.type="highpass"; f.frequency.value=2600; g.gain.setValueAtTime(0.5,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.08);
+    s.connect(f).connect(g).connect(this.master); s.start(t); s.stop(t+0.09);
+  },
+  thud(){ if(!this.ctx||!this.on) return; const ctx=this.ctx,t=ctx.currentTime;
+    const s=ctx.createBufferSource(); s.buffer=this.noise(); const g=ctx.createGain(), f=ctx.createBiquadFilter();
+    f.type="lowpass"; f.frequency.value=400; g.gain.setValueAtTime(0.12,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.12);
+    s.connect(f).connect(g).connect(this.master); s.start(t); s.stop(t+0.13);
+  },
+  bell(){ if(!this.ctx||!this.on) return; const ctx=this.ctx,t=ctx.currentTime;
+    [880,1320].forEach(fr=>{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type="triangle"; o.frequency.value=fr;
+      g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.3,t+0.01); g.gain.exponentialRampToValueAtTime(0.0001,t+0.6);
+      o.connect(g).connect(this.master); o.start(t); o.stop(t+0.62); });
+  },
+  blip(freq,dur,type){ if(!this.ctx||!this.on) return; const ctx=this.ctx,t=ctx.currentTime, D=dur||0.08;
+    const o=ctx.createOscillator(),g=ctx.createGain(); o.type=type||"square"; o.frequency.value=freq;
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.16,t+0.005); g.gain.exponentialRampToValueAtTime(0.0001,t+D);
+    o.connect(g).connect(this.master); o.start(t); o.stop(t+D+0.02);
+  },
+  jingle(win){ if(!this.ctx||!this.on) return; const ctx=this.ctx, seq= win?[523,659,784,1047]:[392,440,523];
+    seq.forEach((fr,i)=>{ const t=ctx.currentTime+i*0.13; const o=ctx.createOscillator(),g=ctx.createGain(); o.type="triangle"; o.frequency.value=fr;
+      g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.26,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+0.32);
+      o.connect(g).connect(this.master); o.start(t); o.stop(t+0.34); });
+  },
+  startCrowd(){ if(!this.ctx||!this.on||this.crowdSrc) return; const ctx=this.ctx;
+    const s=ctx.createBufferSource(); s.buffer=this.noise(); s.loop=true;
+    const f=ctx.createBiquadFilter(); f.type="lowpass"; f.frequency.value=720;
+    const g=ctx.createGain(); g.gain.value=0.05;
+    s.connect(f).connect(g).connect(this.master); s.start(); this.crowdSrc=s; this.crowdGain=g;
+  },
+  setCrowd(level){ if(this.crowdGain&&this.ctx) this.crowdGain.gain.setTargetAtTime(level, this.ctx.currentTime, 0.4); },
+  stopCrowd(){ if(this.crowdSrc){ try{this.crowdSrc.stop();}catch(e){} this.crowdSrc=null; this.crowdGain=null; } },
+  toggle(){ this.on=!this.on; if(this.master&&this.ctx) this.master.gain.setTargetAtTime(this.on?0.85:0.0001,this.ctx.currentTime,0.05); return this.on; }
+};
+
+/* ============================ 実況音声（Web Speech・日本語読み上げ） ============================ */
+const Voice = {
+  on:true, voice:null, female:false, _primed:false,
+  supported(){ return typeof window!=="undefined" && 'speechSynthesis' in window; },
+  init(){ if(!this.supported()) return; this.pick(); try{ window.speechSynthesis.onvoiceschanged=()=>this.pick(); }catch(e){} },
+  pick(){ try{ const vs=window.speechSynthesis.getVoices()||[];
+    const ja = vs.filter(v=> ((v.lang||"").toLowerCase().startsWith("ja")) || /japanese|日本/i.test(v.name||""));
+    const MALE=/Otoya|Hattori|Ichiro|Daichi|Takumi|Kenji|Ryo|男性|\bmale\b/i;
+    const FEMALE=/Kyoko|Ayumi|Haruka|Sayaka|Nanami|Mizuki|O-?ren|Sora|Eri|女性|\bfemale\b/i;
+    let v = ja.find(x=>MALE.test(x.name||"")) || ja.find(x=>!FEMALE.test(x.name||"")) || ja[0] || null;
+    this.voice = v; this.female = v ? FEMALE.test(v.name||"") : false;
+  }catch(e){} },
+  prime(){ if(this._primed||!this.supported()) return; this._primed=true; try{ const u=new SpeechSynthesisUtterance(" "); u.volume=0; u.lang="ja-JP"; window.speechSynthesis.speak(u);}catch(e){} },
+  say(text){
+    if(!this.on || !Sfx.on || !this.supported()) return;
+    try{
+      if(!this.voice) this.pick();
+      let t=String(text)
+        .replace(/（[^）]*）|\([^)]*\)/g,"")        // 括弧書きは読まない
+        .replace(/　/g,"、")                          // 全角空白→自然な区切り
+        .replace(/(\d+)\s*[mｍ]/gi,"$1メートル")       // 800m→800メートル
+        .replace(/1着/g,"いっちゃく").replace(/2着/g,"にちゃく").replace(/3着/g,"さんちゃく")
+        .replace(/！+/g,"！");
+      window.speechSynthesis.cancel();              // 最新の実況を優先
+      const u=new SpeechSynthesisUtterance(t);
+      u.lang="ja-JP"; if(this.voice) u.voice=this.voice;
+      u.rate=1.06;                                  // 自然なアナウンサーのテンポ
+      u.pitch=this.female?0.82:0.94;                // 男性実況：低めで落ち着いたトーン
+      u.volume=1.0;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  },
+  stop(){ try{ if(this.supported()) window.speechSynthesis.cancel(); }catch(e){} }
+};
+
+// 接戦のゴール前か（スローモーション判定）
+function slowmoActive(){
+  const f=state.field; if(!f||!f.length) return false;
+  let lead=f[0]; for(const o of f){ if(o.dist>lead.dist) lead=o; }
+  const remain=(CFG.DIST||1600)-lead.dist;
+  if(remain>48 || remain<0) return false;
+  let second=-1; for(const o of f){ if(o===lead) continue; if(o.dist>second) second=o.dist; }
+  return (lead.dist-second) < 3.0;
+}
+function loop(ts){
+  if(state.screen!=="race"){ return; }   // 画面を離れたら停止
+  const now = ts/1000;
+  let dt = now - state.race.lastTs;
+  state.race.lastTs = now;
+  if(dt>CFG.dtCap) dt=CFG.dtCap;
+  if(dt<0) dt=0;
+
+  const ph = state.race.phase;
+  if(ph==="gate"){
+    updateGate(dt);
+  } else if(ph==="running"){
+    const pd0 = state.player ? state.player.dist : 0;
+    let ts = CFG.timeScale;
+    if(slowmoActive()) ts *= 0.42;                  // 接戦のゴール前はスローモーション
+    stepRace(dt*ts);
+    if(state.player) Sfx.hoofTick(state.player.dist - pd0);
+  } else if(ph==="finishing"){
+    let ts = CFG.finishMult;
+    if(slowmoActive()) ts = 0.55;                   // 自分がゴール後でも接戦ならスロー
+    stepRace(dt*ts);          // 残りは早送り（接戦時はスロー）
+  }
+  render();
+  state.raf = requestAnimationFrame(loop);
+}
+
+/* ============================ ゲート演出（カウントダウン） ============================ */
+function updateGate(dt){
+  const r=state.race;
+  r.gateClock += dt;
+  const c=r.gateClock;
+  const gt=$("gate-text"), gs=$("gate-sub"), gc=$("gate-card");
+  if(r.goTime===null){
+    if(c<2.4){ gt.textContent="枠入り"; gs.textContent="展開を読む…"; if(gc) gc.style.display="block"; }
+    else if(c<3.1){ if(r._cd!==3){r._cd=3; Sfx.blip(620,0.09);} gt.textContent="3"; gs.textContent="構えて…"; if(gc) gc.style.display="none"; }
+    else if(c<3.8){ if(r._cd!==2){r._cd=2; Sfx.blip(620,0.09);} gt.textContent="2"; gs.textContent="構えて…"; }
+    else if(c<4.5){ if(r._cd!==1){r._cd=1; Sfx.blip(780,0.09);} gt.textContent="1"; gs.textContent="構えて…"; }
+    else { // 発走（自動・反射神経は不要。出はゲート駐立＝パワー/調子で決まる）
+      r.goTime=c;
+      Sfx.bell(); Sfx.startCrowd(); Sfx.startRumble();
+      gt.innerHTML='<span class="go-flash">発走！</span>';
+      gs.textContent="";
+      beginRun();
+    }
+  }
+}
+
+/* レース本走へ移行（自動発走：出はゲート駐立＝パワー・調子・固有で決まる） */
+function beginRun(){
+  const r=state.race;
+  r.started=true; r.phase="running";
+  $("gate-overlay").style.display="none";
+  $("start-zone").style.display="none";
+  $("controls").style.display="block";
+
+  // プレイヤーのスタート評価（反射神経ではなく、ゲートの出＝パワー＋調子）
+  const gscore = state.player.p.gatePow + (state.player.condition.f-1)*3 + rand(-0.35,0.35);
+  let pq = gscore>0.45? "good" : gscore<-0.15? "slow" : "ok";
+
+  // 全馬のスタート結果を反映（出遅れ＝後方、好発＝前付け＋初速）
+  state.field.forEach(h=>{
+    let q;
+    if(h.isPlayer){ q=pq; }
+    else{
+      const g=h.p.gatePow + (h.condition.f-1)*3 + rand(-0.55,0.55);
+      q = g>0.5? "good" : g<-0.25? "slow" : "ok";
+    }
+    if(h.ability==="rocket" && q==="slow"){ q="ok"; }   // ロケットスタート：出遅れを帳消し
+    const powAdj = h.p.gatePow;
+    let off = q==="good"? rand(1.5,3.0) : q==="slow"? -rand(2.0,4.0) : rand(-0.5,1.0);
+    off += powAdj*1.2;
+    h.dist = Math.max(0, 0.5 + off);        // ゲート位置から発走（好発ほど前へ出る）
+    h.speed = (q==="slow"? 12.5 : 14.5) + powAdj*0.8 + rand(-0.4,0.4);
+    if(h.isPlayer){
+      if(h.ability==="rocket" && q!=="slow") procAbility("ロケットスタート！");
+      if(q==="slow") flash("出遅れ…", "#d23b3b");
+      else if(q==="good") flash("好スタート！", "#3fbf6f");
+    }
+  });
+  // 実況：発走
+  const pq2 = pq==="good"?"好スタートを切った":pq==="slow"?"やや出遅れた":"五分のスタート";
+  jcall(`ゲートが開いた！　${state.player.name}は${pq2}。`, true);
+  if(typeof openStartGate==="function") openStartGate();   // 発走ゲートを開く
+}
+
+/* ============================ レース1ステップ（物理計算） ============================ */
+function stepRace(dt){
+  const r=state.race;
+  r.raceTime += dt;
+  const field=state.field;
+
+  // --- 先頭速度を平滑化（ペース表示・直線判定用） ---
+  let leader=field[0];
+  field.forEach(h=>{ if(h.dist>leader.dist) leader=h; });
+  r.leaderSpeedSmooth += (leader.speed - r.leaderSpeedSmooth)*Math.min(1,dt*3);
+
+  // === パスA：各馬の希望速度→今フレームの暫定速度を算出（ブロック未考慮） ===
+  field.forEach(h=>{
+    if(h.finished) return;
+    const cmd = computeDesired(h, dt, r);
+    // 加速ランプ：目標へ向けて滑らかに（上げは瞬発力依存、減速は速め）
+    const rate = (cmd.target > h.speed ? h.p.accelUp : 2.4);
+    let v = h.speed + clamp(cmd.target - h.speed, -rate*dt, rate*dt);
+    h._cmd = cmd;
+    h._vTentative = Math.max(0, v);
+  });
+
+  // === パスB：馬群ブロック（前に馬がいると抜けない） ===
+  field.forEach(h=>{
+    if(h.finished) return;
+    h.blocked=false;
+    let cap=Infinity;
+    const bGap = (h.ability==="breaker")? CFG.blockGap*0.8 : CFG.blockGap;   // 馬群突破：やや詰まりにくい
+    for(const o of field){
+      if(o===h || o.finished) continue;
+      const gap = o.dist - h.dist;                       // 縦の差（前方が正）
+      if(gap>0 && gap<bGap && Math.abs(o.lane-h.lane)<CFG.blockLane){
+        cap = Math.min(cap, o.speed);                    // 前の馬の速度までしか出せない
+        h.blocked=true;
+      }
+    }
+    if(h.isPlayer && h.blocked && h.ability==="breaker" && !h._ab.breaker){ h._ab.breaker=1; procAbility("馬群突破！"); }
+    let v = h._vTentative;
+    if(h.blocked) v = Math.min(v, cap);
+    h.speed = v;
+
+    // --- 横移動（進路さばき）。横に並走馬がいる側へは動けない＝袋小路 ---
+    let want = clamp(h.targetLane - h.lane, -CFG.laneRate*dt, CFG.laneRate*dt);
+    if(want!==0){
+      const dir = Math.sign(want);
+      let sideBlocked=false;
+      for(const o of field){
+        if(o===h||o.finished) continue;
+        const dgap = Math.abs(o.dist - h.dist);                 // 縦に近い＝並走
+        const side = (o.lane - h.lane)*dir;                     // 進みたい側にいるか
+        if(dgap < CFG.blockSideGap && side>0 && side < 1.05){ sideBlocked=true; break; }
+      }
+      if(sideBlocked){
+        want=0;                                                 // その方向へは出られない
+        if(h.isPlayer && r.raceTime - (h._pocketNag||0) > 1.1){ h._pocketNag=r.raceTime; flash(dir>0?"外に出せない！":"内に入れない！","#c9762e"); }
+      }
+    }
+    h.lane = clamp(h.lane+want, 0, 7);
+
+    // --- 距離前進。コーナーでは外を回るほど大きく距離をロス（イン取りが速い）。
+    //     パワー(cornerSkill)とコーナー巧者でロスを軽減。startS=当日距離のスタート地点 ---
+    const pose = trackPose(r.startS + h.dist);
+    let gl = pose.curve!==0 ? CFG.groundLossBend : CFG.groundLossStraight;
+    if(pose.curve!==0){
+      let red = h.p.cornerSkill;                      // パワー由来
+      if(h.ability==="corner") red += 0.5;            // コーナー巧者
+      gl *= clamp(1 - red, 0.35, 1);
+      if(h.isPlayer && h.ability==="corner" && !h._ab.corner){ h._ab.corner=1; procAbility("コーナー巧者！"); }
+    }
+    const groundFactor = 1 - h.lane*gl;
+    h.dist += h.speed * groundFactor * dt;
+
+    // --- AIの進路判断（道中の駆け引き） ---
+    if(!h.isPlayer){
+      const onBend = pose.curve!==0;
+      if(h.blocked) h.blockTimer+=dt; else h.blockTimer=Math.max(0,h.blockTimer-dt*0.5);
+      // 詰まったら持ち出す（コーナーでは無駄な大外を嫌い控えめ）
+      if(h.blockTimer>0.5){ h.targetLane=Math.min(onBend?4.5:6, h.targetLane+ (onBend?0.6:1.0)); h.blockTimer=0; }
+      const st=STYLES[h.style];
+      if((CFG.DIST - h.dist) > 480){
+        // 道中：逃げ・先行はインの経済コースを確保。差し・追込は中目。わずかにばらつく
+        const home = (st.cruiseGain>0) ? 0.6 : 2.4;
+        h.targetLane += clamp(home - h.targetLane, -0.5,0.5)*dt*0.5 + (Math.random()-0.5)*dt*0.4;
+      } else {
+        // 勝負所：差し・追込は最終コーナーで外へ持ち出してクリアな進路を作る
+        if((h.style==="sashi"||h.style==="oikomi") && h.targetLane<3.4) h.targetLane += dt*0.9;
+        if(st.cruiseGain>0 && h.targetLane>1.4) h.targetLane -= dt*0.5; // 前は内ピタで粘る
+      }
+      h.targetLane=clamp(h.targetLane,0,7);
+    }
+
+    // --- 計測（プレイヤー講評用） ---
+    if(h.isPlayer){
+      h._compMin = Math.min(h._compMin, h.composure);
+      if(h._staAtStraight===null && h.dist>=CFG.straightDist) h._staAtStraight=h.stamina;
+      if(h.dist>=CFG.straightDist && h.blocked) h._blockStraight+=dt;
+    }
+
+    // --- ゴール判定（クロスした瞬間を補間して着差を正確に） ---
+    if(!h.finished && h.dist>=CFG.DIST){
+      const over = h.dist - CFG.DIST;
+      const vEff = Math.max(0.1, h.speed*groundFactor);
+      h.finishTime = r.raceTime - over/vEff;   // 通過時刻
+      h.finished=true;
+      r.finishedCount++;
+    }
+  });
+
+  // === プレイヤーがゴール → 早送りフェーズへ ===
+  if(state.player.finished && r.phase==="running"){
+    r.phase="finishing";
+    Sfx.setCrowd(0.34);   // ゴール＝歓声
+  }
+  // === 全馬決着 → 結果画面 ===
+  if(r.finishedCount>=CFG.N && !r.resultShown){
+    r.resultShown=true;
+    r.phase="done";
+    setTimeout(finishRace, 900);
+  }
+}
+
+/* ---------- 各馬の希望速度・折り合い・スタミナ更新 ---------- */
+function computeDesired(h, dt, r){
+  const comfortable = CFG.cruiseBase;
+  const st = STYLES[h.style];
+  const ab = h.ability;
+  const going = r.going || {drain:1.0, fast:true};
+  let target;
+
+  // 先頭か（誰も前にいない）
+  let isLeader=true;
+  for(const o of state.field){ if(o===h||o.finished) continue; if(o.dist>h.dist){ isLeader=false; break; } }
+
+  // 末脚の最高速（固有・馬場・進路で増減）＝ベース×topMul
+  let topMul = 1;
+  const inStraight = h.dist >= CFG.straightDist;
+  if(ab==="burst"    && inStraight)               topMul += 0.10; // 末脚爆発
+  if(ab==="widerush" && inStraight && h.lane>=4)  topMul += 0.09; // 大外一気
+  if(ab==="frontsoul"&& isLeader)                 topMul += 0.05; // 逃げ魂
+  if(ab==="mud"      && going.heavy)              topMul += 0.06; // 雨の鬼
+  if(ab==="fast"     && going.fast)               topMul += 0.05; // 高速巧者
+  const tTop = topSpeed(h) * topMul;
+
+  if(h.isPlayer){
+    // ---- プレイヤー：7段ギアで目標速度を決める（4=巡航、1=抑える、7=全力） ----
+    const sg = st.cruiseGain;
+    let keenP = h.p.keenScore*0.7;
+    if(ab==="settle") keenP *= 0.55;                 // 折り合い名人
+    const cr   = comfortable + sg;                   // 巡航(ギア4)
+    const idle = cr - 3.0;                            // ギア1（抑える）
+    const maxv = Math.max(tTop + 0.8, cr + 2.6);     // ギア7（全力。脚質×瞬発力で頭打ちが変わる）
+    const throttle = (h.gear - 1) / 6;                // 0〜1
+    target = idle + (maxv - idle) * throttle;
+    if(h.gear>=4) target += keenP*((h.gear-4)/3);     // 上のギアほど気性ぶん前進（行きたがる）
+    if(h.gear>=5 && !h.committed){ h.committed=true; if(h._commitAt===null) h._commitAt=h.dist; }
+    if(h.pulling) target += 1.3;                      // 折り合いを欠くと勝手に行く
+
+    // ギアのガチャつき（上げ下げの乱れ）は時間で収まる
+    h._gearChurn = Math.max(0, (h._gearChurn||0) - dt*0.6);
+
+    if(h.dist < CFG.straightDist + 20){
+      // 折り合い：低ギアで回復、高ギア/力みで低下（気性が荒いほど）
+      if(h.gear<=2){
+        let rec = 12 + Math.max(0,(h.stats.temper-55))*0.15;
+        if(ab==="settle") rec *= 1.3;
+        h.composure += rec*dt;
+      } else if(h.gear>=5 || target > cr + 0.15){
+        let loss = 2.2 + h.p.keenScore*6 + (h.gear>=6? 1.5:0);
+        if(ab==="settle") loss *= 0.55;
+        h.composure -= loss*dt;
+      } else {
+        h.composure += 4*dt;
+      }
+      // 悪天候でギアを上げ下げ（特に反転）すると折り合いを欠く
+      if(going.bad>0 && h._gearChurn>1){
+        let chLoss = going.bad * (h._gearChurn-1) * 1.6;
+        if(ab==="settle") chLoss *= 0.55;
+        h.composure -= chLoss*dt;
+      }
+    }
+    h.composure = clamp(h.composure,0,100);
+    if(!h.pulling && h.composure < CFG.compPull) h.pulling=true;
+    if(h.pulling && h.composure > CFG.compRecover) h.pulling=false;
+
+  } else {
+    // ---- AI：脚質スクリプト＋楽逃げのペース調整 ----
+    if(h.dist >= h.commitDist){
+      target = tTop; h.committed=true;
+    } else {
+      let cg = st.cruiseGain;
+      if(cg>0){
+        let lead=true, leadMargin=Infinity;
+        for(const o of state.field){ if(o===h||o.finished) continue; const gap=o.dist-h.dist; if(gap>0){lead=false;break;} leadMargin=Math.min(leadMargin,-gap); }
+        if(lead && leadMargin>6) cg -= Math.min(0.85,(leadMargin-6)*0.06);
+      }
+      target = comfortable + cg + rand(-0.15,0.15);
+    }
+    h.composure = 100;
+  }
+
+  // ---- ムチ：直線でのひと押し。効果は逓減し、スタミナが無いと反応しない（連打は無意味） ----
+  if(h.whipTimer>0){
+    h.whipTimer -= dt;
+    const respond = h.stamina>12 ? 1 : 0.2;
+    target += (h._whipBoost||0) * respond;
+  }
+  if(h.whipCd>0) h.whipCd -= dt;
+
+  // ---- 根性：終盤、接戦になると粘ってもうひと伸び（叩き合い） ----
+  let battle=false;
+  if(h.dist > CFG.straightDist-120){
+    for(const o of state.field){ if(o===h||o.finished) continue; if(Math.abs(o.dist-h.dist)<3.2){ battle=true; break; } }
+    if(battle){ let gb=0.4 + h.p.gutsF*0.7; if(ab==="fighter") gb*=1.8; target += gb; }
+  }
+
+  // ---- スタミナ消費（速度×脚質×馬場。固有で軽減） ----
+  // 基礎消費を抑え、巡航で脚を持たせる。速度差ぶんの消費は維持＝差し・追込の決め手を残す
+  let drain = 0.34;
+  drain += Math.pow(Math.max(0,h.speed-16.3),1.8)*0.052*st.staBurn;
+  if(!h.isPlayer && h.committed) drain += 1.0;          // AIの仕掛け
+  if(h.isPlayer) drain += Math.max(0, h.gear-4)*0.45;   // 高ギアほど脚を使う（5/6/7で増加）
+  if(h.pulling) drain += 0.9;
+  let goingMul = going.drain; if(ab==="mud" && going.heavy) goingMul = 1.0;
+  drain *= goingMul;
+  if(ab==="stayer" && h.dist>CFG.DIST*0.66) drain *= 0.9;
+  if(ab==="frontsoul" && isLeader) drain *= 0.95;
+  drain = drain/h.p.drainResist;
+  h.stamina = clamp(h.stamina - drain*dt, 0, 100);
+
+  // ---- 失速：スタミナ枯渇で末脚上限が落ちる（スタミナ王は粘る） ----
+  let floor = (ab==="stayer")? 0.76 : 0.66;
+  const surge = h.isPlayer ? (0.6 + Math.max(0,h.gear-4)*0.35) : 0.6;  // 高ギアで上限引き上げ
+  let vCeil = tTop + surge;
+  if(h.stamina < CFG.staFatigue){
+    const f = floor + (1-floor)*(h.stamina/CFG.staFatigue);
+    vCeil = tTop*f + ((h.isPlayer&&h.gear===7)?0.8:0);
+  }
+  if(h.whipTimer>0) vCeil += (h._whipBoost||0)*0.9;   // ムチ中はひと押しぶん上限を許容
+  target = clamp(target, 6, vCeil);
+
+  // ---- 固有発動の演出（プレイヤーのみ・各1回） ----
+  if(h.isPlayer){
+    const A=h._ab;
+    if(ab==="burst" && inStraight && !A.burst){ A.burst=1; procAbility("末脚爆発！"); }
+    if(ab==="widerush" && inStraight && h.lane>=4 && !A.wide){ A.wide=1; procAbility("大外一気！"); }
+    if(ab==="frontsoul" && isLeader && h.dist>250 && !A.front){ A.front=1; procAbility("逃げ魂！"); }
+    if(ab==="fighter" && battle && !A.fight){ A.fight=1; procAbility("勝負根性！"); }
+    if(ab==="stayer" && h.dist>CFG.DIST*0.66 && h.stamina<CFG.staFatigue+10 && !A.stay){ A.stay=1; procAbility("スタミナ温存！"); }
+    if(ab==="mud" && going.heavy && h.dist>200 && !A.mud){ A.mud=1; procAbility("雨の鬼！"); }
+    if(ab==="fast" && going.fast && inStraight && !A.fast){ A.fast=1; procAbility("高速巧者！"); }
+  }
+
+  return { target };
+}
+
+/* ============================ 騎手の操作（7段ギア） ============================ */
+const GEAR_LABEL = ["", "抑える", "ゆったり", "やや控え", "巡航", "押す", "追う", "全力"]; // 1..7
+function resetPlayerControls(){
+  const h=state.player; if(!h) return;
+  h.gear=4; h._gearChurn=0; h._lastGearDir=0;
+  h.whipTimer=0; h.whipCd=0; h._whips=0; h._whipBoost=0;
+  syncGearUI();
+}
+// ムチ：直線（追い出しゾーン）でのひと押し。連打は無効＝効果は逓減し、スタミナ切れだと反応しない
+function doWhip(){
+  const h=state.player, r=state.race; if(!h||h.finished||!r||r.phase!=="running") return;
+  if(h.dist < CFG.straightDist - 150){ flash("ムチはまだ早い","#9fb1ad"); return; }  // 直線手前のみ
+  if(h.whipCd>0) return;                                   // 連打しても無意味（クールダウン）
+  if(h.stamina < 12){ flash("反応なし…脚が残っていない","#9fb1ad"); h.whipCd=0.7; h._whips=(h._whips||0)+1; Sfx.thud(); return; }
+  const uses = h._whips||0;
+  const boost = (h.p.whipPow||1.4) * Math.pow(0.55, uses);  // 1発目が最大、叩くほど逓減
+  h._whipBoost = boost; h.whipTimer = 1.6; h.whipCd = 0.75; h._whips = uses+1;
+  h.stamina = Math.max(0, h.stamina - 1.5);                // ひと押しの脚使い
+  Sfx.whip();
+  if(boost < 0.4){ flash("もう反応が鈍い…","#c9762e"); }
+  else { flash("ムチ！","#e8b84b"); if(uses===0) jcall(`${h.name}にムチが入った！　最後の脚を引き出す！`, true); }
+}
+// ギアの上げ下げ。悪天候で上げ下げ（特に反転）を繰り返すと折り合いを欠く
+function shiftGear(delta){
+  const h=state.player, r=state.race; if(!h||h.finished||!r||r.phase!=="running") return;
+  const ng = clamp(h.gear+delta, 1, 7);
+  if(ng===h.gear) return;
+  const dir = ng>h.gear? 1 : -1;
+  // 乱れ蓄積：直前と逆方向（上げ→下げ等）は大きく、同方向は小さく
+  if(h._lastGearDir && dir!==h._lastGearDir) h._gearChurn=(h._gearChurn||0)+1.6;
+  else h._gearChurn=(h._gearChurn||0)+0.5;
+  h._lastGearDir = dir;
+  const prev=h.gear; h.gear=ng;
+  Sfx.blip(dir>0?560:380, 0.05, "square");   // シフト音
+  // 仕掛け地点（初めてギア5以上）
+  if(h.gear>=5 && h._commitAt===null){ h._commitAt=h.dist; jcall(`${h.name}、ここで仕掛けた！　残り${Math.max(0,Math.round(CFG.DIST-h.dist))}m！`, true); }
+  else if(h.gear===7 && prev<7){ jcall(`${h.name}、全力！　最後の力を振り絞る！`, true); }
+  // 悪天候でギアがガチャつくと警告＋折り合い悪化（実処理は computeDesired）
+  if((r.going.bad||0)>0 && h._gearChurn>2.2){ flash("ギアの乱れ！折り合いを欠く","#c9762e"); }
+  syncGearUI();
+}
+function syncGearUI(){
+  const h=state.player; if(!h) return;
+  const sg=$("sp-gear"); if(sg) sg.textContent = h.gear;
+  const sl=$("sp-gear-label"); if(sl) sl.textContent = GEAR_LABEL[h.gear]||"";
+  // ギアピップ
+  const pips=$("gear-pips");
+  if(pips){
+    for(let i=0;i<pips.children.length;i++){
+      const on = (i+1)<=h.gear;
+      pips.children[i].className = "pip" + (on? (h.gear>=6?" hot": h.gear>=5?" push":" on") : "");
+    }
+  }
+  const dn=$("btn-geardown"), up=$("btn-gearup");
+  if(dn) dn.disabled = h.gear<=1;
+  if(up) up.disabled = h.gear>=7;
+}
+
+/* ============================ 実況システム ============================ */
+function jcall(text, lead){
+  const el=$("commentary"); if(!el) return;
+  el.classList.add("show");
+  el.innerHTML = lead? `<span class="lead">${text}</span>` : text;
+  if(lead) Voice.say(text);                 // 盛り上がりどころは音声実況
+}
+// レース展開を監視して実況を出す（render から毎フレーム呼ぶ。各イベント1回）
+function callRace(){
+  const r=state.race, p=state.player, field=state.field; if(!r||!r.started) return;
+  const said = r._said || (r._said={});
+  const lead = field.reduce((a,b)=> b.dist>a.dist? b : a, field[0]);
+  const remain = CFG.DIST - lead.dist;
+  // 序盤のペース判定
+  if(!said.pace && r.raceTime>4){
+    said.pace=1;
+    const ls=r.leaderSpeedSmooth;
+    const pl = ls>CFG.cruiseBase+0.8?"ハイペース": ls<CFG.cruiseBase-0.4?"スローペース":"平均ペース";
+    jcall(`先頭は${lead.num}番${lead.name}。${pl}の入り。`);
+  }
+  // 向正面〜３コーナー
+  if(!said.mid && lead.dist>CFG.DIST*0.45 && lead.dist<CFG.DIST*0.62){
+    said.mid=1;
+    const prank = playerRank();
+    jcall(`隊列が固まる。${p.name}は${prank}番手で折り合う。`);
+  }
+  // 勝負所（残り500m手前）
+  if(!said.corner && remain<520 && remain>360){
+    said.corner=1;
+    jcall(`最終コーナー、ここから勝負！　各馬仕掛けるタイミングを計る。`, true);
+  }
+  // 直線
+  if(!said.straight && lead.dist>=CFG.straightDist){
+    said.straight=1;
+    jcall(`直線に入った！　先頭は${lead.num}番${lead.name}！`, true);
+  }
+  // ゴール前の接戦
+  if(!said.duel && remain<140 && !p.finished){
+    const near = field.filter(o=>!o.finished && Math.abs(o.dist-p.dist)<2.6 && o!==p).length;
+    if(near>=1){ said.duel=1; jcall(`ゴール前、${p.name}も伸びる！　大接戦だ！`, true); }
+  }
+}
+function playerRank(){
+  const p=state.player; let rank=1; for(const o of state.field){ if(o!==p && o.dist>p.dist) rank++; } return rank;
+}
+
+/* ============================ 画面表示（HUD＋canvas） ============================ */
+function render(){
+  const r=state.race; if(!r) return;
+  const p=state.player, field=state.field;
+
+  // --- 現在順位（距離が多い順） ---
+  let rank=1; for(const o of field){ if(o!==p && o.dist>p.dist) rank++; }
+  $("rank-val").textContent = rank;
+  const rof=$("rank-of"); if(rof) rof.textContent = CFG.N;
+
+  // --- 馬場・脚質・固有チップ（初回のみ更新でも良いが軽いので毎フレーム） ---
+  const gv=$("going-val"); if(gv && r.going) gv.textContent = r.going.label;
+  const ms=$("my-style"); if(ms) ms.textContent = "脚質 "+STYLES[p.style].name;
+  const ma=$("my-abil"); if(ma) ma.textContent = "固有 "+(ABILITIES[p.ability]?ABILITIES[p.ability].name:"—");
+
+  // --- 残り距離・進行ゲージ ---
+  const remain = Math.max(0, Math.round(CFG.DIST - p.dist));
+  $("dist-val").textContent = remain;
+  $("prog-fill").style.width = clamp(p.dist/CFG.DIST*100,0,100)+"%";
+
+  // --- フェーズ表示（残り距離ベース） ---
+  const rem2 = CFG.DIST - p.dist;
+  let phaseTxt = rem2>CFG.DIST*0.55? "道中（序盤）" : p.dist<CFG.straightDist? "中盤・位置取り" : "直線！";
+  $("phase-val").textContent = p.finished? "ゴール" : phaseTxt;
+
+  // --- ペース表示 ---
+  const ls=r.leaderSpeedSmooth;
+  let pace = ls>CFG.cruiseBase+0.8? "ハイ" : ls<CFG.cruiseBase-0.4? "スロー" : "平均";
+  $("pace-val").textContent = r.started? pace : "—";
+
+  // --- スタミナ／折り合いゲージ ---
+  setGauge($("sta-bar"),$("sta-num"), p.stamina, "stamina");
+  setGauge($("comp-bar"),$("comp-num"), p.composure, "comp");
+
+  // --- スピードメーター（km/h アーク） ---
+  const k=$("sp-kmh"); if(k) k.textContent = Math.round(p.speed*3.6);
+  const arc=$("sp-arc");
+  if(arc){
+    const frac=clamp(p.speed/21,0,1);
+    arc.style.strokeDashoffset = (157.1*(1-frac)).toFixed(1);
+    arc.setAttribute("stroke", p.gear>=6?"#d23b3b": p.gear>=5?"#e0a23a": p.gear<=2?"#6f86df":"#5fb0b0");
+  }
+
+  // --- 観客の盛り上がり（直線で増し、ゴールで歓声） ---
+  if(Sfx.crowdGain){
+    const lvl = p.finished ? 0.30 : (p.dist>=CFG.straightDist ? 0.19 : (p.dist>CFG.DIST*0.5?0.10:0.06));
+    Sfx.setCrowd(lvl);
+  }
+  // --- 馬群の地鳴り（スピードに連動） ---
+  if(Sfx.rumbleGain){
+    const lvl = (r.started && !p.finished) ? Math.min(0.16, Math.max(0, p.speed-12)/16*0.16) : 0.0001;
+    Sfx.setRumble(lvl);
+  }
+  // --- 実況の順位ボード（上位6頭をリアルタイム表示） ---
+  const ob=$("order-board");
+  if(ob){
+    if(r.started){
+      const order=[...field].sort((a,b)=>b.dist-a.dist).slice(0,6);
+      ob.style.display="block";
+      ob.innerHTML='<div class="ob-head">着 順</div>'+order.map((h,i)=>
+        `<div class="ob-row${h.isPlayer?' me':''}"><span class="ob-pos">${i+1}</span><span class="ob-dot" style="background:${h.color}"></span><span class="ob-num">${h.num}${h.isPlayer?' ★':''}</span></div>`).join("");
+    } else ob.style.display="none";
+  }
+  // --- スピードライン（高速時に放射状の流線） ---
+  const sl=$("speedlines");
+  if(sl){
+    let o=0;
+    if(r.started && !p.finished){ o=clamp((p.speed-15)/7,0,0.5); if(p.gear>=7||p.whipTimer>0) o=Math.min(0.62,o+0.15); }
+    sl.style.opacity=o;
+  }
+
+  // --- ムチボタン（直線でのみ有効・連打は無効表示） ---
+  const wb=$("btn-whip");
+  if(wb){
+    const inZone = r.started && !p.finished && p.dist >= CFG.straightDist-150;
+    wb.disabled = !inZone;
+    wb.classList.toggle("cooling", p.whipCd>0);
+    const wen=$("whip-en");
+    if(wen) wen.textContent = !inZone? "直線で追う" : ((p._whips||0)>=3? "反応が薄い" : "ここで追え！");
+  }
+
+  // --- 直線バナー ---
+  $("straight-banner").classList.toggle("show", p.dist>=CFG.straightDist && !p.finished);
+
+  // --- 実況 ---
+  callRace();
+
+  drawTrack();
+}
+
+function setGauge(bar,num,val,type){
+  val=clamp(val,0,100);
+  bar.style.width = val+"%";
+  num.textContent = Math.round(val);
+  let col;
+  if(type==="stamina"){
+    col = val>50? "var(--green)" : val>25? "var(--amber)" : "var(--red)";
+  }else{
+    col = val>50? "var(--blue)" : val>CFG.compPull? "var(--amber)" : "var(--red)";
+  }
+  bar.style.background = col;
+}
+
+/* ===================== コース幾何（オーバルトラック / 右回り） =====================
+   1周＝約1600m。s(センターライン距離) を ワールド座標(x,z)・進行方位・コーナー判定へ変換する。
+   ① 第1コーナー → ② 向正面(直線) → ③ 第2コーナー(最終) → ④ ホームストレッチ(ゴール) */
+const TRK_R = 140;                 // コーナー半径(m)
+const TRK_SL = 360;                // 直線部の長さ(m)
+const TRK_LB = Math.PI * TRK_R;    // コーナー1つの長さ(半円)
+const TRK_P = 2 * TRK_LB + 2 * TRK_SL; // 1周
+const LANE_W = 2.4;                // 1レーンの幅(m)
+const TRK_OUT = LANE_W * 7;        // 最外レーンまでの幅
+
+function trackPose(s){
+  s = ((s % TRK_P) + TRK_P) % TRK_P;
+  if(s < TRK_LB){                                   // ① 第1コーナー（中心 +SL/2,0）
+    const a = Math.PI/2 - s/TRK_R;
+    return { x: TRK_SL/2 + TRK_R*Math.cos(a), z: TRK_R*Math.sin(a), heading: a - Math.PI/2, curve: -1 };
+  } else if(s < TRK_LB + TRK_SL){                   // ② 向正面（直線・heading -X）
+    const d = s - TRK_LB;
+    return { x: TRK_SL/2 - d, z: -TRK_R, heading: Math.PI, curve: 0 };
+  } else if(s < 2*TRK_LB + TRK_SL){                 // ③ 第2コーナー＝最終（中心 -SL/2,0）
+    const d = s - (TRK_LB + TRK_SL); const a = -Math.PI/2 - d/TRK_R;
+    return { x: -TRK_SL/2 + TRK_R*Math.cos(a), z: TRK_R*Math.sin(a), heading: a - Math.PI/2, curve: -1 };
+  } else {                                          // ④ ホームストレッチ（直線・heading +X）→ゴール
+    const d = s - (2*TRK_LB + TRK_SL);
+    return { x: -TRK_SL/2 + d, z: TRK_R, heading: 0, curve: 0 };
+  }
+}
+// レーンぶん外側(インフィールドの逆)へ法線オフセットしたワールド座標
+function laneWorld(s, lane){
+  const p = trackPose(s);
+  const ox = -Math.sin(p.heading), oz = Math.cos(p.heading); // 外向き法線
+  return { x: p.x + ox*lane*LANE_W, z: p.z + oz*lane*LANE_W, heading: p.heading, curve: p.curve };
+}
+
+/* ===================== Three.js 3Dシーン ===================== */
+let scene, camera, renderer, threeReady = false, camMode = "chase", camInit = false;
+let horseMeshes = [], playerRing = null;
+const camState = { pos: null, tgt: null };
+
+// --- テクスチャ生成 ---
+function _rr(x,X,Y,w,h,r){ x.beginPath(); x.moveTo(X+r,Y); x.arcTo(X+w,Y,X+w,Y+h,r); x.arcTo(X+w,Y+h,X,Y+h,r); x.arcTo(X,Y+h,X,Y,r); x.arcTo(X,Y,X+w,Y,r); x.closePath(); }
+function makeStripeTex(){
+  const c=document.createElement("canvas"); c.width=8; c.height=64; const x=c.getContext("2d");
+  x.fillStyle="#1f5132"; x.fillRect(0,0,8,64); x.fillStyle="#1c4a2c"; x.fillRect(0,0,8,32);
+  const t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; return t;
+}
+function makeCheckerTex(){
+  const c=document.createElement("canvas"); c.width=c.height=2; const x=c.getContext("2d");
+  x.fillStyle="#f4f4f4"; x.fillRect(0,0,2,2); x.fillStyle="#111"; x.fillRect(0,0,1,1); x.fillRect(1,1,1,1);
+  const t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.magFilter=THREE.NearestFilter; t.repeat.set(14,2); return t;
+}
+function makeSkyTex(){
+  const c=document.createElement("canvas"); c.width=16; c.height=256; const x=c.getContext("2d");
+  const g=x.createLinearGradient(0,0,0,256);
+  g.addColorStop(0,"#0c1020"); g.addColorStop(0.45,"#2b2740"); g.addColorStop(0.62,"#6b4a66");
+  g.addColorStop(0.74,"#c8743a"); g.addColorStop(0.86,"#e0a05a"); g.addColorStop(1,"#243042");
+  x.fillStyle=g; x.fillRect(0,0,16,256);
+  return new THREE.CanvasTexture(c);
+}
+function makeStandTex(){
+  const c=document.createElement("canvas"); c.width=256; c.height=64; const x=c.getContext("2d");
+  x.fillStyle="#161b22"; x.fillRect(0,0,256,64);
+  for(let i=0;i<460;i++){ const cx=Math.random()*256, cy=Math.random()*64; const warm=Math.random()<0.6;
+    x.fillStyle = warm? "rgba(232,184,120,.9)" : "rgba(150,180,220,.8)"; x.fillRect(cx,cy,2,2); }
+  return new THREE.CanvasTexture(c);
+}
+
+// --- ジオメトリ：トラックに沿った帯（内オフセット〜外オフセット） ---
+function buildBand(innerOff, outerOff, y, mat, vScale, sStart, sEnd){
+  const a0 = (sStart==null)?0:sStart, a1=(sEnd==null)?TRK_P:sEnd;
+  const step=4, n=Math.max(2, Math.ceil((a1-a0)/step));
+  const pos=[], uv=[], idx=[];
+  for(let i=0;i<=n;i++){
+    const s=a0 + (a1-a0)*(i/n); const ps=trackPose(s);
+    const ox=-Math.sin(ps.heading), oz=Math.cos(ps.heading);
+    pos.push(ps.x+ox*innerOff, y, ps.z+oz*innerOff,  ps.x+ox*outerOff, y, ps.z+oz*outerOff);
+    const v = vScale ? s/vScale : i;
+    uv.push(0,v, 1,v);
+  }
+  for(let i=0;i<n;i++){ const a=i*2,b=i*2+1,c=(i+1)*2,d=(i+1)*2+1; idx.push(a,c,b, b,c,d); }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));
+  geo.setIndex(idx); geo.computeVertexNormals();
+  return new THREE.Mesh(geo, mat);
+}
+
+function buildSky(){
+  const mat=new THREE.MeshBasicMaterial({ map:makeSkyTex(), side:THREE.BackSide, fog:false });
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(900,24,16), mat));
+}
+function buildLights(){
+  scene.add(new THREE.HemisphereLight(0xc2d2ee, 0x33301f, 0.72));
+  scene.add(new THREE.AmbientLight(0x3e475c, 0.28));
+  const sun=new THREE.DirectionalLight(0xffcf8a, 1.45); sun.position.set(-240,150,120); scene.add(sun);
+  const rim=new THREE.DirectionalLight(0x86a0f0, 0.5); rim.position.set(190,90,-180); scene.add(rim);
+  const fill=new THREE.DirectionalLight(0xffe2b4, 0.22); fill.position.set(70,40,210); scene.add(fill);
+}
+function buildSun(){
+  const c=document.createElement("canvas"); c.width=c.height=128; const x=c.getContext("2d");
+  const g=x.createRadialGradient(64,64,4,64,64,64);
+  g.addColorStop(0,"rgba(255,244,214,0.95)"); g.addColorStop(0.25,"rgba(255,212,150,0.6)");
+  g.addColorStop(0.55,"rgba(240,150,90,0.22)"); g.addColorStop(1,"rgba(240,150,90,0)");
+  x.fillStyle=g; x.fillRect(0,0,128,128);
+  const t=new THREE.CanvasTexture(c);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t, transparent:true, depthWrite:false, depthTest:false, blending:THREE.AdditiveBlending, fog:false, toneMapped:false}));
+  sp.scale.set(260,260,1); sp.position.set(-360,150,-520); scene.add(sp);
+}
+function buildTrack(){
+  // 外周の地面
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(2400,2400),
+    new THREE.MeshStandardMaterial({color:0x14241a, roughness:1}));
+  ground.rotation.x=-Math.PI/2; ground.position.y=-0.12; scene.add(ground);
+  // 芝（流れる刈り目ストライプ）
+  scene.add(buildBand(-0.7, TRK_OUT+0.7, 0,
+    new THREE.MeshStandardMaterial({map:makeStripeTex(), roughness:.96, side:THREE.DoubleSide}), 14));
+  // インフィールド（中心からの扇形で塗りつぶし）
+  buildInfield();
+  // 内ラチ・外ラチ（白）
+  const rail=new THREE.MeshBasicMaterial({color:0xf2f4f5});
+  scene.add(buildBand(-1.05, -0.6, 0.13, rail));
+  scene.add(buildBand(TRK_OUT+0.6, TRK_OUT+1.05, 0.13, rail));
+  // マーカー（ハロン棒・残り400m・ゴール）
+  buildMarkers();
+}
+function buildInfield(){
+  const step=6, n=Math.ceil(TRK_P/step);
+  const pos=[0,-0.05,0], idx=[];
+  for(let i=0;i<=n;i++){ const s=(i*step)%TRK_P; const ps=trackPose(s); const ox=-Math.sin(ps.heading), oz=Math.cos(ps.heading);
+    pos.push(ps.x+ox*(-1.0), -0.05, ps.z+oz*(-1.0)); }
+  for(let i=1;i<=n;i++){ idx.push(0, i, i+1); }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos,3)); geo.setIndex(idx); geo.computeVertexNormals();
+  scene.add(new THREE.Mesh(geo, new THREE.MeshStandardMaterial({color:0x123a23, roughness:1, side:THREE.DoubleSide})));
+}
+function addPole(s, color, h, emissive){
+  const ps=trackPose(s); const ox=-Math.sin(ps.heading), oz=Math.cos(ps.heading);
+  const x=ps.x+ox*(-1.5), z=ps.z+oz*(-1.5);
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(emissive?0.13:0.09, emissive?0.13:0.09, h, 8),
+    new THREE.MeshStandardMaterial({color, emissive: emissive?0x5a3d00:0x000000, emissiveIntensity:emissive?0.8:0}));
+  m.position.set(x, h/2, z); scene.add(m);
+}
+function buildMarkers(){
+  for(let rem=200; rem<1600; rem+=200){
+    const s=((TRK_P - rem)%TRK_P + TRK_P)%TRK_P;
+    const gold=(rem===400);
+    addPole(s, gold?0xE8B84B:0xffffff, gold?3.0:2.0, gold);
+    if(gold){ // 残り400m：金の帯を路面に
+      scene.add(buildBand(-0.6, TRK_OUT+0.6, 0.05,
+        new THREE.MeshBasicMaterial({color:0xE8B84B, transparent:true, opacity:0.5}), null, s-0.8, s+0.8));
+    }
+  }
+  // ゴールの市松帯
+  scene.add(buildBand(-0.6, TRK_OUT+0.6, 0.06,
+    new THREE.MeshBasicMaterial({map:makeCheckerTex()}), null, -1.4, 1.4));
+  // ゴールポスト＋バナー
+  for(const off of [-1.2, TRK_OUT+1.2]){
+    const ps=trackPose(0); const ox=-Math.sin(ps.heading), oz=Math.cos(ps.heading);
+    const m=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.16,4.6,10), new THREE.MeshStandardMaterial({color:0xcf2f2f}));
+    m.position.set(ps.x+ox*off, 2.3, ps.z+oz*off); scene.add(m);
+  }
+  const ps=trackPose(0); const ox=-Math.sin(ps.heading), oz=Math.cos(ps.heading);
+  const ban=new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.0, TRK_OUT+2.6), new THREE.MeshStandardMaterial({color:0x111418}));
+  ban.position.set(ps.x, 4.4, ps.z+oz*(TRK_OUT/2)); scene.add(ban);
+}
+function buildStand(){
+  const zStand = TRK_R + TRK_OUT + 16, len = TRK_SL + 90;
+  const mat=new THREE.MeshStandardMaterial({color:0x20262e, roughness:.92});
+  const base=new THREE.Mesh(new THREE.BoxGeometry(len,9,16), mat); base.position.set(0,4.5,zStand); scene.add(base);
+  const faceMat=new THREE.MeshStandardMaterial({map:makeStandTex(), emissive:0xffffff, emissiveMap:makeStandTex(), emissiveIntensity:0.55, roughness:1});
+  const face=new THREE.Mesh(new THREE.PlaneGeometry(len,9), faceMat);
+  face.position.set(0,4.9,zStand-8.05); face.rotation.y=Math.PI; scene.add(face);
+  const roof=new THREE.Mesh(new THREE.BoxGeometry(len,1.0,20), mat); roof.position.set(0,9.4,zStand+1.5); scene.add(roof);
+}
+
+// --- サラブレッド3Dモデル（共通骨格＋毛色テクスチャ差し替え方式・ローポリ） ---
+function makeHorseMesh(silk, coatKey, markings, isPlayer){
+  const coat = COATS[coatKey] || COATS.kage;
+  const g=new THREE.Group();
+  const bodyMat = new THREE.MeshStandardMaterial({color:coat.body, roughness:.62, metalness:.02});
+  const pntMat  = new THREE.MeshStandardMaterial({color:coat.points, roughness:.8});
+  const whtMat  = new THREE.MeshStandardMaterial({color:0xf0ece4, roughness:.7});
+  const silkMat = new THREE.MeshStandardMaterial({color:silk, roughness:.5});
+
+  // 胴（細身）：胸〜バレル＋引き締まった後躯
+  const barrel=new THREE.Mesh(new THREE.BoxGeometry(1.55,0.60,0.50), bodyMat); barrel.position.set(0.10,1.02,0); g.add(barrel);
+  const chest =new THREE.Mesh(new THREE.BoxGeometry(0.45,0.58,0.46), bodyMat); chest.position.set(0.86,1.00,0); g.add(chest);
+  const hind  =new THREE.Mesh(new THREE.BoxGeometry(0.62,0.66,0.54), bodyMat); hind.position.set(-0.78,1.04,0); g.add(hind);
+
+  // 首（前傾）＋たてがみ（points）
+  const neck=new THREE.Mesh(new THREE.BoxGeometry(0.72,0.40,0.30), bodyMat); neck.position.set(1.04,1.30,0); neck.rotation.z=-0.62; g.add(neck);
+  const mane=new THREE.Mesh(new THREE.BoxGeometry(0.74,0.13,0.16), pntMat); mane.position.set(1.02,1.49,0); mane.rotation.z=-0.62; g.add(mane);
+
+  // 頭部（細く伸びた顔＋鼻）
+  const headG=new THREE.Group(); headG.position.set(1.40,1.46,0);
+  const head=new THREE.Mesh(new THREE.BoxGeometry(0.30,0.30,0.24), bodyMat); headG.add(head);
+  const muzz=new THREE.Mesh(new THREE.BoxGeometry(0.30,0.20,0.19), pntMat); muzz.position.set(0.27,-0.07,0); muzz.rotation.z=-0.25; headG.add(muzz);
+  const earL=new THREE.Mesh(new THREE.ConeGeometry(0.06,0.16,6), bodyMat); earL.position.set(-0.05,0.20,0.09); headG.add(earL);
+  const earR=new THREE.Mesh(new THREE.ConeGeometry(0.06,0.16,6), bodyMat); earR.position.set(-0.05,0.20,-0.09); headG.add(earR);
+  // 顔の白徴（流星/大流星/鼻白）
+  if(markings && markings.blaze>0){
+    const bw = markings.blaze===2?0.18:0.09;          // 大流星は太い
+    const bh = markings.blaze===3?0.14:0.30;          // 鼻白は鼻先のみ
+    const by = markings.blaze===3?-0.10:0.02;
+    const bx = markings.blaze===3?0.30:0.16;
+    const blz=new THREE.Mesh(new THREE.BoxGeometry(0.04,bh,bw), whtMat); blz.position.set(bx,by,0.13); headG.add(blz);
+  }
+  g.add(headG);
+
+  // 尾（points・長め）
+  const tail=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.66,0.20), pntMat); tail.geometry.translate(0,-0.33,0);
+  tail.position.set(-1.12,1.12,0); tail.rotation.z=0.7; g.add(tail);
+
+  // 脚×4（股関節＋膝の2関節。ギャロップで畳んで伸ばす）
+  const legs=[];
+  const order=[[0.80,0.27],[0.80,-0.27],[-0.80,0.27],[-0.80,-0.27]]; // FL,FR,BL,BR
+  order.forEach(([lx,lz],i)=>{
+    const hip=new THREE.Group(); hip.position.set(lx,1.00,lz);            // 股関節ピボット
+    const thigh=new THREE.Mesh(new THREE.CylinderGeometry(0.095,0.07,0.52,7), bodyMat); thigh.position.y=-0.26; hip.add(thigh);
+    const knee=new THREE.Group(); knee.position.y=-0.52;                  // 膝ピボット
+    const sock = (markings && markings.socks && markings.socks[i]) ? whtMat : bodyMat;
+    const cannon=new THREE.Mesh(new THREE.CylinderGeometry(0.065,0.05,0.46,7), sock); cannon.position.y=-0.23; knee.add(cannon);
+    const hoof=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.075,0.1,7), pntMat); hoof.position.y=-0.46-0.05; knee.add(hoof);
+    hip.add(knee);
+    g.add(hip); legs.push({hip, knee, front:(i<2)});
+  });
+
+  // 騎手（シルクの胴＋ヘルメット）
+  const rider=new THREE.Mesh(new THREE.BoxGeometry(0.52,0.5,0.46), silkMat); rider.position.set(-0.05,1.48,0); rider.rotation.x=0.18; g.add(rider);
+  const arms =new THREE.Mesh(new THREE.BoxGeometry(0.32,0.16,0.5), silkMat); arms.position.set(0.30,1.40,0); g.add(arms);
+  const cap  =new THREE.Mesh(new THREE.SphereGeometry(0.17,12,10), silkMat); cap.position.set(-0.02,1.80,0); g.add(cap);
+
+  g.userData = { legs, body:barrel, neck:headG, tail, rider, arms, cap, riderY:1.48 };
+  return g;
+}
+function makeNumberSprite(num, color){
+  const c=document.createElement("canvas"); c.width=c.height=100; const x=c.getContext("2d");
+  x.fillStyle=color; _rr(x,10,10,80,80,16); x.fill();
+  x.lineWidth=6; x.strokeStyle="rgba(255,255,255,.92)"; _rr(x,10,10,80,80,16); x.stroke();
+  x.fillStyle = isLight(color)?"#111":"#fff"; x.font="bold 56px 'Zen Kaku Gothic New', sans-serif";
+  x.textAlign="center"; x.textBaseline="middle"; x.fillText(num,50,54);
+  const tex=new THREE.CanvasTexture(c); tex.anisotropy=2;
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex, transparent:true})); sp.scale.set(2.0,2.0,1);
+  return sp;
+}
+function syncHorseMeshes(){
+  if(!threeReady) return;
+  horseMeshes.forEach(m=>{ scene.remove(m.group); scene.remove(m.sprite); if(m.blob) scene.remove(m.blob); });
+  horseMeshes=[];
+  if(playerRing){ scene.remove(playerRing); playerRing=null; }
+  state.field.forEach((h)=>{
+    const g=makeHorseMesh(h.color, h.coat, h.markings, h.isPlayer); scene.add(g);
+    const sp=makeNumberSprite(String(h.num), h.color); scene.add(sp);
+    const blob=new THREE.Mesh(new THREE.PlaneGeometry(2.6,1.5),
+      new THREE.MeshBasicMaterial({map:blobTex(), transparent:true, depthWrite:false, opacity:0.5, toneMapped:false}));
+    blob.rotation.x=-Math.PI/2; blob.position.y=0.04; scene.add(blob);
+    horseMeshes.push({ h, group:g, sprite:sp, blob, _ld:0 });
+  });
+  Dust.init(); Dust.setGoing(state.race && state.race.going);
+  const ring=new THREE.Mesh(new THREE.RingGeometry(1.35,1.95,30),
+    new THREE.MeshBasicMaterial({color:0xffffff, side:THREE.DoubleSide, transparent:true, opacity:0.85, toneMapped:false}));
+  ring.rotation.x=-Math.PI/2; ring.position.y=0.07; playerRing=ring; scene.add(ring);
+  buildStartGate((state.race&&state.race.startS)||0);   // 発走ゲートを始点に設置（閉じた状態）
+  camInit=false; // 新レースでカメラを始点へスナップ
+}
+
+/* ---------- 発走ゲート（スタート地点に設置・発走で開いてフェード） ---------- */
+let startGate=null, gateDoors=[], gateAnim=-1;   // gateAnim<0:閉じて静止 / ≥0:開放アニメ進行
+function buildStartGate(startS){
+  if(startGate){ scene.remove(startGate); startGate=null; }
+  gateDoors=[]; gateAnim=-1;
+  const grp=new THREE.Group();
+  const p=trackPose(startS);
+  grp.position.set(p.x, 0, p.z);
+  grp.rotation.y = -p.heading;                    // local +X=進行方向, +Z=外側（レーン増加方向）
+  const H=2.4, z0=-0.7, z1=LANE_W*7+0.7, span=z1-z0;
+  const frameMat=()=>new THREE.MeshStandardMaterial({color:0x3a4048, roughness:.7, transparent:true, opacity:1});
+  const metalMat=()=>new THREE.MeshStandardMaterial({color:0x9aa3ab, roughness:.5, metalness:.3, transparent:true, opacity:1});
+  const doorMat =()=>new THREE.MeshStandardMaterial({color:0x2f6f3c, roughness:.7, transparent:true, opacity:1});
+  // 仕切りの支柱（前後）
+  for(let k=0;k<=8;k++){
+    const z=z0+span*(k/8);
+    const pf=new THREE.Mesh(new THREE.BoxGeometry(0.1,H,0.1), frameMat()); pf.position.set(0.55,H/2,z); grp.add(pf);
+    const pb=new THREE.Mesh(new THREE.BoxGeometry(0.1,H,0.1), frameMat()); pb.position.set(-1.05,H/2,z); grp.add(pb);
+    const side=new THREE.Mesh(new THREE.BoxGeometry(1.6,0.08,0.08), frameMat()); side.position.set(-0.25,H-0.2,z); grp.add(side);
+  }
+  // 上部レール（前後）＋ 番号帯
+  const railGeo=new THREE.BoxGeometry(0.12,0.14,span);
+  const rf=new THREE.Mesh(railGeo, metalMat()); rf.position.set(0.55,H-0.05,(z0+z1)/2); grp.add(rf);
+  const rb=new THREE.Mesh(railGeo, metalMat()); rb.position.set(-1.05,H-0.05,(z0+z1)/2); grp.add(rb);
+  const sign=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.34,span), new THREE.MeshStandardMaterial({color:0x152a3a, roughness:.8, transparent:true, opacity:1}));
+  sign.position.set(0.62,H+0.18,(z0+z1)/2); grp.add(sign);
+  // 前扉（各馬房・上ヒンジで跳ね上がる）
+  for(let s=0;s<8;s++){
+    const zc=z0+span*((s+0.5)/8), w=span/8*0.9;
+    const door=new THREE.Group(); door.position.set(0.55, H-0.35, zc);
+    const panel=new THREE.Mesh(new THREE.BoxGeometry(0.06,1.5,w), doorMat()); panel.position.y=-0.75; door.add(panel);
+    grp.add(door); gateDoors.push(door);
+  }
+  scene.add(grp); startGate=grp;
+}
+function openStartGate(){ gateAnim=0; }   // 発走で呼ぶ
+function animStartGate(){
+  if(gateAnim<0 || !startGate) return;
+  gateAnim += 0.03;
+  const open=Math.min(1, gateAnim/0.45);
+  for(const d of gateDoors) d.rotation.z = open*1.65;       // 扉が跳ね上がる
+  let op=1; if(gateAnim>0.45) op=Math.max(0, 1-(gateAnim-0.45)/0.85);  // 開いたらフェード
+  startGate.traverse(o=>{ if(o.material) o.material.opacity=op; });
+  if(gateAnim>1.4){ scene.remove(startGate); startGate=null; gateDoors=[]; gateAnim=-1; }
+}
+
+let camBtnBuilt=false;
+function buildCamButton(){
+  if(camBtnBuilt) return; camBtnBuilt=true;
+  const b=document.createElement("button"); b.className="cam-btn"; b.textContent="視点：チェイス";
+  b.addEventListener("click", ()=>{ camMode = (camMode==="chase")?"overhead":"chase";
+    b.textContent = "視点："+(camMode==="chase"?"チェイス":"俯瞰"); });
+  const wrap=$("track").parentNode; if(wrap) wrap.appendChild(b);
+}
+
+/* ---------- 砂煙・芝の飛散（スプライトプール） ---------- */
+const Dust = {
+  pool:[], idx:0, _tex:null,
+  init(){
+    if(this.pool.length){ this.pool.forEach(s=>{ s.visible=false; s.material.opacity=0; }); return; }
+    const c=document.createElement("canvas"); c.width=c.height=64; const x=c.getContext("2d");
+    const g=x.createRadialGradient(32,32,1,32,32,32);
+    g.addColorStop(0,"rgba(255,255,255,0.95)"); g.addColorStop(0.5,"rgba(255,255,255,0.4)"); g.addColorStop(1,"rgba(255,255,255,0)");
+    x.fillStyle=g; x.fillRect(0,0,64,64); this._tex=new THREE.CanvasTexture(c);
+    for(let i=0;i<60;i++){
+      const m=new THREE.SpriteMaterial({map:this._tex, transparent:true, opacity:0, depthWrite:false, color:0xcbb78a, fog:true, toneMapped:false});
+      const s=new THREE.Sprite(m); s.visible=false; s.userData={vx:0,vy:0,vz:0,life:0,max:1};
+      scene.add(s); this.pool.push(s);
+    }
+  },
+  setGoing(going){
+    const bad=going?(going.bad||0):0;
+    const col = bad>=1? 0x6f5a43 : bad>0? 0x9d855f : 0xcbb78a;   // 重=泥/良=土埃
+    this.pool.forEach(s=> s.material.color.setHex(col));
+  },
+  emit(x,z,intensity){
+    const s=this.pool[this.idx]; this.idx=(this.idx+1)%this.pool.length;
+    s.visible=true;
+    s.position.set(x+(Math.random()-0.5)*0.8, 0.15+Math.random()*0.2, z+(Math.random()-0.5)*0.8);
+    s.userData.vx=(Math.random()-0.5)*1.3; s.userData.vz=(Math.random()-0.5)*1.3; s.userData.vy=0.7+Math.random()*0.9;
+    s.userData.life=s.userData.max=0.45+Math.random()*0.35;
+    s.scale.set(0.6,0.6,1); s.material.opacity=0.5*intensity;
+  },
+  update(dt){
+    for(const s of this.pool){
+      if(!s.visible) continue;
+      const u=s.userData; u.life-=dt;
+      if(u.life<=0){ s.visible=false; s.material.opacity=0; continue; }
+      s.position.x+=u.vx*dt; s.position.z+=u.vz*dt; s.position.y+=u.vy*dt; u.vy-=1.4*dt;
+      const k=u.life/u.max; s.material.opacity=0.55*k;
+      const sc=0.6+(1-k)*1.8; s.scale.set(sc,sc,1);
+    }
+  }
+};
+let _blobTex=null;
+function blobTex(){
+  if(_blobTex) return _blobTex;
+  const c=document.createElement("canvas"); c.width=c.height=64; const x=c.getContext("2d");
+  const g=x.createRadialGradient(32,32,2,32,32,32);
+  g.addColorStop(0,"rgba(0,0,0,0.5)"); g.addColorStop(0.6,"rgba(0,0,0,0.28)"); g.addColorStop(1,"rgba(0,0,0,0)");
+  x.fillStyle=g; x.fillRect(0,0,64,64); _blobTex=new THREE.CanvasTexture(c); return _blobTex;
+}
+
+function ensureThree(){
+  if(threeReady) return true;
+  if(typeof THREE==="undefined"){
+    if(!window.__threeWarned){ window.__threeWarned=true;
+      const d=document.createElement("div");
+      d.style.cssText="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#cdd6df;font-size:13px;text-align:center;padding:24px;line-height:1.7;";
+      d.textContent="3D表示の読み込みに失敗しました。通信環境をご確認のうえ、再読み込みしてください。";
+      const w=$("track").parentNode; if(w) w.appendChild(d); }
+    return false;
+  }
+  renderer=new THREE.WebGLRenderer({ canvas:$("track"), antialias:true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+  renderer.setClearColor(0x0a0e14, 1);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;   // フィルミックな階調
+  renderer.toneMappingExposure = 1.16;
+  scene=new THREE.Scene();
+  scene.fog=new THREE.Fog(0x202a3a, 150, 600);
+  camera=new THREE.PerspectiveCamera(56, 1, 0.5, 2000);
+  camState.pos=new THREE.Vector3(TRK_SL/2-12, 7, TRK_R-2);
+  camState.tgt=new THREE.Vector3(TRK_SL/2, 1, TRK_R);
+  buildSky(); buildLights(); buildSun(); buildTrack(); buildStand(); Dust.init(); buildCamButton();
+  // 自発光・空などの「素の色」はトーンマップ対象外にして発色を維持
+  scene.traverse(o=>{ if(o.material && o.material.isMeshBasicMaterial) o.material.toneMapped=false; });
+  threeReady=true;
+  return true;
+}
+
+function resizeCanvas(){
+  if(!ensureThree()) return;
+  const cv=$("track"); const rect=cv.getBoundingClientRect();
+  const w=Math.max(1, rect.width), h=Math.max(1, rect.height);
+  renderer.setSize(w, h, false);
+  camera.aspect = w/h; camera.updateProjectionMatrix();
+}
+window.addEventListener("resize", ()=>{ if(state.screen==="race") resizeCanvas(); });
+
+function _lerpV(a,b,k){ a.x+=(b.x-a.x)*k; a.y+=(b.y-a.y)*k; a.z+=(b.z-a.z)*k; }
+function updateCamera(){
+  const p=state.player; if(!p) return;
+  const sS=(state.race&&state.race.startS)||0;
+  const w=laneWorld(sS + p.dist, p.lane);
+  const hx=Math.cos(w.heading), hz=Math.sin(w.heading);
+  const inStraight = p.dist >= (CFG.straightDist||1200);
+  let dpos, dtgt;
+  if(camMode==="overhead"){
+    dpos=new THREE.Vector3(w.x - hx*5, 60, w.z - hz*5);
+    dtgt=new THREE.Vector3(w.x + hx*8, 0, w.z + hz*8);
+  } else if(inStraight){
+    // 直線：低く、迫力のあるアングル
+    dpos=new THREE.Vector3(w.x - hx*9.5, 4.6, w.z - hz*9.5);
+    dtgt=new THREE.Vector3(w.x + hx*17, 1.4, w.z + hz*17);
+  } else {
+    dpos=new THREE.Vector3(w.x - hx*11, 6.3, w.z - hz*11);
+    dtgt=new THREE.Vector3(w.x + hx*16, 1.3, w.z + hz*16);
+  }
+  if(!camInit){ camState.pos.copy(dpos); camState.tgt.copy(dtgt); camInit=true; }
+  else { _lerpV(camState.pos, dpos, inStraight?0.16:0.12); _lerpV(camState.tgt, dtgt, inStraight?0.18:0.14); }
+  camera.position.copy(camState.pos);
+  if(camMode!=="overhead"){
+    const tt=performance.now()*0.001;       // 中継カメラ風の微かな手ぶれ
+    camera.position.x += Math.sin(tt*1.7)*0.06;
+    camera.position.y += Math.sin(tt*2.3)*0.05;
+  }
+  camera.lookAt(camState.tgt);
+  // FOVパンチ：高ギア/全力/ムチで視野が広がりスピード感UP
+  let fovT = 56;
+  if(camMode!=="overhead"){
+    if(p.gear>=6) fovT += 4;
+    if(p.gear>=7 || p.whipTimer>0) fovT += 3;
+    if(inStraight) fovT += 1.5;
+  }
+  camera.fov += (fovT - camera.fov)*0.1;
+  camera.updateProjectionMatrix();
+}
+
+/* render() から呼ばれる描画本体（名称は drawTrack のまま） */
+let _drawPrev=0;
+function drawTrack(){
+  if(!ensureThree()) return;
+  if(horseMeshes.length !== state.field.length) syncHorseMeshes();
+  const p=state.player;
+  const now=performance.now();
+  const dt = Math.min(0.05, (now-(_drawPrev||now))/1000); _drawPrev=now;
+  const sS=(state.race&&state.race.startS)||0;
+  const running = state.race && (state.race.phase==="running" || state.race.phase==="finishing");
+  // 砂煙：自分に近い数頭から（負荷を抑える）
+  let pdist = p? p.dist : 0;
+  for(const m of horseMeshes){
+    const h=m.h; const w=laneWorld(sS + h.dist, h.lane);
+    const sp=clamp(h.speed/17, 0, 1.35);
+    const ph=h.dist*1.55;                                 // 走行位相（距離ベースで安定）
+    const bob=Math.max(0,Math.sin(ph+0.3))*0.085*sp;      // バウンド（一完歩に一度の浮き）
+    m.group.position.set(w.x, bob, w.z);
+    m.group.rotation.y = -w.heading;
+    // コーナーのバンク（内に傾ける。速いほど深く、滑らかに）
+    const tgtBank = (w.curve!==0) ? (-0.17*clamp(sp,0,1.2)) : 0;
+    m._bank = (m._bank||0) + (tgtBank - (m._bank||0))*0.08;
+    m.group.rotation.x = m._bank;
+    m.group.rotation.z = Math.sin(ph)*0.055*sp;           // 馬体のうねり（前後のロック）
+    const ud=m.group.userData, lg=ud.legs;
+    if(lg && lg[0] && lg[0].hip){
+      const LEGPH=[2.6, 3.05, 0.0, 0.45];                 // FL,FR,BL,BR のギャロップ位相
+      for(let i=0;i<4;i++){
+        const L=lg[i], a=ph+LEGPH[i];
+        L.hip.rotation.z = 0.72*sp*Math.sin(a);           // 股関節の前後スイング
+        const fold=Math.max(0, Math.sin(a+1.5));          // スイング中に脚を畳む
+        L.knee.rotation.z = (L.front?-1:1) * (0.30+0.55*sp) * fold;  // 膝/飛節の屈伸
+      }
+    }
+    if(ud.neck) ud.neck.rotation.z = -0.04 + Math.sin(ph)*0.11*sp;    // 首を完歩ごとに大きく送る
+    if(ud.tail) ud.tail.rotation.z = 0.7 + Math.sin(ph*1.3)*0.13;     // 尾のなびき
+    // 騎手：ストライドに合わせて追う。直線・高ギア・ムチで激しく＝追い出しの姿勢
+    if(ud.rider){
+      const driving = (h.isPlayer && (h.gear>=6 || h.whipTimer>0)) ? 1 : (h.dist>=CFG.straightDist?0.6:0);
+      const amp=(0.12+driving*0.22)*sp;
+      ud.rider.rotation.x = 0.18 + driving*0.22 + Math.sin(ph)*amp;
+      ud.rider.position.y = ud.riderY - driving*0.06 + Math.abs(Math.sin(ph))*0.05*sp;
+      if(ud.arms){ ud.arms.rotation.x = Math.sin(ph)*amp*0.8; ud.arms.position.y = 1.40 - driving*0.05; }
+    }
+    m.sprite.position.set(w.x, 2.45+bob, w.z);
+    m.sprite.material.opacity = h.finished? 0.5 : 1;
+    // 影（ブロブ）：地面に貼り付き、速度で少し伸びる
+    if(m.blob){
+      m.blob.visible = !h.finished || true;
+      m.blob.position.set(w.x, 0.04, w.z);
+      m.blob.rotation.z = -w.heading;
+      const st=1+sp*0.5; m.blob.scale.set(st,1,1);
+      m.blob.material.opacity = 0.5 - sp*0.12;
+    }
+    // 砂煙：走行中、近い馬の後脚から
+    if(running && !h.finished && h.speed>11){
+      const near = Math.abs(h.dist - pdist) < 26;
+      if(near){
+        m._ld = (m._ld||0) + (h.dist - (m._lastDist||h.dist));
+        m._lastDist = h.dist;
+        const step = 3.2;
+        let guard=0;
+        while(m._ld >= step && guard<3){ m._ld-=step; guard++;
+          const bx=w.x - Math.cos(w.heading)*1.1, bz=w.z - Math.sin(w.heading)*1.1;
+          Dust.emit(bx, bz, 0.5 + sp*0.5);
+        }
+      } else { m._lastDist=h.dist; }
+    } else { m._lastDist=h.dist; }
+  }
+  Dust.update(dt);
+  if(playerRing && p){
+    const w=laneWorld(sS + p.dist, p.lane); playerRing.position.set(w.x, 0.07, w.z);
+    playerRing.material.opacity = p.finished? 0.35 : (0.8 + 0.2*Math.sin(performance.now()*0.006));
+  }
+  animStartGate();
+  updateCamera();
+  renderer.render(scene, camera);
+}
+// 文字色判定用：背景色が明るいか
+function isLight(hex){
+  const c=hex.replace("#",""); const r=parseInt(c.substr(0,2),16),g=parseInt(c.substr(2,2),16),b=parseInt(c.substr(4,2),16);
+  return (r*0.299+g*0.587+b*0.114)>150;
+}
+
+/* ---------- フラッシュメッセージ ---------- */
+let flashTimer=null;
+function flash(msg, color){
+  const el=$("flash-msg");
+  el.textContent=msg;
+  if(color) el.style.background = color.startsWith("var")? color : color;
+  el.style.background = color || "rgba(210,59,59,.92)";
+  el.classList.add("show");
+  clearTimeout(flashTimer);
+  flashTimer=setTimeout(()=>el.classList.remove("show"), 900);
+}
+// 固有能力の発動演出（金色バナー）
+let abilTimer=null;
+function procAbility(text){
+  const el=$("abil-msg"); if(!el) return;
+  Sfx.blip(990,0.12,"triangle");
+  el.textContent=text;
+  el.classList.add("show");
+  clearTimeout(abilTimer);
+  abilTimer=setTimeout(()=>el.classList.remove("show"), 1150);
+}
+// 「前が壁！」はブロックが続いたら自動表示（別管理：レンダ時に判定）
+let blockNagTimer=0;
+setInterval(()=>{
+  const r=state.race;
+  if(r&&r.phase==="running" && state.player && state.player.blocked && state.player.dist>500){
+    const el=$("flash-msg");
+    if(!el.classList.contains("show")){ flash("前が壁！内か外へ！", "#d23b3b"); }
+  }
+},700);
+
+/* ============================ 結果画面 ============================ */
+function finishRace(){
+  const field=state.field;
+  const ranked=[...field].sort((a,b)=>a.finishTime-b.finishTime);
+  ranked.forEach((h,i)=> h.rank=i+1 );
+  const p=state.player;
+
+  function margin(prevT, t){
+    if(prevT===null) return "—";
+    const g=t-prevT;
+    if(g<0.018) return "ハナ";
+    if(g<0.045) return "アタマ";
+    if(g<0.075) return "クビ";
+    if(g<0.13)  return "1/2";
+    const len=Math.max(0.5, Math.round((g*19/2.4)*2)/2);
+    return len+"馬身";
+  }
+
+  // 賞金・騎手ポイント
+  const C = state.career || (state.career={funds:0,points:0,races:0,wins:0});
+  const distMul = CFG.DIST>=2000?1.3: CFG.DIST>=1600?1.1:1.0;
+  const baseP=[0,1000,400,250,150,100,60,40,30][p.rank] || 20;
+  const prize=Math.round(baseP*distMul);
+  let pts=[0,50,24,16,10,6,3][p.rank] || 1;
+  let upset=false;
+  if(p.rank===1 && p.popRank>=5){ pts+=30; upset=true; }
+  C.funds+=prize; C.points+=pts; C.races++; if(p.rank===1) C.wins++;
+
+  // 着順表
+  const body=$("result-body"); body.innerHTML="";
+  let prevT=null;
+  ranked.forEach(h=>{
+    const tr=document.createElement("tr");
+    if(h.isPlayer) tr.className="me";
+    if(h.rank===1) tr.classList.add("won");
+    tr.innerHTML=`<td class="r">${h.rank}</td>
+      <td>${h.name}${h.isPlayer?' <span style="color:var(--gold);font-size:10px;">(自分)</span>':''}</td>
+      <td class="dim">${STYLES[h.style].name}</td>
+      <td class="num">${h.popRank}人気</td>
+      <td class="num">${margin(prevT,h.finishTime)}</td>`;
+    body.appendChild(tr);
+    prevT=h.finishTime;
+  });
+
+  // 大見出し
+  const rk=$("result-rank"), sub=$("result-sub");
+  rk.textContent = p.rank+"着";
+  rk.className = "result-rank " + (p.rank===1?"win": p.rank<=3?"place":"lose");
+  const phr = p.rank===1?"勝利！ 完璧な騎乗だ":
+              p.rank<=3?"好騎乗！ 馬券圏内に好走":
+              p.rank<=5?"惜しい。あと一歩":"powerless… 巻き返しを期そう";
+  sub.textContent = `${p.rank} / ${CFG.N} 着　${phr}　（${p.popRank}番人気・単勝${p.odds}倍）`;
+  // 賞金・ポイント表示
+  const rw=$("result-reward");
+  if(rw) rw.innerHTML =
+    `<span class="pill${upset?' up':''}">獲得賞金 <b>${prize}</b>万</span>`+
+    `<span class="pill${upset?' up':''}">騎手P <b>+${pts}</b>${upset?'（人気薄勝ち!）':''}</span>`+
+    `<span class="pill">通算 <b>${C.wins}</b>勝 / ${C.points}P / ${C.funds}万</span>`;
+
+  $("result-advice").innerHTML = buildAdvice(p);
+
+  // 写真判定（1〜2着が際どい）→ スロー演出の後に結果
+  const m12 = ranked.length>1 ? (ranked[1].finishTime - ranked[0].finishTime) : 1;
+  const reveal = ()=>{ Sfx.jingle(p.rank===1); Voice.say(`1着は、${ranked[0].name}！`); setTimeout(()=>{Sfx.stopCrowd(); Sfx.stopRumble();},2200); cancelAnimationFrame(state.raf); showScreen("result"); };
+  if(m12 < 0.03){
+    jcall("際どい！　写真判定だ！", true);
+    showPhotoFinish(reveal);
+  } else {
+    reveal();
+  }
+}
+// 写真判定の演出（3Dを映したままフラッシュ→数秒後にコールバック）
+function showPhotoFinish(cb){
+  const ov=$("photo-finish"), fl=$("pf-flash"); if(!ov){ cb(); return; }
+  ov.classList.add("show");
+  if(fl){ fl.classList.remove("go"); void fl.offsetWidth; fl.classList.add("go"); }
+  Sfx.thud(); Sfx.blip(1500,0.04,"square");   // シャッター音
+  setTimeout(()=>{ if(fl){ fl.classList.remove("go"); void fl.offsetWidth; fl.classList.add("go"); } Sfx.blip(1500,0.04,"square"); }, 700);
+  setTimeout(()=>{ ov.classList.remove("show"); cb(); }, 2300);
+}
+
+/* ---------- 講評ロジック：何が良/悪かったかを判定 ---------- */
+function buildAdvice(p){
+  const tips=[];
+  const commit = p._commitAt;          // 仕掛けた地点（nullなら未仕掛け）
+  const compMin = p._compMin;
+  const staStraight = p._staAtStraight; // 直線入口でのスタミナ
+  const blockS = p._blockStraight;      // 直線でブロックされた時間
+
+  // 良かった点（勝因）
+  if(p.rank===1 && p.popRank>=4){
+    tips.push(`<b>🏆 能力差を覆した！</b>${p.popRank}番人気の評価を、騎乗の力で勝利に変えた。これぞジョッキーの醍醐味。`);
+  } else if(p.rank===1){
+    tips.push(`<b>勝因：</b>仕掛け・折り合い・進路取りが噛み合った。理想的な騎乗。`);
+  } else if(p.rank<=3){
+    tips.push(`<b>好走：</b>大きなロスなく立ち回れている。`);
+  }
+
+  // 折り合い
+  if(compMin < 20){
+    tips.push(`<b>折り合い：</b>道中で力みすぎ（最低${Math.round(compMin)}）。気性の荒い馬は序盤にギアを落として折り合いをつけると、終い脚が残る。`);
+  } else if(compMin > 60 && p.stats.temper<60){
+    tips.push(`<b>折り合い◎：</b>難しい気性をうまく御せていた。`);
+  }
+
+  // 仕掛けタイミング
+  if(commit===null){
+    tips.push(`<b>仕掛け：</b>最後までギアを上げ切れなかった。勝負所でギアを上げて追い出そう。`);
+  } else if((CFG.DIST - commit) > 650){
+    tips.push(`<b>仕掛けが早い：</b>残り${Math.round(CFG.DIST-commit)}mから動いて直線で脚が上がった。瞬発力の高い馬ほど我慢が利く。`);
+  } else if((CFG.DIST - commit) < 220 && p.rank>3){
+    tips.push(`<b>仕掛けが遅い：</b>追い出しが間に合わず届かなかった。早めの進出も検討を。`);
+  }
+
+  // スタミナ
+  if(staStraight!==null && staStraight<25){
+    tips.push(`<b>スタミナ：</b>直線入口で残り少（${Math.round(staStraight)}）。前半飛ばしすぎ。序盤はギアを落として脚を温存しよう。`);
+  }
+
+  // 馬群さばき
+  if(blockS>1.2){
+    tips.push(`<b>進路：</b>直線で前が壁になり${blockS.toFixed(1)}秒ロス。早めに［内/外］で進路を確保したい。`);
+  }
+
+  // 脚質と気性の相性ヒント
+  const bestFit = CANDIDATES[state.selectedHorseIdx].bestStyle.includes(p.style);
+  if(!bestFit && p.rank>3){
+    const rec=CANDIDATES[state.selectedHorseIdx].bestStyle.map(s=>STYLES[s].name).join("・");
+    tips.push(`<b>作戦：</b>この馬は<b>${rec}</b>が合う。脚質を変えると持ち味が出やすい。`);
+  }
+
+  if(tips.length===0) tips.push("大きな破綻のない騎乗。あとは仕掛けの一押しで上位を狙おう。");
+  return tips.slice(0,3).join("<br><br>");
+}
+
+/* ============================ イベント結線 ============================ */
+// 画面遷移ボタン
+$("btn-to-select").addEventListener("click", ()=>{ renderHorseList(); showScreen("horse"); });
+$("btn-back-title").addEventListener("click", ()=> showScreen("title"));
+$("btn-to-tactic").addEventListener("click", ()=>{ renderTacticScreen(); showScreen("tactic"); });
+$("btn-back-horse").addEventListener("click", ()=> showScreen("horse"));
+$("btn-to-race").addEventListener("click", ()=> initRace());
+
+// レース操作ボタン
+$("btn-in").addEventListener("click", ()=>{ const h=state.player; if(h&&!h.finished) h.targetLane=clamp(h.targetLane-1,0,7); });
+$("btn-out").addEventListener("click", ()=>{ const h=state.player; if(h&&!h.finished) h.targetLane=clamp(h.targetLane+1,0,7); });
+$("btn-geardown").addEventListener("click", ()=> shiftGear(-1));
+$("btn-gearup").addEventListener("click", ()=> shiftGear(+1));
+$("btn-whip").addEventListener("click", doWhip);
+$("btn-sound").addEventListener("click", ()=>{
+  Sfx.init(); Sfx.resume();
+  const on = Sfx.toggle();
+  if(!on) Voice.stop();
+  const b=$("btn-sound"); b.textContent = on?"🔊":"🔇"; b.classList.toggle("off", !on);
+});
+// 最初のタップで音声を有効化（ブラウザの自動再生制限への対応）
+document.addEventListener("pointerdown", ()=>{ Sfx.init(); Sfx.resume(); Voice.init(); Voice.prime(); }, true);
+
+// 結果画面
+$("btn-replay").addEventListener("click", ()=> initRace());           // 同じ馬・同じ作戦
+$("btn-rehorse").addEventListener("click", ()=>{ renderHorseList(); showScreen("horse"); });
+$("btn-to-title2").addEventListener("click", ()=> showScreen("title"));
+
+// 起動時：キャンバスのサイズ取得用に一度だけ参照
+window.addEventListener("load", ()=>{ /* タイトル表示のみ。レース開始時にresizeCanvas */ });
+</script>
+</body>
+</html>

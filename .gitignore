@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Claude Code: ローカル端末固有の設定（共有しない）
+.claude/settings.local.json
+
+# OS / エディタの一時ファイル
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*~
+
+# 一時生成物（構文チェック等）
+.__syntax_check.js
+*.tmp

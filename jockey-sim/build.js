@@ -15,6 +15,7 @@ fs.mkdirSync(distVendor, { recursive: true });
 const copies = [
   ["jockey_game.html", path.join(dist, "index.html")],          // エントリ名を index.html へ
   ["vendor/three-bundle.js", path.join(distVendor, "three-bundle.js")],  // esbuildバンドル: three r160 + addons
+  ["vendor/Horse.glb", path.join(distVendor, "Horse.glb")],              // GLTF馬（three.js公式・実証用）
   // PWA（インストール可能アプリ化）
   ["manifest.webmanifest", path.join(dist, "manifest.webmanifest")],
   ["sw.js", path.join(dist, "sw.js")],

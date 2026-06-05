@@ -2297,6 +2297,45 @@ function makeNumberSprite(num, color){
   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex, transparent:true})); sp.scale.set(2.0,2.0,1);
   return sp;
 }
+/* ===== GLTF馬（実証用・フラグOFF既定）。USE_GLTF_HORSE=true で箱馬→GLTF馬へ。要視覚レビュー =====
+   スライスで実証した GLTF ギャロップ馬を本体へ。毛色tint＋procedural騎手(シルク/枠番帽)を載せる。
+   v1: rest-pose接地＋距離同期timeScale（足滑り防止）。per-frame接地IK/首pumpは次段。 */
+const USE_GLTF_HORSE = false;
+const HORSE_LEN_M = 3.0;     // 体長スケール（要調整）
+const HORSE_STRIDE = 7.0;    // 1完歩で進む距離(m)。脚回転を地上速度に同期
+let gltfHorseProto=null, gltfHorseClip=null;
+function loadGltfHorse(){
+  if(!USE_GLTF_HORSE || !window.THREE_ADDONS || gltfHorseProto) return;
+  new window.THREE_ADDONS.GLTFLoader().load('vendor/Horse.glb', (gltf)=>{
+    gltfHorseProto = gltf.scene; gltfHorseClip = gltf.animations[0];
+    if(threeReady && state.field && state.field.length) syncHorseMeshes();   // 読み込み完了で差し替え
+  }, undefined, ()=>{ /* 失敗時は箱馬のまま */ });
+}
+function makeGltfHorse(coatKey, silk, capCol){
+  const A=window.THREE_ADDONS, coat=COATS[coatKey]||COATS.kage, g=new THREE.Group();
+  const h=A.cloneSkeleton(gltfHorseProto);
+  const box=new THREE.Box3().setFromObject(h), size=new THREE.Vector3(); box.getSize(size);
+  const s=HORSE_LEN_M/Math.max(size.x, size.z);
+  h.scale.setScalar(s); h.rotation.y=Math.PI/2;             // 前方を group の +X へ（要調整）
+  let cmesh=null;
+  h.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.frustumCulled=false; if(o.morphTargetInfluences) cmesh=o;
+    o.material=o.material.clone(); if(o.material.color) o.material.color.setHex(coat.body); o.material.roughness=0.62; } });
+  h.updateMatrixWorld(true);
+  const b2=new THREE.Box3().setFromObject(h); h.position.y = -b2.min.y;   // 足を group の y=0 へ（rest-pose接地）
+  g.add(h);
+  const mixer=new THREE.AnimationMixer(h);
+  if(gltfHorseClip){ const a=mixer.clipAction(gltfHorseClip); a.play(); a.time=Math.random()*1.2; }
+  // 騎手（procedural・シルク＋枠番帽）。GLTF馬の背の高さに乗せる
+  const backY=(size.y*s)*0.72;
+  const silkMat=new THREE.MeshStandardMaterial({color:silk, roughness:.5});
+  const capMat =new THREE.MeshStandardMaterial({color:(capCol!=null?capCol:silk), roughness:.45});
+  const rider=new THREE.Mesh(new THREE.SphereGeometry(0.5,12,10), silkMat); rider.scale.set(0.5,0.54,0.46); rider.position.set(-0.1, backY+0.18, 0); rider.rotation.x=0.18; g.add(rider);
+  const arms =new THREE.Mesh(new THREE.BoxGeometry(0.30,0.15,0.46), silkMat); arms.position.set(0.28, backY+0.06, 0); g.add(arms);
+  const cap  =new THREE.Mesh(new THREE.SphereGeometry(0.16,12,10), capMat); cap.position.set(-0.06, backY+0.50, 0); g.add(cap);
+  g.userData={ gltf:true, mixer, rider, arms, cap, riderY:backY+0.18, armsY:backY+0.06, clipDur:(gltfHorseClip?gltfHorseClip.duration:0.5) };
+  return g;
+}
+
 function syncHorseMeshes(){
   if(!threeReady) return;
   horseMeshes.forEach(m=>{ scene.remove(m.group); scene.remove(m.sprite); if(m.blob) scene.remove(m.blob); });
@@ -2304,7 +2343,9 @@ function syncHorseMeshes(){
   if(playerRing){ scene.remove(playerRing); playerRing=null; }
   const nField=state.field.length;
   state.field.forEach((h)=>{
-    const g=makeHorseMesh(h.color, h.coat, h.markings, h.isPlayer, capColor(h.num, nField));
+    const g=(USE_GLTF_HORSE && gltfHorseProto)
+      ? makeGltfHorse(h.coat, h.color, capColor(h.num, nField))
+      : makeHorseMesh(h.color, h.coat, h.markings, h.isPlayer, capColor(h.num, nField));
     g.traverse(o=>{ if(o.isMesh) o.castShadow=true; });   // 馬体は影を落とす
     scene.add(g);
     const sp=makeNumberSprite(String(h.num), h.color); scene.add(sp);
@@ -2509,6 +2550,7 @@ function ensureThree(){
   // 自発光・空などの「素の色」はトーンマップ対象外にして発色を維持
   scene.traverse(o=>{ if(o.material && o.material.isMeshBasicMaterial) o.material.toneMapped=false; });
   buildComposer();     // ポストプロセス（POST=true時）
+  loadGltfHorse();     // GLTF馬（USE_GLTF_HORSE=true時・非同期で差し替え）
   threeReady=true;
   Budget.reset();      // 予算オーケストレーター起動（初期=高）
   return true;
@@ -2598,32 +2640,37 @@ function drawTrack(){
     const sp=clamp(h.speed/17, 0, 1.35);
     const ph=h.dist*1.55;                                 // 走行位相（距離ベースで安定）
     const bob=Math.max(0,Math.sin(ph+0.3))*0.085*sp;      // バウンド（一完歩に一度の浮き）
-    m.group.position.set(w.x, bob, w.z);
+    m.group.position.set(w.x, m.group.userData.gltf?0:bob, w.z);   // GLTFは接地済み(y=0)／箱馬はbob
     m.group.rotation.y = -w.heading;
     // コーナーのバンク（内に傾ける。速いほど深く、滑らかに）
     const tgtBank = (w.curve!==0) ? (-0.17*clamp(sp,0,1.2)) : 0;
     m._bank = (m._bank||0) + (tgtBank - (m._bank||0))*0.08;
     m.group.rotation.x = m._bank;
-    m.group.rotation.z = Math.sin(ph)*0.055*sp;           // 馬体のうねり（前後のロック）
     const ud=m.group.userData, lg=ud.legs;
-    if(lg && lg[0] && lg[0].hip){
-      const LEGPH=[2.6, 3.05, 0.0, 0.45];                 // FL,FR,BL,BR のギャロップ位相
-      for(let i=0;i<4;i++){
-        const L=lg[i], a=ph+LEGPH[i];
-        L.hip.rotation.z = 0.72*sp*Math.sin(a);           // 股関節の前後スイング
-        const fold=Math.max(0, Math.sin(a+1.5));          // スイング中に脚を畳む
-        L.knee.rotation.z = (L.front?-1:1) * (0.30+0.55*sp) * fold;  // 膝/飛節の屈伸
+    if(ud.gltf){
+      // GLTF：脚の回転を地上速度に同期してギャロップ再生（足滑り防止）。うねり/脚/首/尾はモーフが担う
+      if(ud.mixer){ ud.mixer.timeScale = (h.speed/HORSE_STRIDE)*ud.clipDur; ud.mixer.update(dt); }
+    } else {
+      m.group.rotation.z = Math.sin(ph)*0.055*sp;           // 馬体のうねり（前後のロック）
+      if(lg && lg[0] && lg[0].hip){
+        const LEGPH=[2.6, 3.05, 0.0, 0.45];                 // FL,FR,BL,BR のギャロップ位相
+        for(let i=0;i<4;i++){
+          const L=lg[i], a=ph+LEGPH[i];
+          L.hip.rotation.z = 0.72*sp*Math.sin(a);           // 股関節の前後スイング
+          const fold=Math.max(0, Math.sin(a+1.5));          // スイング中に脚を畳む
+          L.knee.rotation.z = (L.front?-1:1) * (0.30+0.55*sp) * fold;  // 膝/飛節の屈伸
+        }
       }
+      if(ud.neck) ud.neck.rotation.z = -0.04 + Math.sin(ph)*0.11*sp;    // 首を完歩ごとに大きく送る
+      if(ud.tail) ud.tail.rotation.z = 0.7 + Math.sin(ph*1.3)*0.13;     // 尾のなびき
     }
-    if(ud.neck) ud.neck.rotation.z = -0.04 + Math.sin(ph)*0.11*sp;    // 首を完歩ごとに大きく送る
-    if(ud.tail) ud.tail.rotation.z = 0.7 + Math.sin(ph*1.3)*0.13;     // 尾のなびき
     // 騎手：ストライドに合わせて追う。直線・高ギア・ムチで激しく＝追い出しの姿勢
     if(ud.rider){
       const driving = (h.isPlayer && (h.gear>=6 || h.whipTimer>0)) ? 1 : (h.dist>=CFG.straightDist?0.6:0);
       const amp=(0.12+driving*0.22)*sp;
       ud.rider.rotation.x = 0.18 + driving*0.22 + Math.sin(ph)*amp;
       ud.rider.position.y = ud.riderY - driving*0.06 + Math.abs(Math.sin(ph))*0.05*sp;
-      if(ud.arms){ ud.arms.rotation.x = Math.sin(ph)*amp*0.8; ud.arms.position.y = 1.40 - driving*0.05; }
+      if(ud.arms){ ud.arms.rotation.x = Math.sin(ph)*amp*0.8; ud.arms.position.y = (ud.armsY!=null?ud.armsY:1.40) - driving*0.05; }
     }
     m.sprite.position.set(w.x, 2.45+bob, w.z);
     m.sprite.material.opacity = h.finished? 0.5 : 1;

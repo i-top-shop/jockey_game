@@ -1,11 +1,12 @@
 // Service Worker：アプリシェルをキャッシュしオフライン動作＆インストール可能に。
 //   相対パスで記述（GitHub Pages のサブパス /<repo>/ でも壊れない）。
 //   キャッシュを更新したい時は CACHE のバージョンを上げる。
-const CACHE = "hizumeoto-v4";
+const CACHE = "hizumeoto-v5";
 const SHELL = [
   "./",
   "./index.html",
   "./vendor/three-bundle.js",
+  "./vendor/Horse.glb",
   "./manifest.webmanifest",
   "./icon-192.png",
   "./icon-512.png",

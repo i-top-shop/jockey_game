@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>蹄音 縦スライス — 直線追い比べ30秒（スタイライズド検証）</title>
+<!-- 検証スライス：現スタックのまま r0.16x + EffectComposer + GLTF馬 + 夕景。東京再現なし（架空の直線）。 -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<style>
+  html,body{margin:0;height:100%;background:#0b0d12;overflow:hidden;font-family:system-ui,sans-serif;color:#e8eef0}
+  #app{position:fixed;inset:0}
+  #hud{position:fixed;top:10px;left:10px;z-index:10;background:rgba(8,12,16,.62);backdrop-filter:blur(6px);
+       border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 12px;font-size:12px;line-height:1.6;
+       font-variant-numeric:tabular-nums;min-width:190px;pointer-events:none}
+  #hud b{color:#e8b84b}
+  #hud .big{font-size:20px;font-weight:700}
+  #btns{position:fixed;top:10px;right:10px;z-index:10;display:flex;gap:8px}
+  #btns button{background:#16212b;color:#e8eef0;border:1px solid #2a3a47;border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer}
+  #btns button:hover{background:#1e2c38}
+  #report{position:fixed;bottom:10px;left:10px;right:10px;z-index:10;max-height:34vh;overflow:auto;display:none;
+          background:rgba(8,12,16,.82);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px;font-size:11px;white-space:pre-wrap}
+  #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:20;
+           background:#0b0d12;font-size:15px;letter-spacing:.05em}
+  #err{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:30;background:#1a0f0f;
+       color:#ffb3b3;padding:24px;text-align:center;font-size:13px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="hud">
+  <div><span class="big" id="fps">–</span> FPS　<span id="ft">–</span> ms</div>
+  <div>draw <b id="calls">–</b>　tris <b id="tris">–</b></div>
+  <div>prog <span id="progs">–</span>　geo <span id="geos">–</span>　tex <span id="texs">–</span></div>
+  <div>res <span id="res">–</span> @<span id="dpr">–</span>x</div>
+  <div>horses <span id="nh">–</span>　three <span id="ver">–</span></div>
+</div>
+<div id="btns">
+  <button id="shot">📷 スクショ保存</button>
+  <button id="rep">📊 負荷レポート</button>
+</div>
+<div id="report"></div>
+<div id="loading">夕景の直線を読み込み中…（CDNからThree.js r0.160 / 馬GLTF）</div>
+<div id="err"></div>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { clone as cloneGLTF } from 'three/addons/utils/SkeletonUtils.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+// ===== 調整しやすい定数（実機を見て微調整する想定） =====
+const HORSE_LEN   = 3.3;        // 馬の体長(m)へ自動スケール（柵に対し見栄えするやや大きめ）
+const GROUND_Y    = 0.0;        // 接地の微調整（浮く=+/めり込む=- で数cm単位）
+const HORSE_FACE_Y= Math.PI/2;  // 馬の向き補正（走行は +X）
+const N_HORSES    = 4;          // 追い比べの頭数
+const STRAIGHT    = 520;        // 直線の長さ(m)。30秒×ギャロップ速度に合わせて長く
+const LOOP_SEC    = 30;         // 30秒で1本走ってループ
+const BASE_SPEED  = STRAIGHT/LOOP_SEC;   // 平均速度≈17m/s（実際のギャロップ帯）
+const START_X     = 0;          // スタートのX
+const STRIDE      = 7.0;        // 1完歩で進む距離(m)。脚の回転を地上速度に同期＝足滑り解消（前/後に滑れば±）
+const NECK_AMP    = 0.26;       // 首・頭の上下動の振幅(m)。0で無効
+const NECK_REACH  = 0.18;       // 前後の伸縮振幅(m)。下げる時に前へ伸ばす＝本物のpump（楕円運動）
+const NECK_PHASE  = 0.0;        // 完歩に対する首振りの位相(rad)。脚と合わなければ調整（π前後で反転）
+const NECK_LAG    = 0.8;        // 首付け根ほど遅れて動く位相差(rad)＝頭が先導する"しなり波"
+const NECK_SIGN   = 0;          // 頭の向き符号。0=自動判定／首でなく尻が動いたら 1 か -1 で反転
+const SHOW_GRASS  = false;      // 芝（インスタンス草）の表示。true で復活
+
+const errEl = document.getElementById('err');
+function fail(msg){ errEl.style.display='flex'; errEl.textContent='読み込みエラー:\n'+msg+'\n\n※ ローカルサーバ(http)で開いてください（file:// は不可）。ネット接続も必要です。'; }
+window.addEventListener('error', e=> fail(e.message||String(e.error||e)));
+window.addEventListener('unhandledrejection', e=> fail((e.reason&&e.reason.message)||String(e.reason)));
+
+const app = document.getElementById('app');
+const W = ()=>app.clientWidth, H = ()=>app.clientHeight;
+
+// ===== レンダラ（r0.16x：色管理・トーンマップ） =====
+const renderer = new THREE.WebGLRenderer({ antialias:true, preserveDrawingBuffer:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio||1, 2));
+renderer.setSize(W(), H());
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+app.appendChild(renderer.domElement);
+renderer.info.autoReset = false;   // Composerの複数パス合計を正しく集計するため手動リセット
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(38, W()/H(), 0.3, 600);
+camera.position.set(-8, 3.2, -13);
+
+// ===== 夕景の空（グラデーション球）＋フォグ =====
+const SKY_TOP=new THREE.Color(0x2f72c4), SKY_HOR=new THREE.Color(0xcfe2f3), SUN=new THREE.Color(0xfffaf0);  // 昼空
+{
+  const skyGeo = new THREE.SphereGeometry(400, 32, 16);
+  const skyMat = new THREE.ShaderMaterial({
+    side: THREE.BackSide, depthWrite:false, fog:false,
+    uniforms:{ top:{value:SKY_TOP}, hor:{value:SKY_HOR}, sun:{value:SUN}, sunDir:{value:new THREE.Vector3(0.5,0.85,0.3).normalize()} },
+    vertexShader:`varying vec3 vd; void main(){ vd=normalize(position); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);} `,
+    fragmentShader:`varying vec3 vd; uniform vec3 top,hor,sun,sunDir;
+      float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
+      float noise(vec2 p){ vec2 i=floor(p),f=fract(p); f=f*f*(3.0-2.0*f);
+        return mix(mix(hash(i),hash(i+vec2(1,0)),f.x), mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x), f.y); }
+      float fbm(vec2 p){ float v=0.0,a=0.5; for(int k=0;k<4;k++){ v+=a*noise(p); p*=2.0; a*=0.5; } return v; }
+      void main(){ float h=clamp(vd.y*1.4+0.15,0.0,1.0); vec3 c=mix(hor,top,pow(h,0.7));
+        float s=pow(max(dot(normalize(vd),normalize(sunDir)),0.0), 18.0); c=mix(c,sun,s*0.8);
+        if(vd.y>0.03){ vec2 cp=vd.xz/vd.y*1.2;
+          float cl=smoothstep(0.52,0.86,fbm(cp*1.4));
+          cl*=smoothstep(0.03,0.22,vd.y)*(1.0-smoothstep(0.72,1.0,vd.y));   // 地平近く＆天頂は薄く
+          c=mix(c, vec3(1.0), cl*0.55); }
+        gl_FragColor=vec4(c,1.0);} `
+  });
+  scene.add(new THREE.Mesh(skyGeo, skyMat));
+}
+scene.fog = new THREE.Fog(0xbfd4e6, 90, 380);   // 昼の霞
+
+// ===== ライティング（低い暖色の主光＋クールな補助＋リム） =====
+const sun = new THREE.DirectionalLight(0xfff4e0, 3.1);
+sun.position.set(38, 62, 20);              // 高い日中の太陽（影が真下寄り＝接地が読める）
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.near = 1; sun.shadow.camera.far = 220;
+sun.shadow.camera.left=-50; sun.shadow.camera.right=50; sun.shadow.camera.top=40; sun.shadow.camera.bottom=-40;
+sun.shadow.bias = -0.0004;
+scene.add(sun); scene.add(sun.target);
+const hemi = new THREE.HemisphereLight(0xaeccf5, 0x5b5a3f, 0.75);  // 昼：空=青 / 地=草の照り返し
+scene.add(hemi);
+const rim = new THREE.DirectionalLight(0xbcd0ff, 0.35);            // 反対側からの淡いリム
+rim.position.set(-40, 18, -20); scene.add(rim);
+
+// ===== 地面（芝）＋ラチ＋ゴール線 =====
+function turfTexture(){
+  const c=document.createElement('canvas'); c.width=c.height=256; const x=c.getContext('2d');
+  x.fillStyle='#0f2d18'; x.fillRect(0,0,256,256);   // さらに濃い深緑ベース
+  for(let i=0;i<2600;i++){ x.fillStyle=`rgba(${12+Math.random()*18|0},${42+Math.random()*30|0},${24+Math.random()*18|0},.5)`;
+    x.fillRect(Math.random()*256,Math.random()*256,1,2+Math.random()*3); }
+  // 刈り目の縞（控えめ）
+  for(let i=0;i<256;i+=32){ x.fillStyle='rgba(255,255,255,.02)'; if((i/32)%2) x.fillRect(i,0,32,256); }
+  const t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(40,8);
+  t.anisotropy=8; t.colorSpace=THREE.SRGBColorSpace; return t;
+}
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(STRAIGHT+80, 60),
+  new THREE.MeshStandardMaterial({ map:turfTexture(), roughness:0.95, metalness:0.0 })
+);
+ground.rotation.x = -Math.PI/2; ground.position.set(STRAIGHT*0.4, 0, 0);
+ground.receiveShadow = true; scene.add(ground);
+
+const railMat=new THREE.MeshStandardMaterial({color:0xf3f4f5, roughness:0.6});
+function rail(z){
+  const top=new THREE.Mesh(new THREE.BoxGeometry(STRAIGHT+80, 0.06, 0.06), railMat); top.position.set(STRAIGHT*0.4,0.78,z); scene.add(top);
+  const xs=[]; for(let x=-30;x<=STRAIGHT+50;x+=6) xs.push(x);
+  const posts=new THREE.InstancedMesh(new THREE.CylinderGeometry(0.04,0.04,0.82,6), railMat, xs.length);  // 支柱＝1ドローコール
+  const m=new THREE.Matrix4(); xs.forEach((x,i)=>{ m.makeTranslation(x,0.39,z); posts.setMatrixAt(i,m); });
+  posts.instanceMatrix.needsUpdate=true; posts.castShadow=true; scene.add(posts);
+}
+rail(-6); rail(6);
+
+// ===== インスタンス芝（風になびく草ブレード＝スタイライズドの肝） =====
+let grassU=null;
+(function buildGrass(){
+  if(!SHOW_GRASS) return;   // 芝オフ（地面テクスチャのみ）
+  const H=0.035, geo=new THREE.PlaneGeometry(0.03, H, 1, 1); geo.translate(0, H/2, 0);   // 極短ターフ3.5cm（根本をy=0へ）
+  const mat=new THREE.MeshStandardMaterial({ color:0xffffff, roughness:0.92, side:THREE.DoubleSide });
+  mat.onBeforeCompile=(sh)=>{
+    sh.uniforms.uTime={value:0}; grassU=sh.uniforms.uTime;
+    sh.vertexShader='uniform float uTime;\n'+sh.vertexShader.replace('#include <begin_vertex>',
+      `#include <begin_vertex>
+       float gh = clamp(position.y/${H.toFixed(3)}, 0.0, 1.0);
+       vec3 wp = (instanceMatrix*vec4(transformed,1.0)).xyz;
+       float sway = sin(uTime*1.4 + wp.x*0.18 + wp.z*0.22)*0.008 + sin(uTime*2.7 + wp.x*0.5)*0.003;
+       transformed.x += sway*gh*gh;`);
+  };
+  const N=140000, inst=new THREE.InstancedMesh(geo, mat, N);
+  const m=new THREE.Matrix4(), q=new THREE.Quaternion(), up=new THREE.Vector3(0,1,0), sc=new THREE.Vector3(), p=new THREE.Vector3(), col=new THREE.Color();
+  const X0=-20, X1=STRAIGHT+20, Z0=-12.5, Z1=12.5;
+  for(let i=0;i<N;i++){
+    p.set(X0+Math.random()*(X1-X0), 0, Z0+Math.random()*(Z1-Z0));
+    q.setFromAxisAngle(up, Math.random()*6.2832);
+    const w=0.7+Math.random()*0.6; sc.set(w, 0.7+Math.random()*0.5, w);   // 背丈ばらつき小（伸びすぎ防止）
+    m.compose(p,q,sc); inst.setMatrixAt(i,m);
+    col.setHSL(0.31+Math.random()*0.04, 0.45+Math.random()*0.15, 0.085+Math.random()*0.055); inst.setColorAt(i,col);   // さらに暗い深緑
+  }
+  inst.instanceMatrix.needsUpdate=true; if(inst.instanceColor) inst.instanceColor.needsUpdate=true;
+  inst.castShadow=false; inst.receiveShadow=false; inst.frustumCulled=false;
+  scene.add(inst);
+})();
+// ゴール線（チェッカー）
+{
+  const c=document.createElement('canvas'); c.width=64; c.height=8; const x=c.getContext('2d');
+  for(let i=0;i<8;i++){ x.fillStyle=(i%2)?'#111':'#f4f4f4'; x.fillRect(i*8,0,8,8); }
+  const t=new THREE.CanvasTexture(c); t.wrapS=THREE.RepeatWrapping; t.repeat.set(2,1); t.magFilter=THREE.NearestFilter; t.colorSpace=THREE.SRGBColorSpace;
+  const line=new THREE.Mesh(new THREE.PlaneGeometry(0.6,12), new THREE.MeshStandardMaterial({map:t, roughness:.7}));
+  line.rotation.x=-Math.PI/2; line.position.set(STRAIGHT*0.82, 0.02, 0); scene.add(line);
+  const post=new THREE.MeshStandardMaterial({color:0xd23b3b, roughness:.5});
+  for(const z of [-6.6,6.6]){ const m=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,4,10), post); m.position.set(STRAIGHT*0.82,2,z); m.castShadow=true; scene.add(m); }
+}
+
+// ===== ポストプロセス（Bloom → グレード/ビネット → 出力） =====
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(W(),H()), 0.30, 0.5, 0.9); // strength,radius,threshold（昼は控えめ）
+composer.addPass(bloom);
+const GradeVignette = {
+  uniforms:{ tDiffuse:{value:null}, warm:{value:new THREE.Color(1.03,1.0,0.95)}, sat:{value:1.14}, vig:{value:1.2} },
+  vertexShader:`varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);} `,
+  fragmentShader:`uniform sampler2D tDiffuse; uniform vec3 warm; uniform float sat,vig; varying vec2 vUv;
+    void main(){ vec4 c=texture2D(tDiffuse,vUv); vec3 col=c.rgb*warm;
+      float l=dot(col,vec3(0.2126,0.7152,0.0722)); col=mix(vec3(l),col,sat);
+      vec2 d=vUv-0.5; float v=smoothstep(0.78, vig, length(d)*1.3); col*=(1.0 - v*0.55);
+      gl_FragColor=vec4(col,c.a);} `
+};
+composer.addPass(new ShaderPass(GradeVignette));
+composer.addPass(new OutputPass());
+
+// ===== 馬（GLTF・ギャロップ）。読み込み→自動スケール/接地→N体クローン =====
+const horses = [];
+let GND = null;                       // 接地IK：{basePos, morphs, rel, foot[]}（モーフ変形後の蹄を実測）
+let NECK = null;                      // 首バウンド：{w[], idx[]}（頭側頂点の重み）
+let CLIP_DUR = 0.5;                   // ギャロップ1サイクルの長さ（読み込み時に確定）
+const _v = new THREE.Vector3();
+const clock = new THREE.Clock();
+new GLTFLoader().load('Horse.glb', (gltf)=>{
+  const proto = gltf.scene;
+  const box = new THREE.Box3().setFromObject(proto); const size=new THREE.Vector3(); box.getSize(size);
+  const s = HORSE_LEN / Math.max(size.x, size.z);
+  CLIP_DUR = (gltf.animations[0] && gltf.animations[0].duration) || 0.5;
+
+  // --- 接地IKの下ごしらえ：モーフ変形メッシュと「足候補頂点（ワールド最下12%）」を特定 ---
+  proto.updateMatrixWorld(true);
+  let pm=null; proto.traverse(o=>{ if(o.isMesh && o.morphTargetInfluences && o.geometry.morphAttributes.position) pm=o; });
+  if(pm){
+    const basePos=pm.geometry.attributes.position, morphs=pm.geometry.morphAttributes.position, rel=pm.geometry.morphTargetsRelative;
+    const ys=[]; for(let i=0;i<basePos.count;i++){ _v.fromBufferAttribute(basePos,i).applyMatrix4(pm.matrixWorld); ys.push([i,_v.y]); }
+    ys.sort((a,b)=>a[1]-b[1]);
+    const foot = ys.slice(0, Math.max(30,(basePos.count*0.12)|0)).map(a=>a[0]);
+    GND = { basePos, morphs, rel, foot };
+
+    // 首・頭バウンドの重み：頭側（平均Yが高い端）かつ上半身の頂点ほど大きい（脚・尻・蹄は0）
+    const axC=(size.x>=size.z)?'x':'z', gA=(i)=> axC==='x'?basePos.getX(i):basePos.getZ(i);
+    const minA=axC==='x'?box.min.x:box.min.z, maxA=axC==='x'?box.max.x:box.max.z, midA=(minA+maxA)/2;
+    const minY=box.min.y, maxY=box.max.y; let yp=0,np=0,ym=0,nm=0;
+    for(let i=0;i<basePos.count;i++){ const y=basePos.getY(i); if(gA(i)>midA){yp+=y;np++;}else{ym+=y;nm++;} }
+    let sign=(np&&nm&&(yp/np)>=(ym/nm))?1:-1; if(NECK_SIGN!==0) sign=NECK_SIGN;
+    const w=new Float32Array(basePos.count), tp=new Float32Array(basePos.count), idx=[];
+    for(let i=0;i<basePos.count;i++){
+      const t=THREE.MathUtils.clamp(((gA(i)-midA)*sign)/Math.max(0.001,(maxA-midA)),0,1);
+      const hy=THREE.MathUtils.smoothstep(basePos.getY(i), minY+0.42*(maxY-minY), minY+0.82*(maxY-minY));
+      const ww=THREE.MathUtils.smoothstep(t,0.1,0.95)*hy;
+      if(ww>0.02){ w[i]=ww; tp[i]=t; idx.push(i); }   // tp=首付け根0..頭先1（しなり波の位相に使う）
+    }
+    NECK = { w, tp, idx, ai:(axC==='x'?0:2), sign };   // ai=前後軸(0:x/2:z)、sign=頭の向き
+  }
+
+  const lanes = []; for(let i=0;i<N_HORSES;i++) lanes.push((i-(N_HORSES-1)/2)*2.6);
+  const palette=[0x8a5a2e,0x6e4628,0xb0702f,0x5c4030,0x9a8e80];   // 明るめのbay/栗/芦（暗すぎ解消）
+  for(let i=0;i<N_HORSES;i++){
+    const h = cloneGLTF(proto);
+    h.scale.setScalar(s); h.rotation.y = HORSE_FACE_Y; h.position.z = lanes[i];
+    let cmesh=null;
+    h.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.frustumCulled=false; if(o.morphTargetInfluences) cmesh=o;
+      o.material = o.material.clone(); if(o.material.color) o.material.color.setHex(palette[i%palette.length]); o.material.roughness=0.6; } });
+    let neck=null;
+    if(NECK && cmesh){ cmesh.geometry = cmesh.geometry.clone(); const pa=cmesh.geometry.attributes.position; neck={ pa, base:new Float32Array(pa.array) }; }
+    const mixer = new THREE.AnimationMixer(h);
+    if(gltf.animations[0]){ const a=mixer.clipAction(gltf.animations[0]); a.play(); a.time=Math.random()*1.2; }
+    mixer.update(0); h.updateMatrixWorld(true);
+    if(GND&&cmesh) h.position.y += GROUND_Y - lowestWorldY(cmesh);   // 初期接地
+    scene.add(h);
+    horses.push({ obj:h, mixer, mesh:cmesh, neck, s, spd: BASE_SPEED*(0.97+0.05*Math.random()), phase:Math.random()*6.28, lane:lanes[i], dist:-i*0.8 });
+  }
+  document.getElementById('loading').style.display='none';
+  document.getElementById('nh').textContent=N_HORSES;
+  document.getElementById('ver').textContent='r'+THREE.REVISION;
+  clock.start(); renderer.setAnimationLoop(tick);
+}, undefined, (e)=> fail('Horse.glb の読み込みに失敗: '+(e&&e.message||e)) );
+
+// モーフ変形後の蹄（足候補頂点）のワールド最下Yを実測 → 接地に使う
+function lowestWorldY(mesh){
+  const {basePos,morphs,rel,foot}=GND, infl=mesh.morphTargetInfluences, mw=mesh.matrixWorld;
+  let minY=Infinity;
+  for(const idx of foot){
+    let x=basePos.getX(idx), y=basePos.getY(idx), z=basePos.getZ(idx);
+    for(let k=0;k<morphs.length;k++){ const w=infl[k]; if(w){ const m=morphs[k];
+      if(rel){ x+=w*m.getX(idx); y+=w*m.getY(idx); z+=w*m.getZ(idx); }
+      else   { x+=w*(m.getX(idx)-basePos.getX(idx)); y+=w*(m.getY(idx)-basePos.getY(idx)); z+=w*(m.getZ(idx)-basePos.getZ(idx)); } } }
+    _v.set(x,y,z).applyMatrix4(mw); if(_v.y<minY) minY=_v.y;
+  }
+  return minY;
+}
+
+// ===== ループ：馬を走らせる＋カメラ追走＋ポスト合成＋HUD =====
+let smFps=60, smFt=16, hudT=0, runT=0, camFollowX=0;
+function tick(){
+  const dt = Math.min(0.05, clock.getDelta()); runT += dt;
+
+  let leadX=-Infinity, sumX=0, leadDist=-Infinity;
+  for(const h of horses){
+    // 速度は距離を積分（実速度≈17m/s）。surgeで僅かに上下し先頭が入れ替わる「追い比べ」
+    const surge = 1 + 0.03*Math.sin(runT*0.7 + h.phase);
+    const v = h.spd * surge;                       // m/s
+    h.dist += v*dt;
+    const x = START_X + h.dist; h.obj.position.x = x;
+    // 脚の回転数を地上速度に同期：1完歩=STRIDE 進む＝足が滑らない
+    h.mixer.timeScale = (v / STRIDE) * CLIP_DUR;
+    h.mixer.update(dt);
+    h.obj.updateMatrixWorld(true);
+    // 接地IK：変形後の蹄の最下点を地面へピン留め（bodyは着地に応じ自然に上下）
+    if(GND && h.mesh) h.obj.position.y += GROUND_Y - lowestWorldY(h.mesh);
+    // 首・頭のpump：完歩ごとに「前へ伸ばして下げ→引いて上げる」楕円運動（頭先ほど大きく＝首付け根が支点）
+    if(h.neck){
+      const t0=(h.dist/STRIDE)*6.2832 + NECK_PHASE;
+      const pa=h.neck.pa, base=h.neck.base, w=NECK.w, tp=NECK.tp, idx=NECK.idx, ai=NECK.ai, sgn=NECK.sign;
+      const ay=NECK_AMP/h.s, af=NECK_REACH/h.s;
+      for(const j of idx){ const o=j*3, wj=w[j];
+        const ph=t0 - NECK_LAG*(1-tp[j]);                        // 頭が先導し首付け根が遅れる"しなり波"
+        pa.array[o+1]  = base[o+1]  + wj*ay*Math.sin(ph);        // 上下
+        pa.array[o+ai] = base[o+ai] + wj*af*(-Math.cos(ph))*sgn; // 前後（楕円pump）
+      }
+      pa.needsUpdate=true;
+    }
+    sumX+=x; if(x>leadX) leadX=x; if(h.dist>leadDist) leadDist=h.dist;
+  }
+  if(leadDist > STRAIGHT){ for(const h of horses) h.dist -= STRAIGHT; camFollowX -= STRAIGHT; }  // ループ時はカメラXも戻す
+  const packX = sumX/horses.length;
+  sun.target.position.set(leadX, 0, 0);
+  // 中継カメラ（酔い対策・最終形）：一定速度で進む"仮想レール"に乗せる＝加速ジッタ無し。
+  //   後方やや上から前方を見る3/4アングルで、横の流れ（酔いの主因）を前方向の流れへ。
+  camFollowX += BASE_SPEED*dt + (packX - camFollowX)*Math.min(1, dt*0.8);   // 等速＋緩い補正＝滑らか
+  // 真後ろ寄りのチェイス：中心線上・後方・高めから前方(+X)を見る＝光学流が前方向のみ＝最も酔いにくい
+  camera.position.set(camFollowX - 14, 5.0, 0);
+  camera.lookAt(camFollowX + 12, 1.1, 0);
+
+  if(grassU) grassU.value = runT;   // 芝の風アニメ
+  renderer.info.reset();   // フレーム頭でリセット → composer全パスを累積集計
+  composer.render();
+
+  // HUD（0.25s毎）
+  const ft = dt*1000; smFt += (ft-smFt)*0.1; smFps += (1000/Math.max(1,ft)-smFps)*0.1;
+  hudT += dt; if(hudT>0.25){ hudT=0; updateHUD(); }
+}
+function updateHUD(){
+  const inf=renderer.info;
+  document.getElementById('fps').textContent = smFps.toFixed(0);
+  document.getElementById('ft').textContent = smFt.toFixed(1);
+  document.getElementById('calls').textContent = inf.render.calls;
+  document.getElementById('tris').textContent = inf.render.triangles.toLocaleString();
+  document.getElementById('progs').textContent = inf.programs?inf.programs.length:'-';
+  document.getElementById('geos').textContent = inf.memory.geometries;
+  document.getElementById('texs').textContent = inf.memory.textures;
+  document.getElementById('res').textContent = renderer.domElement.width+'×'+renderer.domElement.height;
+  document.getElementById('dpr').textContent = renderer.getPixelRatio().toFixed(2);
+}
+
+// ===== リサイズ =====
+addEventListener('resize', ()=>{
+  camera.aspect=W()/H(); camera.updateProjectionMatrix();
+  renderer.setSize(W(),H()); composer.setSize(W(),H()); bloom.setSize(W(),H());
+});
+
+// ===== スクショ / 負荷レポート =====
+document.getElementById('shot').onclick = ()=>{
+  const a=document.createElement('a'); a.download='hizumeoto-slice-'+Date.now()+'.png';
+  a.href=renderer.domElement.toDataURL('image/png'); a.click();
+};
+document.getElementById('rep').onclick = ()=>{
+  const inf=renderer.info, el=document.getElementById('report');
+  const txt =
+`蹄音 縦スライス 負荷レポート（このブラウザ/GPUでの実測）
+─────────────────────────────
+端末/GPU   : ${navigator.userAgent}
+解像度     : ${renderer.domElement.width}×${renderer.domElement.height}  (DPR ${renderer.getPixelRatio().toFixed(2)})
+FPS(平滑)  : ${smFps.toFixed(0)}　フレーム時間 ${smFt.toFixed(1)} ms
+ドローコール: ${inf.render.calls}
+三角形数   : ${inf.render.triangles.toLocaleString()}
+プログラム : ${inf.programs?inf.programs.length:'-'}　ジオメトリ ${inf.memory.geometries}　テクスチャ ${inf.memory.textures}
+馬         : ${N_HORSES}頭（GLTFモーフ・ギャロップ）
+Three.js   : r${THREE.REVISION}
+ポスト     : Bloom(控えめ) + グレード + ビネット + ACESトーンマップ
+ライト     : 日中の主光(影2048) + ヘミ + 淡いリム / 昼霞フォグ　｜ 接地IK・首pump=CPU
+─────────────────────────────
+※ これは実機GPU実測。サンドボックスのソフト描画では無意味なため画面内HUDで計測。`;
+  el.textContent=txt; el.style.display = el.style.display==='block'?'none':'block';
+};
+</script>
+</body>
+</html>

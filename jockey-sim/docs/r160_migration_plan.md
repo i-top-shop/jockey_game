@@ -18,17 +18,16 @@
 1. **依存とビルド**：推奨＝**ESMの three + addons をローカル vendor ＋ esbuild で単一HTMLへバンドル**。
    - 理由：オフライン/単一HTML/将来のApp Store(Capacitor)という本作の identity を維持（CDN import map はネット依存で却下）。
    - 影響：`build.js` を「コピー」から「esbuildバンドル」へ拡張（**生成補助・実行時非依存＝成果物は常に単一HTML**）。devDependency に three / esbuild を追加（ゲーム本体はバンドル後ゼロ依存のまま）。
-2. **アーキテクチャ分離**：**ロジック（非module・jsdom検証可）と 描画（ESM module・THREE/addons）を分離**。
-   - 現コードは既に境界が緩く存在（`stepRace/computeDesired/UI/audio/career`＝ロジック ↔ `ensureThree/drawTrack/makeHorseMesh/updateCamera`＝描画）。
-   - 効果：**smoke はロジック側を従来通り検証**（描画module は jsdom が現在の外部threeと同様に無視）。**balance/物理の回帰基盤を一切壊さない**。描画とロジックの疎結合化は将来にも効く。
+2. **ESMブートストラップ・グローバル方式（採用）**：小さな `<script type="module">` が **THREE（と将来のaddons）を import し `window` へ提供**。ゲーム本体は**通常スクリプトのまま global THREE/addons を使用**（＝大規模な"ロジック/描画分離"は不要）。
+   - 効果：**jsdomは module を実行しない**ので `window.THREE` 未定義 → **smoke はロジックを従来通り検証**（balance/物理の回帰基盤を一切壊さない）。本体構造は維持＝低リスク。Stage1の移行は「ブートストラップの import を r128→r160 に差し替え＋本体の色/ライト再調整」に閉じる。
+   - 実証：増分0.1（r128 ESM化）で smoke 緑・実機描画不変を確認済み。
 3. **直列順守**：Stage1（移行・機能不変）を完全に緑にしてから Stage2（機能）へ。
 
 ---
 
 ## Stage 0 ── 足場（リスク小・絵は不変）
-- [ ] esbuild 導入（devDep）。`build.js`：ロジック`<script>` ＋ 描画module をバンドルし dist/index.html を生成（インライン化＝単一HTML維持）。
-- [ ] ESM three(r160) + 必要 addons を vendor（`EffectComposer/RenderPass/UnrealBloomPass/ShaderPass/OutputPass/GLTFLoader/SkeletonUtils`）。
-- [ ] **コード分割の足場**：描画関連（`ensureThree/buildEnv/buildSky/buildLights/buildSun/buildTrack/buildStand/makeHorseMesh/drawTrack/updateCamera/Dust/buildStartGate`）を描画module へ寄せ、ロジックは非module のまま。`window` 経由の薄い橋渡しで状態共有（`state`/`CFG`/関数フック）。
+- [x] **0.1 three を UMD→ESM 化**：r128 ESMビルド(`vendor/three.module.js`)を同梱、`<script type="module">`で `window.THREE` 提供。本体コード不変。build.js/sw.js を対応（SW v3）。**smoke緑・実機描画不変を確認済み**。
+- [ ] **0.2 esbuild＋addonブートストラップ**：esbuild(devDep)で three+addons(`EffectComposer/RenderPass/UnrealBloomPass/ShaderPass/OutputPass/GLTFLoader/SkeletonUtils`)を1つのESMへbundleし `window` へ提供。`build.js` をバンドル対応（成果物は単一HTML維持）。dev は import map もしくは vendor 直import。
 - [ ] smoke がロジック側で従来通り緑、`npm run gates` 緑、実機で**r128のまま**現状描画が出る（まだ移行しない）ことを確認。
 - **ゲート**：4ゲート緑・見た目不変。
 
@@ -56,7 +55,7 @@
 
 ## 横断リスクと対策
 - **色/ライト総崩れ（最大リスク）**：Stage1を機能ゼロで単独遂行・実機で旧版と比較。`§5`トーンマップ規約（exposure1.16・MeshBasic toneMapped=false）を r160 文脈で再定義。
-- **smoke が module で動かない**：→ ロジック/描画分離で回避（smoke はロジックのみ）。分離が不十分だと回帰基盤が死ぬので Stage0 の完了条件に必須化。
+- **smoke が module で動かない**：→ **ブートストラップ・グローバル方式**で回避（本体は通常スクリプト＝jsdomで実行され、moduleは無視される＝THREE未定義でロジック検証は不変）。増分0.1で実証済み。
 - **balance を揺らさない**：本移行は描画のみ。`stepRace/computeDesired/engine.js/timeScale` は不可触。各コミットで balance_check。
 - **配布の単一HTMLが壊れる**：esbuild は「生成補助」。dev は分割、**dist は常に単一HTML**を維持（build検査でCDN残存/外部参照を検出）。
 - **GLTF馬の品質**：暫定サンプルはモーフ。本番品質はボーン付きアセット導入が前提（首/脚の表現・IK簡素化）。アセット工程は独立投資。

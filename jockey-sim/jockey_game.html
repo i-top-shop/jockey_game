@@ -401,8 +401,13 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
 .title-career{ margin-top:12px; font-size:12px; color:#cfe0ff; background:rgba(20,28,38,.6); border:1px solid var(--line); border-radius:999px; padding:7px 16px; }
 .title-career b{ color:var(--gold); }
 </style>
-<!-- Three.js r128（ローカル同梱＝オフライン/配布で確実に動く。CDN依存を排除） -->
-<script src="vendor/three.min.js"></script>
+<!-- Three.js r128（ESMビルドをローカル同梱→window.THREEへ提供）。
+     本体は通常スクリプトのまま global THREE を使用。smokeはmoduleを無視するため検証不変。
+     Stage0(ESM土台化)：絵・バージョンは不変。Stage1でこのimportをr160へ差し替え＋色再調整。 -->
+<script type="module">
+  import * as THREE from './vendor/three.module.js';
+  window.THREE = THREE;
+</script>
 </head>
 <body>
 <div id="app">

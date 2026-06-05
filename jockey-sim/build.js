@@ -14,7 +14,7 @@ fs.mkdirSync(distVendor, { recursive: true });
 
 const copies = [
   ["jockey_game.html", path.join(dist, "index.html")],          // エントリ名を index.html へ
-  ["vendor/three.min.js", path.join(distVendor, "three.min.js")],
+  ["vendor/three.module.js", path.join(distVendor, "three.module.js")],  // ESM版 three（r128）
   // PWA（インストール可能アプリ化）
   ["manifest.webmanifest", path.join(dist, "manifest.webmanifest")],
   ["sw.js", path.join(dist, "sw.js")],
@@ -30,14 +30,14 @@ for (const [src, dest] of copies) {
   console.log(`✓ ${src} → ${path.relative(root, dest)} (${kb} KB)`);
 }
 
-// 検証：index.html が vendor/three.min.js をローカル参照しているか（CDN残存の検出）
+// 検証：index.html が three をローカル(ESM)参照しているか（CDN残存の検出）
 const html = fs.readFileSync(path.join(dist, "index.html"), "utf8");
-if (/<script[^>]+src=["']https?:\/\/[^"']*three/i.test(html)) {
-  console.error("✗ Three.js がまだCDN参照のままです（vendor/three.min.js へ差し替えてください）");
+if (/<script[^>]+src=["']https?:\/\/[^"']*three/i.test(html) || /from\s+["']https?:\/\/[^"']*three/i.test(html)) {
+  console.error("✗ Three.js がまだCDN参照のままです（vendor/three.module.js へ差し替えてください）");
   process.exit(1);
 }
-if (!/<script[^>]+src=["']vendor\/three\.min\.js["']/.test(html)) {
-  console.error("✗ vendor/three.min.js への参照が見つかりません");
+if (!/vendor\/three\.module\.js/.test(html)) {
+  console.error("✗ vendor/three.module.js への参照が見つかりません");
   process.exit(1);
 }
 

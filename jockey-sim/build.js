@@ -14,7 +14,7 @@ fs.mkdirSync(distVendor, { recursive: true });
 
 const copies = [
   ["jockey_game.html", path.join(dist, "index.html")],          // エントリ名を index.html へ
-  ["vendor/three.module.js", path.join(distVendor, "three.module.js")],  // ESM版 three（r128）
+  ["vendor/three-bundle.js", path.join(distVendor, "three-bundle.js")],  // esbuildバンドル: three r160 + addons
   // PWA（インストール可能アプリ化）
   ["manifest.webmanifest", path.join(dist, "manifest.webmanifest")],
   ["sw.js", path.join(dist, "sw.js")],
@@ -36,8 +36,8 @@ if (/<script[^>]+src=["']https?:\/\/[^"']*three/i.test(html) || /from\s+["']http
   console.error("✗ Three.js がまだCDN参照のままです（vendor/three.module.js へ差し替えてください）");
   process.exit(1);
 }
-if (!/vendor\/three\.module\.js/.test(html)) {
-  console.error("✗ vendor/three.module.js への参照が見つかりません");
+if (!/vendor\/three-bundle\.js/.test(html)) {
+  console.error("✗ vendor/three-bundle.js への参照が見つかりません（npm run bundle で生成）");
   process.exit(1);
 }
 

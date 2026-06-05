@@ -10,11 +10,14 @@
     "smoke": "node sims/smoke.js",
     "grid": "node sims/grid_search.js",
     "gates": "node sims/balance_check.js 400 && node sims/smoke.js",
+    "bundle": "esbuild src/three-bootstrap.js --bundle --minify --format=esm --outfile=vendor/three-bundle.js",
     "build": "node build.js",
     "icons": "node tools/make-icons.js",
     "serve": "node tools/serve.js"
   },
   "devDependencies": {
-    "jsdom": "^29.1.1"
+    "esbuild": "^0.28.0",
+    "jsdom": "^29.1.1",
+    "three": "^0.160.0"
   }
 }

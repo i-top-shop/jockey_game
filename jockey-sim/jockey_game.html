@@ -2460,6 +2460,27 @@ const Budget = {
   },
 };
 
+// ===== ポストプロセス（Bloom→グレード/ビネット→出力）。POST=false で従来の直接描画に戻る（可逆） =====
+const POST = true;
+let composer=null, bloomPass=null;
+function buildComposer(){
+  if(!POST || !window.THREE_ADDONS) return;
+  const A=window.THREE_ADDONS, cv=$("track");
+  composer = new A.EffectComposer(renderer);
+  composer.addPass(new A.RenderPass(scene, camera));
+  bloomPass = new A.UnrealBloomPass(new THREE.Vector2(cv.clientWidth||1, cv.clientHeight||1), 0.42, 0.6, 0.8); // strength,radius,threshold（夕景の西日/ハイライト）
+  composer.addPass(bloomPass);
+  const grade = { uniforms:{ tDiffuse:{value:null}, warm:{value:new THREE.Color(1.04,1.0,0.95)}, sat:{value:1.08}, vig:{value:1.2} },
+    vertexShader:`varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);} `,
+    fragmentShader:`uniform sampler2D tDiffuse; uniform vec3 warm; uniform float sat,vig; varying vec2 vUv;
+      void main(){ vec4 c=texture2D(tDiffuse,vUv); vec3 col=c.rgb*warm;
+        float l=dot(col,vec3(0.2126,0.7152,0.0722)); col=mix(vec3(l),col,sat);
+        vec2 d=vUv-0.5; float v=smoothstep(0.78, vig, length(d)*1.3); col*=(1.0 - v*0.5);
+        gl_FragColor=vec4(col,c.a);} ` };
+  composer.addPass(new A.ShaderPass(grade));
+  composer.addPass(new A.OutputPass());   // トーンマップ(ACES)＋sRGB出力を最終段で
+}
+
 function ensureThree(){
   if(threeReady) return true;
   if(typeof THREE==="undefined"){
@@ -2487,6 +2508,7 @@ function ensureThree(){
   buildEnv(); buildSky(); buildLights(); buildSun(); buildTrack(); buildStand(); Dust.init(); buildCamButton();
   // 自発光・空などの「素の色」はトーンマップ対象外にして発色を維持
   scene.traverse(o=>{ if(o.material && o.material.isMeshBasicMaterial) o.material.toneMapped=false; });
+  buildComposer();     // ポストプロセス（POST=true時）
   threeReady=true;
   Budget.reset();      // 予算オーケストレーター起動（初期=高）
   return true;
@@ -2498,6 +2520,7 @@ function resizeCanvas(){
   const w=Math.max(1, rect.width), h=Math.max(1, rect.height);
   renderer.setSize(w, h, false);
   camera.aspect = w/h; camera.updateProjectionMatrix();
+  if(composer){ composer.setPixelRatio(renderer.getPixelRatio()); composer.setSize(w, h); }   // ポストもサイズ/解像度に追従
 }
 window.addEventListener("resize", ()=>{ if(state.screen==="race") resizeCanvas(); });
 
@@ -2635,7 +2658,7 @@ function drawTrack(){
   }
   animStartGate();
   updateCamera(dt);
-  renderer.render(scene, camera);
+  if(composer) composer.render(); else renderer.render(scene, camera);
   Budget.tick(dt*1000);   // フレーム時間を監視し品質を自動調整（60FPS維持）
 }
 // 文字色判定用：背景色が明るいか

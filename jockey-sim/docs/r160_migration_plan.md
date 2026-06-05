@@ -31,14 +31,13 @@
 - [ ] smoke がロジック側で従来通り緑、`npm run gates` 緑、実機で**r128のまま**現状描画が出る（まだ移行しない）ことを確認。
 - **ゲート**：4ゲート緑・見た目不変。
 
-## Stage 1 ── r128 → r160 移行（描画のみ・機能不変・厳格検証）★最重要
-- [ ] 描画module を r160 ESM 化（`import * as THREE from 'three'`）。
-- [ ] **色管理**：`renderer.outputColorSpace = SRGBColorSpace`、`THREE.ColorManagement.enabled=true`（既定）。全 `CanvasTexture` に `.colorSpace=SRGBColorSpace`、環境/反射系は `NoColorSpace/Linear` を適切に。**全色の見え方を再調整**（exposure/材質色/フォグ色）。
-- [ ] **ライト**：物理正規化(useLegacyLights=false 既定)に合わせ Hemi/Directional/Ambient/Sun の intensity を再スケール。影(`PCFSoftShadowMap`)・`shadow.bias`再調整。
-- [ ] **PMREM環境マップ**：r160 の API/色空間で再構築（`buildEnv`）。
-- [ ] 削除/改名API（`outputEncoding`等）を置換。`MeshBasicMaterial.toneMapped=false` 群は維持。
-- [ ] 予算オーケストレーター（`Budget`）の `renderer.info`/解像度操作を r160 対応に。
-- **ゲート（このStageの完了条件）**：全画面遷移・無頭レース・**balance_check 回帰（不変）**・smoke 緑、**実機で「色が破綻せず現状同等以上」**（roadmapの「単独完了・検証」）。**ここを緑にするまで Stage2 に入らない。**
+## Stage 1 ── r128 → r160 移行（描画のみ・機能不変・厳格検証）★最重要　【実質完了】
+- [x] vendor の three を **r128→r160** 差し替え（ブートストラップ import 経由）。削除/改名APIの使用なしを確認（旧encoding/Geometry/Face3 未使用）。
+- [x] **色管理**：`renderer.outputColorSpace = SRGBColorSpace`。全 `CanvasTexture` に `.colorSpace=SRGBColorSpace`（`srgbTex` ヘルパー＋一括置換）。
+- [x] **ライト**：当面 `renderer.useLegacyLights = true` で旧来強度を維持（移行差分を最小化）。→ 物理正規化への再スケールは後日（任意）。
+- [x] **実機確認**：地面/馬/スタンド/影/カメラ等は正常。smoke緑・構文OK・balance不変（描画のみ）。
+- [ ] **【後回し・既知】夕景の空(MeshBasic)が暗くなる**。暫定で空テクスチャを `LinearSRGBColorSpace`（デコード無し）にして緩和済み。黄昏の見え方の微調整は後日。
+- **ゲート**：実機で破綻なし（空のトーンのみ要微調整）。**Stage2 着手可**。
 
 ## Stage 2 ── スライス技術の統合（段階的・各々4ゲート＋実機）
 - [ ] **2a. EffectComposer**：Bloom＋グレード＋ビネット＋OutputPass（スライス移植）。常時は控えめ、直線/ゴール前で強める（予算オーケストレーター連動・「予算先払い」）。

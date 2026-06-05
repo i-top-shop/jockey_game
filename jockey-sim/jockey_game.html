@@ -2029,15 +2029,17 @@ const camState = { pos: null, tgt: null };
 
 // --- テクスチャ生成 ---
 function _rr(x,X,Y,w,h,r){ x.beginPath(); x.moveTo(X+r,Y); x.arcTo(X+w,Y,X+w,Y+h,r); x.arcTo(X+w,Y+h,X,Y+h,r); x.arcTo(X,Y+h,X,Y,r); x.arcTo(X,Y,X+w,Y,r); x.closePath(); }
+// r160: 色テクスチャは sRGB として扱う（ColorManagement対応）。引数名は cv（一括置換の対象外にするため）
+function srgbTex(cv){ const t=new THREE.CanvasTexture(cv); t.colorSpace=THREE.SRGBColorSpace; return t; }
 function makeStripeTex(){
   const c=document.createElement("canvas"); c.width=8; c.height=64; const x=c.getContext("2d");
   x.fillStyle="#1f5132"; x.fillRect(0,0,8,64); x.fillStyle="#1c4a2c"; x.fillRect(0,0,8,32);
-  const t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; return t;
+  const t=srgbTex(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; return t;
 }
 function makeCheckerTex(){
   const c=document.createElement("canvas"); c.width=c.height=2; const x=c.getContext("2d");
   x.fillStyle="#f4f4f4"; x.fillRect(0,0,2,2); x.fillStyle="#111"; x.fillRect(0,0,1,1); x.fillRect(1,1,1,1);
-  const t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.magFilter=THREE.NearestFilter; t.repeat.set(14,2); return t;
+  const t=srgbTex(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.magFilter=THREE.NearestFilter; t.repeat.set(14,2); return t;
 }
 function makeSkyTex(){
   const c=document.createElement("canvas"); c.width=16; c.height=256; const x=c.getContext("2d");
@@ -2045,14 +2047,15 @@ function makeSkyTex(){
   g.addColorStop(0,"#0c1020"); g.addColorStop(0.45,"#2b2740"); g.addColorStop(0.62,"#6b4a66");
   g.addColorStop(0.74,"#c8743a"); g.addColorStop(0.86,"#e0a05a"); g.addColorStop(1,"#243042");
   x.fillStyle=g; x.fillRect(0,0,16,256);
-  return new THREE.CanvasTexture(c);
+  // 空(MeshBasic/toneMapped=false)は色管理デコードしない＝キャンバスをそのまま表示（夜化を回避）
+  const t=srgbTex(c); t.colorSpace=THREE.LinearSRGBColorSpace; return t;
 }
 function makeStandTex(){
   const c=document.createElement("canvas"); c.width=256; c.height=64; const x=c.getContext("2d");
   x.fillStyle="#161b22"; x.fillRect(0,0,256,64);
   for(let i=0;i<460;i++){ const cx=Math.random()*256, cy=Math.random()*64; const warm=Math.random()<0.6;
     x.fillStyle = warm? "rgba(232,184,120,.9)" : "rgba(150,180,220,.8)"; x.fillRect(cx,cy,2,2); }
-  return new THREE.CanvasTexture(c);
+  return srgbTex(c);
 }
 
 // --- ジオメトリ：トラックに沿った帯（内オフセット〜外オフセット） ---
@@ -2101,7 +2104,7 @@ function buildSun(){
   g.addColorStop(0,"rgba(255,244,214,0.95)"); g.addColorStop(0.25,"rgba(255,212,150,0.6)");
   g.addColorStop(0.55,"rgba(240,150,90,0.22)"); g.addColorStop(1,"rgba(240,150,90,0)");
   x.fillStyle=g; x.fillRect(0,0,128,128);
-  const t=new THREE.CanvasTexture(c);
+  const t=srgbTex(c);
   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t, transparent:true, depthWrite:false, depthTest:false, blending:THREE.AdditiveBlending, fog:false, toneMapped:false}));
   sp.scale.set(260,260,1); sp.position.set(-360,150,-520); scene.add(sp);
 }
@@ -2116,7 +2119,7 @@ function buildEnv(){
   g.addColorStop(0.54,"#5a4d3a");
   g.addColorStop(1.00,"#1b2a1e");   // 芝の照り返し
   x.fillStyle=g; x.fillRect(0,0,64,32);
-  const tex=new THREE.CanvasTexture(c); tex.mapping=THREE.EquirectangularReflectionMapping;
+  const tex=srgbTex(c); tex.mapping=THREE.EquirectangularReflectionMapping;
   const pmrem=new THREE.PMREMGenerator(renderer); pmrem.compileEquirectangularShader();
   scene.environment = pmrem.fromEquirectangular(tex).texture;
   tex.dispose(); pmrem.dispose();
@@ -2292,7 +2295,7 @@ function makeNumberSprite(num, color){
   x.lineWidth=6; x.strokeStyle="rgba(255,255,255,.92)"; _rr(x,10,10,80,80,16); x.stroke();
   x.fillStyle = isLight(color)?"#111":"#fff"; x.font="bold 56px 'Zen Kaku Gothic New', sans-serif";
   x.textAlign="center"; x.textBaseline="middle"; x.fillText(num,50,54);
-  const tex=new THREE.CanvasTexture(c); tex.anisotropy=2;
+  const tex=srgbTex(c); tex.anisotropy=2;
   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex, transparent:true})); sp.scale.set(2.0,2.0,1);
   return sp;
 }
@@ -2387,7 +2390,7 @@ const Dust = {
     const c=document.createElement("canvas"); c.width=c.height=64; const x=c.getContext("2d");
     const g=x.createRadialGradient(32,32,1,32,32,32);
     g.addColorStop(0,"rgba(255,255,255,0.95)"); g.addColorStop(0.5,"rgba(255,255,255,0.4)"); g.addColorStop(1,"rgba(255,255,255,0)");
-    x.fillStyle=g; x.fillRect(0,0,64,64); this._tex=new THREE.CanvasTexture(c);
+    x.fillStyle=g; x.fillRect(0,0,64,64); this._tex=srgbTex(c);
     for(let i=0;i<60;i++){
       const m=new THREE.SpriteMaterial({map:this._tex, transparent:true, opacity:0, depthWrite:false, color:0xcbb78a, fog:true, toneMapped:false});
       const s=new THREE.Sprite(m); s.visible=false; s.userData={vx:0,vy:0,vz:0,life:0,max:1};
@@ -2424,7 +2427,7 @@ function blobTex(){
   const c=document.createElement("canvas"); c.width=c.height=64; const x=c.getContext("2d");
   const g=x.createRadialGradient(32,32,2,32,32,32);
   g.addColorStop(0,"rgba(0,0,0,0.5)"); g.addColorStop(0.6,"rgba(0,0,0,0.28)"); g.addColorStop(1,"rgba(0,0,0,0)");
-  x.fillStyle=g; x.fillRect(0,0,64,64); _blobTex=new THREE.CanvasTexture(c); return _blobTex;
+  x.fillStyle=g; x.fillRect(0,0,64,64); _blobTex=srgbTex(c); return _blobTex;
 }
 
 /* ---------- レンダリング予算オーケストレーター（60FPS維持の常設インフラ） ----------
@@ -2472,6 +2475,8 @@ function ensureThree(){
   renderer=new THREE.WebGLRenderer({ canvas:$("track"), antialias:true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
   renderer.setClearColor(0x0a0e14, 1);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;     // r160: 正しい色管理（sRGB出力）
+  renderer.useLegacyLights = true;                      // 旧来のライト強度を維持＝移行の差分を最小化（後で物理正規化へ）
   renderer.toneMapping = THREE.ACESFilmicToneMapping;   // フィルミックな階調
   renderer.toneMappingExposure = 1.16;
   renderer.shadowMap.enabled = true;                    // リアルタイム影（太陽光）

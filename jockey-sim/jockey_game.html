@@ -493,6 +493,13 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
     <!-- コース（canvas） -->
     <div class="track-wrap">
       <canvas id="track"></canvas>
+      <button id="btn-pause" aria-label="一時停止" style="position:absolute; top:8px; right:8px; z-index:20; width:40px; height:40px; border-radius:10px; border:1px solid rgba(255,255,255,.18); background:rgba(10,14,20,.55); color:#cdd6df; font-size:15px; cursor:pointer;">⏸</button>
+      <div id="pause-overlay" style="position:absolute; inset:0; z-index:30; display:none; flex-direction:column; align-items:center; justify-content:center; gap:14px; background:rgba(6,9,14,.82);">
+        <div style="font-family:'Dela Gothic One',sans-serif; font-size:20px; color:#f0c862; letter-spacing:.12em; margin-bottom:6px;">一時停止</div>
+        <button id="btn-resume" class="btn primary" style="min-width:210px;">続ける</button>
+        <button id="btn-retry" class="btn" style="min-width:210px;">リトライ</button>
+        <button id="btn-quit" class="btn" style="min-width:210px;">やめる</button>
+      </div>
       <div class="straight-banner" id="straight-banner">直 線！</div>
       <div class="abil-msg" id="abil-msg">末脚爆発！</div>
       <div class="flash-msg" id="flash-msg">前が壁！</div>
@@ -1158,6 +1165,7 @@ function initRace(){
   const pf=$("photo-finish"); if(pf) pf.classList.remove("show");
   resetPlayerControls();
 
+  state.paused=false; $("pause-overlay").style.display="none";   // ポーズ状態をリセット
   showScreen("race");
   resizeCanvas();          // ※display後に採寸（＋3Dシーン初期化）
   syncHorseMeshes();       // 出走馬に合わせて3Dモデルを生成
@@ -1327,17 +1335,10 @@ const Voice = {
 };
 
 // 接戦のゴール前か（スローモーション判定）
-function slowmoActive(){
-  const f=state.field; if(!f||!f.length) return false;
-  let lead=f[0]; for(const o of f){ if(o.dist>lead.dist) lead=o; }
-  const remain=(CFG.DIST||1600)-lead.dist;
-  if(remain>48 || remain<0) return false;
-  let second=-1; for(const o of f){ if(o===lead) continue; if(o.dist>second) second=o.dist; }
-  return (lead.dist-second) < 3.0;
-}
 function loop(ts){
   if(state.screen!=="race"){ return; }   // 画面を離れたら停止
   const now = ts/1000;
+  if(state.paused){ state.race.lastTs = now; state.raf = requestAnimationFrame(loop); return; }   // ポーズ中は進めない（dtジャンプ防止のためlastTsだけ更新）
   let dt = now - state.race.lastTs;
   state.race.lastTs = now;
   if(dt>CFG.dtCap) dt=CFG.dtCap;
@@ -1348,17 +1349,27 @@ function loop(ts){
     updateGate(dt);
   } else if(ph==="running"){
     const pd0 = state.player ? state.player.dist : 0;
-    let ts = CFG.timeScale;
-    if(slowmoActive()) ts *= 0.42;                  // 接戦のゴール前はスローモーション
-    stepRace(dt*ts);
+    stepRace(dt*CFG.timeScale);
     if(state.player) Sfx.hoofTick(state.player.dist - pd0);
   } else if(ph==="finishing"){
-    let ts = CFG.finishMult;
-    if(slowmoActive()) ts = 0.55;                   // 自分がゴール後でも接戦ならスロー
-    stepRace(dt*ts);          // 残りは早送り（接戦時はスロー）
+    stepRace(dt*CFG.finishMult);          // 残りは早送り
   }
   render();
   state.raf = requestAnimationFrame(loop);
+}
+
+// ポーズ（レース中に 続ける/リトライ/やめる）
+function pauseRace(){
+  if(state.screen!=="race" || !state.race) return;
+  const ph=state.race.phase;
+  if(ph!=="running" && ph!=="finishing" && ph!=="gate") return;   // 決着後は不可
+  state.paused=true;
+  $("pause-overlay").style.display="flex";
+}
+function resumeRace(){
+  state.paused=false;
+  $("pause-overlay").style.display="none";
+  if(state.race) state.race.lastTs=performance.now()/1000;        // dtジャンプ防止
 }
 
 /* ============================ ゲート演出（カウントダウン） ============================ */
@@ -2979,6 +2990,11 @@ $("btn-back-title").addEventListener("click", ()=> showScreen("title"));
 $("btn-to-tactic").addEventListener("click", ()=>{ renderTacticScreen(); showScreen("tactic"); });
 $("btn-back-horse").addEventListener("click", ()=> showScreen("horse"));
 $("btn-to-race").addEventListener("click", ()=> initRace());
+// ポーズ操作
+$("btn-pause").addEventListener("click", pauseRace);
+$("btn-resume").addEventListener("click", resumeRace);
+$("btn-retry").addEventListener("click", ()=>{ resumeRace(); initRace(); });
+$("btn-quit").addEventListener("click", ()=>{ resumeRace(); cancelAnimationFrame(state.raf); try{Sfx.stopCrowd();Sfx.stopRumble();Voice.stop();}catch(e){} showScreen("title"); });
 
 // レース操作ボタン
 $("btn-in").addEventListener("click", ()=>{ const h=state.player; if(h&&!h.finished) h.targetLane=clamp(h.targetLane-1,0,7); });

@@ -10,6 +10,8 @@ const TRK_R=140, TRK_SL=360, TRK_LB=Math.PI*TRK_R, TRK_P=2*TRK_LB+2*TRK_SL;
 function curveAt(s){ s=((s%TRK_P)+TRK_P)%TRK_P; return (s<TRK_LB || (s>=TRK_LB+TRK_SL && s<2*TRK_LB+TRK_SL)) ? -1 : 0; }
 
 const cruiseBase=18.8, staFatigue=24;
+// 創発ペース／ハナ争い（Stage1）：先頭争いからペースを発生させ、スタミナ・縦長・失速へ波及させる
+const LEAD_ZONE=9, HANA_ESC=0.9, LONE_EASE=1.5, SENKO_GAP=7, PACE_DRAIN=0.25;
 const STYLES={
   nige:  {cg:0.55, sb:1.08, kg:0.62, cr:520, pref:[0,1.6]},
   senko: {cg:0.22, sb:1.00, kg:0.88, cr:450, pref:[0.6,2.6]},
@@ -59,8 +61,28 @@ function race(DIST, P){
     h.dist=Math.max(0,0.5+off); h.speed=(q==="slow"?12.5:14.5)+h.p.gatePow*0.8; F.push(h);
   }
   const dt=1/30; let t=0;
+  let pace=cruiseBase, fhPaceSum=0, fhPaceN=0, peakLen=0, peakContest=0;   // 創発ペース・前半ペース・ピーク縦長・最大競り強度
   while(F.some(h=>!h.finished)&&t<300){ t+=dt;
+    // --- レース状態：先頭・順位・ハナ争い頭数・創発ペース（毎フレーム） ---
+    const alive=F.filter(h=>!h.finished);
+    let lead=0; for(const h of alive) if(h.dist>lead)lead=h.dist;
+    const byDist=[...alive].sort((a,b)=>b.dist-a.dist); byDist.forEach((h,i)=>h._rankNow=i+1);
+    const nAlive=alive.length;
+    // ハナ争い：先頭ゾーンの「逃げ頭数」が主因（先行多は「前半が締まる」副次）
+    let nNigeLead=0, nSenkoLead=0;
+    for(const h of alive){ if((lead-h.dist)<LEAD_ZONE){ if(h.style==="nige")nNigeLead++; else if(h.style==="senko")nSenkoLead++; } }
+    const contest = Math.max(0, nNigeLead-1) + nSenkoLead*0.22;                     // 逃げ複数で競る＋先行多で締まる
+    if(contest>peakContest && lead>DIST*0.1 && lead<DIST*0.5) peakContest=contest;  // 前半（スタート後）の最大競り強度
+    const leaderSpeed=byDist[0]?byDist[0].speed:cruiseBase;
+    pace += (leaderSpeed-pace)*Math.min(1,2*dt);                                    // 創発ペース（先頭速度の平滑）
+    const paceLevel = pace>cruiseBase+1.5?3 : pace>cruiseBase+0.75?2 : pace<cruiseBase-0.45?0 : 1;  // 0スロー..3超ハイ
+    let minDist=Infinity; for(const h of alive) if(h.dist<minDist)minDist=h.dist;
+    if(lead>=DIST*0.12 && lead<DIST*0.34){ fhPaceSum+=leaderSpeed; fhPaceN++; }       // 立ち上がり後の前半ペース（失速前）
+    if(lead<straightDist && lead-minDist>peakLen) peakLen=lead-minDist;                // 直線入口までのピーク縦長（ハイほど伸びる）
+    if(process.env.DBG && Math.round(t*30)%15===0 && lead<DIST*0.62){
+      const nige=byDist.filter(h=>h.style==="nige"); if(nige.length>=2) console.error(`t=${t.toFixed(1)} lead=${lead.toFixed(0)} nNigeLead=${nNigeLead} contest=${contest.toFixed(1)} pace=${pace.toFixed(2)} lvl=${paceLevel} 縦長=${(lead-minDist).toFixed(0)} nige[spd/sta]=${nige.map(h=>h.speed.toFixed(1)+'/'+h.stamina.toFixed(0)).join(' ')}`); }
     for(const h of F){ if(h.finished)continue;
+      if(h._rankAtStr==null && h.dist>=straightDist) h._rankAtStr=h._rankNow;        // 直線入口の順位
       let leader=true; for(const o of F){ if(o===h||o.finished)continue; if(o.dist>h.dist){leader=false;break;} }
       const inStr=h.dist>=straightDist; let tm=1;
       if(h.ab==="burst"&&inStr)tm+=0.10; if(h.ab==="widerush"&&inStr&&h.lane>=4)tm+=0.09;
@@ -68,10 +90,23 @@ function race(DIST, P){
       const tTop=topBase(h)*tm; let target;
       if(h.dist>=h.commitDist){ target=tTop; h.committed=true; }
       else{
-        let cg=STYLES[h.style].cg;
-        if(cg>0){ let ld=true,lm=Infinity;
-          for(const o of F){ if(o===h||o.finished)continue; const gp=o.dist-h.dist; if(gp>0){ld=false;break;} lm=Math.min(lm,-gp); }
-          if(ld&&lm>6) cg-=Math.min(0.85,(lm-6)*0.06);     // 楽逃げ
+        const gapToLead=lead-h.dist, early=clamp((DIST*0.5-h.dist)/(DIST*0.5),0,1);  // early:前半=1 後半=0
+        let cg=STYLES[h.style].cg; h._contesting=false;
+        if(h.style==="nige"){                                  // 逃げ：ハナを主張
+          if(contest>0.1 && gapToLead<LEAD_ZONE){             // ハナ争い→競り上げ（逃げ複数・先行多・前半ほど強い）
+            cg+=Math.min(2.2, HANA_ESC*contest)*(0.5+early*0.5); h._contesting=true;
+          } else if(nNigeLead<=1 && gapToLead<1.5){            // 単騎逃げ→楽に（明確にスロー＝前残りの土台）
+            cg-=LONE_EASE*(0.4+early*0.6);
+          }
+        } else if(h.style==="senko"){                          // 先行：逃げの直後で折り合い、先頭ペースに追従
+          if(contest>0.1 && gapToLead<LEAD_ZONE){             // 先頭争いに絡む時は競る（弱め）
+            cg+=Math.min(1.6, HANA_ESC*contest)*0.5*(0.5+early*0.5); h._contesting=true;
+          } else if(gapToLead>6){ cg+=0.4*early;                // 離れすぎ→好位へ詰める
+          } else if(gapToLead<2.5){ cg-=0.6; }                 // 近すぎ→抑えて折り合う（先頭が遅ければ自分も遅く＝詰まる）
+        } else {                                               // 差し・追込：ペース偏差に連続反応（速い→後方で溜める＝縦長／遅い→前へ詰める＝詰まる）
+          const paceDev = pace - cruiseBase;                   // >0 速い / <0 遅い
+          const react = h.style==="oikomi" ? 0.45 : 0.32;      // 追込ほど後方に構える
+          cg -= clamp(paceDev*react, -0.45, 0.9);
         }
         target=cruiseBase+cg+rnd(-0.15,0.15);
       }
@@ -83,6 +118,7 @@ function race(DIST, P){
       // ---- スタミナ消費（ゲーム本体と同一構造。Pで調整実験可） ----
       let drain=P.BASE + Math.pow(Math.max(0,h.speed-P.FREE),1.8)*P.COEF*STYLES[h.style].sb;
       if(h.committed) drain+=1.0;
+      if(h._contesting) drain+=PACE_DRAIN*contest;   // ハナ争いは脚を使う＝後半に失速の伏線
       let gm=going.drain; if(h.ab==="mud"&&going.heavy)gm=1.0; drain*=gm;
       if(h.ab==="stayer"&&h.dist>DIST*0.66)drain*=0.9;
       if(h.ab==="frontsoul"&&leader)drain*=0.95;
@@ -100,7 +136,7 @@ function race(DIST, P){
         if(gap>0&&gap<bg&&Math.abs(o.lane-h.lane)<0.7){ cap=Math.min(cap,o.speed); blk=true; } }   // blockLane 0.95→0.7
       let v=h._v; if(blk)v=Math.min(v,cap); h.speed=v;
       const sW=startS+h.dist, onBend=curveAt(sW)!==0, cg=STYLES[h.style].cg;
-      if((DIST-h.dist)>480){ const home=clamp((cg>0?0.6:2.4)+h.laneBias,0,6); h.target+=clamp(home-h.target,-0.5,0.5)*dt*0.5; }
+      if((DIST-h.dist)>480){ const HB={nige:0.5,senko:0.72,sashi:2.35,oikomi:2.55}, BS={nige:0.6,senko:0.9,sashi:1.15,oikomi:1.3}; const home=clamp((HB[h.style]??1.4)+h.laneBias*(BS[h.style]??1.1),0,6); h.target+=clamp(home-h.target,-0.5,0.5)*dt*0.5; }
       else{ if((h.style==="sashi"||h.style==="oikomi")&&h.target<3.4)h.target+=dt*0.9;
             if(cg>0&&h.target>1.4)h.target-=dt*0.5; }
       if(blk) h.target=Math.min(onBend?4.5:6, h.target+(onBend?0.6:1.0)*dt);
@@ -111,7 +147,7 @@ function race(DIST, P){
       if(!h.finished&&h.dist>=DIST){ const over=h.dist-DIST, ve=Math.max(0.1,h.speed*(1-h.lane*gl)); h.ft=t-over/ve; h.finished=true; }
     }
     // パスC：馬体接触の解消（本体 stepRace と同一・位置のみ＝速度/スタミナ不変。パワーで押し勝つ）
-    const BL=2.0, ML=0.6, kB=clamp(10*dt,0,1);   // bumpDistGap 2.6→2.0 / bumpLaneGap 0.85→0.6
+    const BL=2.0, ML=0.72, kB=clamp(10*dt,0,1);   // bumpDistGap 2.6→2.0 / bumpLaneGap →0.72
     for(let i=0;i<F.length;i++){ const a=F[i]; if(a.finished)continue;
       for(let j=i+1;j<F.length;j++){ const b=F[j]; if(b.finished)continue;
         const dd=a.dist-b.dist; if(dd>BL||dd<-BL)continue;
@@ -125,7 +161,7 @@ function race(DIST, P){
     }
   }
   const r=[...F].sort((a,b)=>a.ft-b.ft); r.forEach((h,i)=>h.rank=i+1);
-  return { F, win:r[0] };
+  return { F, win:r[0], fhPace:(fhPaceN?fhPaceSum/fhPaceN:cruiseBase), peakLen, peakContest, nNige:F.filter(h=>h.style==="nige").length };
 }
 
 /** Nレース回して集計 */

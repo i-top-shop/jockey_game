@@ -513,8 +513,8 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
           <path id="sp-arc" d="M 10 60 A 50 50 0 0 1 110 60" fill="none" stroke="#5fb0b0" stroke-width="9" stroke-linecap="round" stroke-dasharray="157.1" stroke-dashoffset="157.1"/>
         </svg>
         <div class="sp-read"><b id="sp-kmh">0</b><span>km/h</span></div>
-        <div class="sp-gearbox"><span>ギア</span><b id="sp-gear">4</b><small id="sp-gear-label">巡航</small></div>
-        <div class="gear-pips" id="gear-pips"><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i></div>
+        <div class="sp-gearbox"><span>ギア</span><b id="sp-gear">6</b><small id="sp-gear-label">巡航</small></div>
+        <div class="gear-pips" id="gear-pips"><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i></div>
       </div>
       <div class="overlay-center" id="gate-overlay">
         <div class="gate-card" id="gate-card"></div>
@@ -613,7 +613,7 @@ const CFG = {
   blockSideGap: 0.9,     // 横にこの距離内で並走されると進路を変えにくい（→0.9：真横に重なった時だけ）
   // 接触（馬体ぶつかり）：横に重ならないよう押し分ける。位置のみ＝速度/スタミナの縦には触れない
   bumpDistGap: 2.0,      // 縦にこの距離内なら馬体が並ぶ＝接触判定の対象（2.6→2.0）
-  bumpLaneGap: 0.6,      // 確保したい横の最小間隔(レーン)（0.85→0.6＝馬が近づける）
+  bumpLaneGap: 0.72,     // 確保したい横の最小間隔(レーン)（0.72＝馬体が重ならない自然な間隔）
   bumpRate: 10,          // 押し分けの速さ(1/秒)。パワー差で押し勝つ側ほど動かない
   // スタミナ
   staFatigue: 24,        // この値を下回ると失速し始める
@@ -622,6 +622,9 @@ const CFG = {
   compRecover: 46,       // これ以上に回復したらペナルティ解除（ヒステリシス）
   straightDist: 1200,    // 残り400m＝直線開始
 };
+
+// 創発ペース／ハナ争い（Stage1）。engine.js と同一。先頭争いからペースを発生させスタミナ・縦長・失速へ波及
+const PACE = { LEAD_ZONE:9, HANA_ESC:0.9, LONE_EASE:1.5, PACE_DRAIN:0.25 };
 
 /* ---------- 小物ユーティリティ ---------- */
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
@@ -1083,7 +1086,7 @@ function makeHorse(o){
     laneBias:rand(-0.9,0.9),          // 馬ごとの置き所の癖（隊列に幅を出す。平均は不変）
     speed:0, stamina:100, composure:100,
     mode:"cruise",         // （AIの内部状態。プレイヤーはギアで制御）
-    gear:4,                // プレイヤーのスピードギア（1〜7、4=巡航）
+    gear:6,                // プレイヤーのスピードギア（1〜10、6=巡航）
     _gearChurn:0, _lastGearDir:0, // ギアの上げ下げの乱れ（悪天候で折り合いに響く）
     pulling:false,         // 力んでいるか
     committed:false,       // 仕掛け済みか
@@ -1429,6 +1432,17 @@ function stepRace(dt){
   r.leaderSpeedSmooth += (leader.speed - r.leaderSpeedSmooth)*Math.min(1,dt*3);
   if(r.phase==="running"){ r._paceSum=(r._paceSum||0)+r.leaderSpeedSmooth*dt; r._paceT=(r._paceT||0)+dt; }  // 平均ペース（講評の読み一致度用）
 
+  // --- 創発ペース：先頭ゾーンの逃げ頭数→ハナ争い強度→ペース段階（各馬が参照）---
+  { const lead=leader.dist;
+    const byDist=field.filter(h=>!h.finished).sort((a,b)=>b.dist-a.dist); byDist.forEach((h,i)=>h._rankNow=i+1);
+    r._nAlive=byDist.length; r._lead=lead;
+    let nNigeLead=0, nSenkoLead=0;
+    for(const h of byDist){ if((lead-h.dist)<PACE.LEAD_ZONE){ if(h.style==="nige")nNigeLead++; else if(h.style==="senko")nSenkoLead++; } }
+    r._nNigeLead=nNigeLead; r._contest=Math.max(0,nNigeLead-1)+nSenkoLead*0.22;
+    const lv=r.leaderSpeedSmooth;
+    r.paceLevel = lv>CFG.cruiseBase+1.5?3 : lv>CFG.cruiseBase+0.75?2 : lv<CFG.cruiseBase-0.45?0 : 1;   // 0スロー..3超ハイ
+  }
+
   // === パスA：各馬の希望速度→今フレームの暫定速度を算出（ブロック未考慮） ===
   field.forEach(h=>{
     if(h.finished) return;
@@ -1500,8 +1514,10 @@ function stepRace(dt){
       if(h.blockTimer>0.5){ h.targetLane=Math.min(onBend?4.5:6, h.targetLane+ (onBend?0.6:1.0)); h.blockTimer=0; }
       const st=STYLES[h.style];
       if((CFG.DIST - h.dist) > 480){
-        // 道中：逃げ・先行はインの経済コース、差し・追込は中目。馬ごとに横へ散らす（平均は不変＝balance保存）
-        const home = clamp(((st.cruiseGain>0) ? 0.6 : 2.4) + (h.laneBias||0), 0, 6);
+        // 道中：実際の馬群の置き所を脚質4段の勾配で再現。逃=最内ラチ→先行=好位の内→差し=中目→追込=後方中目。
+        //   先頭ほどラチに密集（散らし小）、後方ほど横に散る（散らし大）。脚質内外の平均は保存＝balance不変。
+        const HB={nige:0.5,senko:0.72,sashi:2.35,oikomi:2.55}, BS={nige:0.6,senko:0.9,sashi:1.15,oikomi:1.3};
+        const home = clamp((HB[h.style]??1.4) + (h.laneBias||0)*(BS[h.style]??1.1), 0, 6);
         h.targetLane += clamp(home - h.targetLane, -0.5,0.5)*dt*0.5 + (Math.random()-0.5)*dt*0.4;
       } else {
         // 勝負所：差し・追込は最終コーナーで外へ持ち出してクリアな進路を作る
@@ -1587,17 +1603,17 @@ function computeDesired(h, dt, r){
   const tTop = topSpeed(h) * topMul;
 
   if(h.isPlayer){
-    // ---- プレイヤー：7段ギアで目標速度を決める（4=巡航、1=抑える、7=全力） ----
+    // ---- プレイヤー：10段ギアで目標速度を決める（6=巡航、1=抑える、10=全力） ----
     const sg = st.cruiseGain;
     let keenP = h.p.keenScore*0.7;
     if(ab==="settle") keenP *= 0.55;                 // 折り合い名人
-    const cr   = comfortable + sg;                   // 巡航(ギア4)
+    const cr   = comfortable + sg;                   // 巡航(ギア6)
     const idle = cr - 3.0;                            // ギア1（抑える）
-    const maxv = Math.max(tTop + 0.8, cr + 2.6);     // ギア7（全力。脚質×瞬発力で頭打ちが変わる）
-    const throttle = (h.gear - 1) / 6;                // 0〜1
+    const maxv = Math.max(tTop + 0.8, cr + 2.6);     // ギア10（全力。脚質×瞬発力で頭打ちが変わる）
+    const throttle = (h.gear - 1) / 9;                // 0〜1（10段）
     target = idle + (maxv - idle) * throttle;
-    if(h.gear>=4) target += keenP*((h.gear-4)/3);     // 上のギアほど気性ぶん前進（行きたがる）
-    if(h.gear>=5 && !h.committed){ h.committed=true; if(h._commitAt===null) h._commitAt=h.dist; }
+    if(h.gear>=6) target += keenP*((h.gear-6)/4);     // 巡航より上のギアほど気性ぶん前進（行きたがる）
+    if(h.gear>=7 && !h.committed){ h.committed=true; if(h._commitAt===null) h._commitAt=h.dist; }
     if(h.pulling) target += 1.3;                      // 折り合いを欠くと勝手に行く
 
     // ギアのガチャつき（上げ下げの乱れ）は時間で収まる
@@ -1605,13 +1621,13 @@ function computeDesired(h, dt, r){
 
     if(h.dist < CFG.straightDist + 20){
       // 折り合い：低ギアで回復、高ギア/力みで低下（気性が荒いほど）
-      if(h.gear<=2){
+      if(h.gear<=3){
         let rec = 12 + Math.max(0,(h.stats.temper-55))*0.15;
         if(ab==="settle") rec *= 1.3;
         rec *= (1 + jSkill("settle")*0.10);   // 騎手「折り合い」：回復 最大+10%
         h.composure += rec*dt;
-      } else if(h.gear>=5 || target > cr + 0.15){
-        let loss = 2.2 + h.p.keenScore*6 + (h.gear>=6? 1.5:0);
+      } else if(h.gear>=7 || target > cr + 0.15){
+        let loss = 2.2 + h.p.keenScore*6 + (h.gear>=9? 1.5:0);
         if(ab==="settle") loss *= 0.55;
         loss *= (1 - jSkill("settle")*0.10);  // 騎手「折り合い」：力み 最大-10%
         h.composure -= loss*dt;
@@ -1630,15 +1646,24 @@ function computeDesired(h, dt, r){
     if(h.pulling && h.composure > CFG.compRecover) h.pulling=false;
 
   } else {
-    // ---- AI：脚質スクリプト＋楽逃げのペース調整 ----
+    // ---- AI：脚質ごとの「判断」＋創発ペース（Stage1。engine.js と同一ロジック） ----
     if(h.dist >= h.commitDist){
       target = tTop; h.committed=true;
     } else {
-      let cg = st.cruiseGain;
-      if(cg>0){
-        let lead=true, leadMargin=Infinity;
-        for(const o of state.field){ if(o===h||o.finished) continue; const gap=o.dist-h.dist; if(gap>0){lead=false;break;} leadMargin=Math.min(leadMargin,-gap); }
-        if(lead && leadMargin>6) cg -= Math.min(0.85,(leadMargin-6)*0.06);
+      const lead=(r._lead!=null?r._lead:h.dist), gapToLead=lead-h.dist;
+      const early=clamp((CFG.DIST*0.5-h.dist)/(CFG.DIST*0.5),0,1);   // 前半=1 後半=0
+      const contest=r._contest||0, nNigeLead=r._nNigeLead||0, paceLevel=(r.paceLevel!=null?r.paceLevel:1);
+      let cg = st.cruiseGain; h._contesting=false;
+      if(h.style==="nige"){                                  // 逃げ：ハナを主張
+        if(contest>0.1 && gapToLead<PACE.LEAD_ZONE){ cg+=Math.min(2.2,PACE.HANA_ESC*contest)*(0.5+early*0.5); h._contesting=true; }   // ハナ争い→競り上げ
+        else if(nNigeLead<=1 && gapToLead<1.5){ cg-=PACE.LONE_EASE*(0.4+early*0.6); }                                                  // 単騎逃げ→楽に（スロー）
+      } else if(h.style==="senko"){                          // 先行：逃げの直後で折り合い、先頭ペースに追従
+        if(contest>0.1 && gapToLead<PACE.LEAD_ZONE){ cg+=Math.min(1.6,PACE.HANA_ESC*contest)*0.5*(0.5+early*0.5); h._contesting=true; }
+        else if(gapToLead>6){ cg+=0.4*early; }               // 離れすぎ→好位へ詰める
+        else if(gapToLead<2.5){ cg-=0.6; }                   // 近すぎ→抑えて折り合う（先頭が遅ければ自分も遅く＝詰まる）
+      } else {                                               // 差し・追込：ペース偏差に連続反応（速い→後方で溜める＝縦長／遅い→前へ詰める）
+        const paceDev=r.leaderSpeedSmooth-CFG.cruiseBase, react=h.style==="oikomi"?0.45:0.32;
+        cg-=clamp(paceDev*react,-0.45,0.9);
       }
       target = comfortable + cg + rand(-0.15,0.15);
     }
@@ -1665,7 +1690,8 @@ function computeDesired(h, dt, r){
   let drain = 0.34;
   drain += Math.pow(Math.max(0,h.speed-16.3),1.8)*0.052*st.staBurn;
   if(!h.isPlayer && h.committed) drain += 1.0;          // AIの仕掛け
-  if(h.isPlayer) drain += Math.max(0, h.gear-4)*0.45;   // 高ギアほど脚を使う（5/6/7で増加）
+  if(!h.isPlayer && h._contesting) drain += PACE.PACE_DRAIN*(r._contest||0);   // ハナ争いは脚を使う＝後半に失速
+  if(h.isPlayer) drain += Math.max(0, h.gear-6)*0.34;   // 巡航(6)より上のギアほど脚を使う（7〜10で増加）
   if(h.pulling) drain += 0.9;
   let goingMul = going.drain; if(ab==="mud" && going.heavy) goingMul = 1.0;
   drain *= goingMul;
@@ -1676,11 +1702,11 @@ function computeDesired(h, dt, r){
 
   // ---- 失速：スタミナ枯渇で末脚上限が落ちる（スタミナ王は粘る） ----
   let floor = (ab==="stayer")? 0.76 : 0.66;
-  const surge = h.isPlayer ? (0.6 + Math.max(0,h.gear-4)*0.35) : 0.6;  // 高ギアで上限引き上げ
+  const surge = h.isPlayer ? (0.6 + Math.max(0,h.gear-6)*0.26) : 0.6;  // 巡航より上のギアで上限引き上げ
   let vCeil = tTop + surge;
   if(h.stamina < CFG.staFatigue){
     const f = floor + (1-floor)*(h.stamina/CFG.staFatigue);
-    vCeil = tTop*f + ((h.isPlayer&&h.gear===7)?0.8:0);
+    vCeil = tTop*f + ((h.isPlayer&&h.gear===10)?0.8:0);
   }
   if(h.whipTimer>0) vCeil += (h._whipBoost||0)*0.9;   // ムチ中はひと押しぶん上限を許容
   target = clamp(target, 6, vCeil);
@@ -1700,8 +1726,8 @@ function computeDesired(h, dt, r){
   return { target };
 }
 
-/* ============================ 騎手の操作（7段ギア） ============================ */
-const GEAR_LABEL = ["", "抑える", "ゆったり", "やや控え", "巡航", "押す", "追う", "全力"]; // 1..7
+/* ============================ 騎手の操作（10段ギア） ============================ */
+const GEAR_LABEL = ["", "抑える", "ゆったり", "やや控え", "控えめ", "やや巡航", "巡航", "押す", "強め", "追う", "全力"]; // 1..10（6=巡航）
 function resetPlayerControls(){
   const h=state.player; if(!h) return;
   h.gear=4; h._gearChurn=0; h._lastGearDir=0;
@@ -1725,7 +1751,7 @@ function doWhip(){
 // ギアの上げ下げ。悪天候で上げ下げ（特に反転）を繰り返すと折り合いを欠く
 function shiftGear(delta){
   const h=state.player, r=state.race; if(!h||h.finished||!r||r.phase!=="running") return;
-  const ng = clamp(h.gear+delta, 1, 7);
+  const ng = clamp(h.gear+delta, 1, 10);
   if(ng===h.gear) return;
   const dir = ng>h.gear? 1 : -1;
   // 乱れ蓄積：直前と逆方向（上げ→下げ等）は大きく、同方向は小さく
@@ -1735,8 +1761,8 @@ function shiftGear(delta){
   const prev=h.gear; h.gear=ng;
   Sfx.blip(dir>0?560:380, 0.05, "square");   // シフト音
   // 仕掛け地点（初めてギア5以上）
-  if(h.gear>=5 && h._commitAt===null){ h._commitAt=h.dist; jcall(`${h.name}、ここで仕掛けた！　残り${Math.max(0,Math.round(CFG.DIST-h.dist))}m！`, true); }
-  else if(h.gear===7 && prev<7){ jcall(`${h.name}、全力！　最後の力を振り絞る！`, true); }
+  if(h.gear>=7 && h._commitAt===null){ h._commitAt=h.dist; jcall(`${h.name}、ここで仕掛けた！　残り${Math.max(0,Math.round(CFG.DIST-h.dist))}m！`, true); }
+  else if(h.gear===10 && prev<10){ jcall(`${h.name}、全力！　最後の力を振り絞る！`, true); }
   // 悪天候でギアがガチャつくと警告＋折り合い悪化（実処理は computeDesired）
   if((r.going.bad||0)>0 && h._gearChurn>2.2){ flash("ギアの乱れ！折り合いを欠く","#c9762e"); }
   syncGearUI();
@@ -1750,12 +1776,12 @@ function syncGearUI(){
   if(pips){
     for(let i=0;i<pips.children.length;i++){
       const on = (i+1)<=h.gear;
-      pips.children[i].className = "pip" + (on? (h.gear>=6?" hot": h.gear>=5?" push":" on") : "");
+      pips.children[i].className = "pip" + (on? (h.gear>=9?" hot": h.gear>=7?" push":" on") : "");
     }
   }
   const dn=$("btn-geardown"), up=$("btn-gearup");
   if(dn) dn.disabled = h.gear<=1;
-  if(up) up.disabled = h.gear>=7;
+  if(up) up.disabled = h.gear>=10;
 }
 
 /* ============================ 実況システム ============================ */
@@ -1878,9 +1904,8 @@ function render(){
   let phaseTxt = rem2>CFG.DIST*0.55? "道中（序盤）" : p.dist<CFG.straightDist? "中盤・位置取り" : "直線！";
   $("phase-val").textContent = p.finished? "ゴール" : phaseTxt;
 
-  // --- ペース表示 ---
-  const ls=r.leaderSpeedSmooth;
-  let pace = ls>CFG.cruiseBase+0.8? "ハイ" : ls<CFG.cruiseBase-0.4? "スロー" : "平均";
+  // --- ペース表示（創発ペース4段階） ---
+  const pace = ["スロー","平均","ハイ","超ハイ"][r.paceLevel!=null? r.paceLevel : 1];
   $("pace-val").textContent = r.started? pace : "—";
 
   // --- スタミナ／折り合いゲージ ---
@@ -1893,7 +1918,7 @@ function render(){
   if(arc){
     const frac=clamp(p.speed/21,0,1);
     arc.style.strokeDashoffset = (157.1*(1-frac)).toFixed(1);
-    arc.setAttribute("stroke", p.gear>=6?"#d23b3b": p.gear>=5?"#e0a23a": p.gear<=2?"#6f86df":"#5fb0b0");
+    arc.setAttribute("stroke", p.gear>=9?"#d23b3b": p.gear>=7?"#e0a23a": p.gear<=3?"#6f86df":"#5fb0b0");
   }
 
   // --- 観客の盛り上がり（直線で増し、ゴールで歓声） ---
@@ -1944,7 +1969,7 @@ function render(){
   if(compLab){
     let t="", col="#9fb1ad";
     if(p.pulling){ t="力んでいる！"; col="#e2473e"; }
-    else if(p.composure < CFG.compRecover && p.gear>=5){ t="力みそう"; col="#f0a93b"; }
+    else if(p.composure < CFG.compRecover && p.gear>=7){ t="力みそう"; col="#f0a93b"; }
     else if(p.composure>72){ t="折り合い○"; }
     compLab.innerHTML = "折り合い"+(t?` <span style="font-size:10px;color:${col};">${t}</span>`:"");
   }
@@ -1952,7 +1977,7 @@ function render(){
   const sl=$("speedlines");
   if(sl){
     let o=0;
-    if(r.started && !p.finished){ o=clamp((p.speed-15)/7,0,0.5); if(p.gear>=7||p.whipTimer>0) o=Math.min(0.62,o+0.15); }
+    if(r.started && !p.finished){ o=clamp((p.speed-15)/7,0,0.5); if(p.gear>=10||p.whipTimer>0) o=Math.min(0.62,o+0.15); }
     sl.style.opacity=o;
   }
 
@@ -2604,11 +2629,11 @@ function updateCamera(dt){
     dpos=new THREE.Vector3(w.x - hx*0.2, 2.02 + bob, w.z - hz*0.2);
     dtgt=new THREE.Vector3(w.x + hx*18, 1.35, w.z + hz*18);
     posRate=16; tgtRate=14;
-    fovT=66 + (p.gear>=6?4:0) + ((p.gear>=7||p.whipTimer>0)?3:0) + (inStraight?2:0);
+    fovT=66 + (p.gear>=9?4:0) + ((p.gear>=10||p.whipTimer>0)?3:0) + (inStraight?2:0);
   } else { // chase（追走）
     if(inStraight){ dpos=new THREE.Vector3(w.x - hx*9.5, 4.6, w.z - hz*9.5); dtgt=new THREE.Vector3(w.x + hx*17, 1.4, w.z + hz*17); posRate=11; tgtRate=12; }
     else          { dpos=new THREE.Vector3(w.x - hx*11, 6.3, w.z - hz*11); dtgt=new THREE.Vector3(w.x + hx*16, 1.3, w.z + hz*16); posRate=8;  tgtRate=9;  }
-    fovT=56 + (p.gear>=6?4:0) + ((p.gear>=7||p.whipTimer>0)?3:0) + (inStraight?1.5:0); shake=true;
+    fovT=56 + (p.gear>=9?4:0) + ((p.gear>=10||p.whipTimer>0)?3:0) + (inStraight?1.5:0); shake=true;
   }
   if(!camInit){ camState.pos.copy(dpos); camState.tgt.copy(dtgt); camInit=true; }
   else { _lerpV(camState.pos, dpos, posRate, dt); _lerpV(camState.tgt, dtgt, tgtRate, dt); }
@@ -2681,7 +2706,7 @@ function drawTrack(){
     }
     // 騎手：ストライドに合わせて追う。直線・高ギア・ムチで激しく＝追い出しの姿勢
     if(ud.rider){
-      const driving = (h.isPlayer && (h.gear>=6 || h.whipTimer>0)) ? 1 : (h.dist>=CFG.straightDist?0.6:0);
+      const driving = (h.isPlayer && (h.gear>=9 || h.whipTimer>0)) ? 1 : (h.dist>=CFG.straightDist?0.6:0);
       const amp=(0.12+driving*0.22)*sp;
       ud.rider.rotation.x = 0.18 + driving*0.22 + Math.sin(ph)*amp;
       ud.rider.position.y = ud.riderY - driving*0.06 + Math.abs(Math.sin(ph))*0.05*sp;

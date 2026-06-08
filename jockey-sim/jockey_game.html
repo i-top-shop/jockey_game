@@ -625,6 +625,8 @@ const CFG = {
 
 // 創発ペース／ハナ争い（Stage1）。engine.js と同一。先頭争いからペースを発生させスタミナ・縦長・失速へ波及
 const PACE = { LEAD_ZONE:9, HANA_ESC:0.9, LONE_EASE:1.5, PACE_DRAIN:0.25 };
+// 後続の役割ギャップ（馬身）。先頭ペースに乗り役割ギャップへ寄せて馬群を約8〜20馬身に束ねる
+const ROLEGAP = { nige:1, senko:3.5, sashi:8, oikomi:13 };
 
 /* ---------- 小物ユーティリティ ---------- */
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
@@ -1460,7 +1462,7 @@ function stepRace(dt){
     h.blocked=false;
     let cap=Infinity;
     const bGap = (h.ability==="breaker")? CFG.blockGap*0.8 : CFG.blockGap;   // 馬群突破：やや詰まりにくい
-    for(const o of field){
+    if(((r._lead!=null?r._lead:h.dist) - h.dist) < 30) for(const o of field){   // 後方に離れた馬は開けた所＝ブロック対象外（デッドロック回避・脱落防止）
       if(o===h || o.finished) continue;
       const gap = o.dist - h.dist;                       // 縦の差（前方が正）
       if(gap>0 && gap<bGap && Math.abs(o.lane-h.lane)<CFG.blockLane){
@@ -1653,17 +1655,16 @@ function computeDesired(h, dt, r){
       const lead=(r._lead!=null?r._lead:h.dist), gapToLead=lead-h.dist;
       const early=clamp((CFG.DIST*0.5-h.dist)/(CFG.DIST*0.5),0,1);   // 前半=1 後半=0
       const contest=r._contest||0, nNigeLead=r._nNigeLead||0, paceLevel=(r.paceLevel!=null?r.paceLevel:1);
+      const paceFactor=0.6+paceLevel*0.2;                            // スロー詰める..超ハイ開く
       let cg = st.cruiseGain; h._contesting=false;
-      if(h.style==="nige"){                                  // 逃げ：ハナを主張
-        if(contest>0.1 && gapToLead<PACE.LEAD_ZONE){ cg+=Math.min(2.2,PACE.HANA_ESC*contest)*(0.5+early*0.5); h._contesting=true; }   // ハナ争い→競り上げ
-        else if(nNigeLead<=1 && gapToLead<1.5){ cg-=PACE.LONE_EASE*(0.4+early*0.6); }                                                  // 単騎逃げ→楽に（スロー）
-      } else if(h.style==="senko"){                          // 先行：逃げの直後で折り合い、先頭ペースに追従
-        if(contest>0.1 && gapToLead<PACE.LEAD_ZONE){ cg+=Math.min(1.6,PACE.HANA_ESC*contest)*0.5*(0.5+early*0.5); h._contesting=true; }
-        else if(gapToLead>6){ cg+=0.4*early; }               // 離れすぎ→好位へ詰める
-        else if(gapToLead<2.5){ cg-=0.6; }                   // 近すぎ→抑えて折り合う（先頭が遅ければ自分も遅く＝詰まる）
-      } else {                                               // 差し・追込：ペース偏差に連続反応（速い→後方で溜める＝縦長／遅い→前へ詰める）
-        const paceDev=r.leaderSpeedSmooth-CFG.cruiseBase, react=h.style==="oikomi"?0.45:0.32;
-        cg-=clamp(paceDev*react,-0.45,0.9);
+      const isPacer = h._rankNow===1 || (h.style==="nige" && gapToLead<2.0);
+      if(isPacer && h.style==="nige"){                       // 先頭の逃げ：ハナ争い/単騎楽逃げ
+        if(contest>0.1 && gapToLead<PACE.LEAD_ZONE){ cg+=Math.min(2.2,PACE.HANA_ESC*contest)*(0.5+early*0.5); h._contesting=true; }   // 競り上げ
+        else if(nNigeLead<=1 && gapToLead<1.5){ cg-=PACE.LONE_EASE*(0.4+early*0.6); }                                                  // 単騎楽逃げ
+      } else if(!isPacer){                                   // 後続：先頭ペースに乗り役割ギャップへ寄せる（馬群を8〜20馬身に束ね・脱落防止）
+        const tgtGap=((ROLEGAP[h.style]||6)+(h.num%4)*0.8)*2.4*paceFactor;   // 同脚質は少し散らす
+        cg=(r.leaderSpeedSmooth-CFG.cruiseBase)+clamp((gapToLead-tgtGap)*0.10, -0.5, 2.0);   // 基準＝先頭ペース（付いて行く）＋ギャップ補正
+        if(contest>0.1 && h.style==="senko" && gapToLead<PACE.LEAD_ZONE){ cg+=Math.min(1.6,PACE.HANA_ESC*contest)*0.4*(0.5+early*0.5); h._contesting=true; }
       }
       target = comfortable + cg + rand(-0.15,0.15);
     }
@@ -1708,6 +1709,7 @@ function computeDesired(h, dt, r){
     const f = floor + (1-floor)*(h.stamina/CFG.staFatigue);
     vCeil = tTop*f + ((h.isPlayer&&h.gear===10)?0.8:0);
   }
+  if(!h.isPlayer && !h.committed && ((r._lead!=null?r._lead:h.dist) - h.dist) > 30 && h.stamina>20) vCeil += 1.8;   // 後方に離れた馬は馬群へ取り付くため一時的に上限up（脱落防止＝馬群を束ねる）
   if(h.whipTimer>0) vCeil += (h._whipBoost||0)*0.9;   // ムチ中はひと押しぶん上限を許容
   target = clamp(target, 6, vCeil);
 

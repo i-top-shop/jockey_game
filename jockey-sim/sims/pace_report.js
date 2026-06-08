@@ -27,7 +27,7 @@ for(const b of BINORD){
   const pace = o.fhPace/o.races, len = o.len/o.races;
   const lvl = pace>20.2?"超ハイ": pace>19.5?"ハイ": pace<18.3?"スロー":"平均";
   console.log(`\n■ ${BINLBL[b]}  (${o.races}R)`);
-  console.log(`   前半ペース=${pace.toFixed(2)} m/s 【${lvl}】   前半ピーク縦長=${len.toFixed(0)} m`);
+  console.log(`   前半ペース=${pace.toFixed(2)} m/s 【${lvl}】   ピーク馬群長=${len.toFixed(0)}m (${(len/2.4).toFixed(0)}馬身)`);
   let line="   直線入口→着順: ";
   for(const k of SK){ const s=o.st[k]; if(s&&s.n) line += `${JP[k]} ${(s.strRank/s.n).toFixed(1)}→${(s.rank/s.n).toFixed(1)}  `; }
   console.log(line);

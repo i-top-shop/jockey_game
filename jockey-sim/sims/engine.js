@@ -11,7 +11,9 @@ function curveAt(s){ s=((s%TRK_P)+TRK_P)%TRK_P; return (s<TRK_LB || (s>=TRK_LB+T
 
 const cruiseBase=18.8, staFatigue=24;
 // 創発ペース／ハナ争い（Stage1）：先頭争いからペースを発生させ、スタミナ・縦長・失速へ波及させる
-const LEAD_ZONE=9, HANA_ESC=0.9, LONE_EASE=1.5, SENKO_GAP=7, PACE_DRAIN=0.25;
+const LEAD_ZONE=9, HANA_ESC=0.9, LONE_EASE=1.5, PACE_DRAIN=0.25;
+// 後続の役割ギャップ（馬身。先頭からの距離）。ペースで伸縮し、馬群を約8〜20馬身に束ねる
+const ROLEGAP={nige:1, senko:3.5, sashi:8, oikomi:13};
 const STYLES={
   nige:  {cg:0.55, sb:1.08, kg:0.62, cr:520, pref:[0,1.6]},
   senko: {cg:0.22, sb:1.00, kg:0.88, cr:450, pref:[0.6,2.6]},
@@ -78,9 +80,7 @@ function race(DIST, P){
     const paceLevel = pace>cruiseBase+1.5?3 : pace>cruiseBase+0.75?2 : pace<cruiseBase-0.45?0 : 1;  // 0スロー..3超ハイ
     let minDist=Infinity; for(const h of alive) if(h.dist<minDist)minDist=h.dist;
     if(lead>=DIST*0.12 && lead<DIST*0.34){ fhPaceSum+=leaderSpeed; fhPaceN++; }       // 立ち上がり後の前半ペース（失速前）
-    if(lead<straightDist && lead-minDist>peakLen) peakLen=lead-minDist;                // 直線入口までのピーク縦長（ハイほど伸びる）
-    if(process.env.DBG && Math.round(t*30)%15===0 && lead<DIST*0.62){
-      const nige=byDist.filter(h=>h.style==="nige"); if(nige.length>=2) console.error(`t=${t.toFixed(1)} lead=${lead.toFixed(0)} nNigeLead=${nNigeLead} contest=${contest.toFixed(1)} pace=${pace.toFixed(2)} lvl=${paceLevel} 縦長=${(lead-minDist).toFixed(0)} nige[spd/sta]=${nige.map(h=>h.speed.toFixed(1)+'/'+h.stamina.toFixed(0)).join(' ')}`); }
+    if(peakLen===0 && lead>=DIST*0.4) peakLen=lead-minDist;                            // 道中(40%地点・仕掛け前)の馬群長＝見える隊列
     for(const h of F){ if(h.finished)continue;
       if(h._rankAtStr==null && h.dist>=straightDist) h._rankAtStr=h._rankNow;        // 直線入口の順位
       let leader=true; for(const o of F){ if(o===h||o.finished)continue; if(o.dist>h.dist){leader=false;break;} }
@@ -91,22 +91,16 @@ function race(DIST, P){
       if(h.dist>=h.commitDist){ target=tTop; h.committed=true; }
       else{
         const gapToLead=lead-h.dist, early=clamp((DIST*0.5-h.dist)/(DIST*0.5),0,1);  // early:前半=1 後半=0
-        let cg=STYLES[h.style].cg; h._contesting=false;
-        if(h.style==="nige"){                                  // 逃げ：ハナを主張
-          if(contest>0.1 && gapToLead<LEAD_ZONE){             // ハナ争い→競り上げ（逃げ複数・先行多・前半ほど強い）
-            cg+=Math.min(2.2, HANA_ESC*contest)*(0.5+early*0.5); h._contesting=true;
-          } else if(nNigeLead<=1 && gapToLead<1.5){            // 単騎逃げ→楽に（明確にスロー＝前残りの土台）
-            cg-=LONE_EASE*(0.4+early*0.6);
-          }
-        } else if(h.style==="senko"){                          // 先行：逃げの直後で折り合い、先頭ペースに追従
-          if(contest>0.1 && gapToLead<LEAD_ZONE){             // 先頭争いに絡む時は競る（弱め）
-            cg+=Math.min(1.6, HANA_ESC*contest)*0.5*(0.5+early*0.5); h._contesting=true;
-          } else if(gapToLead>6){ cg+=0.4*early;                // 離れすぎ→好位へ詰める
-          } else if(gapToLead<2.5){ cg-=0.6; }                 // 近すぎ→抑えて折り合う（先頭が遅ければ自分も遅く＝詰まる）
-        } else {                                               // 差し・追込：ペース偏差に連続反応（速い→後方で溜める＝縦長／遅い→前へ詰める＝詰まる）
-          const paceDev = pace - cruiseBase;                   // >0 速い / <0 遅い
-          const react = h.style==="oikomi" ? 0.45 : 0.32;      // 追込ほど後方に構える
-          cg -= clamp(paceDev*react, -0.45, 0.9);
+        const paceFactor=0.6+paceLevel*0.2; h._contesting=false;                      // スロー詰める..超ハイ開く
+        let cg=STYLES[h.style].cg;
+        const isPacer = h._rankNow===1 || (h.style==="nige" && gapToLead<2.0);
+        if(isPacer && h.style==="nige"){                            // 先頭の逃げ：ハナ争い/単騎楽逃げ
+          if(contest>0.1 && gapToLead<LEAD_ZONE){ cg+=Math.min(2.2,HANA_ESC*contest)*(0.5+early*0.5); h._contesting=true; }
+          else if(nNigeLead<=1 && gapToLead<1.5){ cg-=LONE_EASE*(0.4+early*0.6); }
+        } else if(!isPacer){                                        // 後続：先頭ペースに乗り役割ギャップへ寄せる（馬群を8〜20馬身に束ね・脱落防止）
+          const tgtGap=((ROLEGAP[h.style]||6)+(h.id%4)*0.8)*2.4*paceFactor;   // 同脚質は少し散らす
+          cg=(pace-cruiseBase)+clamp((gapToLead-tgtGap)*0.10, -0.5, 2.0);     // 基準＝先頭ペース（付いて行く）＋ギャップ補正
+          if(contest>0.1 && h.style==="senko" && gapToLead<LEAD_ZONE){ cg+=Math.min(1.6,HANA_ESC*contest)*0.4*(0.5+early*0.5); h._contesting=true; }
         }
         target=cruiseBase+cg+rnd(-0.15,0.15);
       }
@@ -126,20 +120,21 @@ function race(DIST, P){
       h.stamina=clamp(h.stamina-drain*dt,0,100); if(h.stamina<h.minSta)h.minSta=h.stamina;
       let floor=h.ab==="stayer"?0.76:0.66, vCeil=tTop+0.6;
       if(h.stamina<staFatigue){ const f=floor+(1-floor)*(h.stamina/staFatigue); vCeil=tTop*f; }
+      if(!h.committed && (lead-h.dist)>30 && h.stamina>20) vCeil+=1.8;   // 後方に離れた馬は馬群へ取り付くため一時的に上限up（脱落防止＝馬群を束ねる）
       target=clamp(target,6,vCeil);
       const rate=target>h.speed?h.p.accelUp:2.4;
       h._v=Math.max(0,h.speed+clamp(target-h.speed,-rate*dt,rate*dt));
     }
     for(const h of F){ if(h.finished)continue;
       let cap=Infinity, blk=false; const bg=h.ab==="breaker"?4.5*0.8:4.5;   // blockGap 6.5→4.5
-      for(const o of F){ if(o===h||o.finished)continue; const gap=o.dist-h.dist;
+      if((lead-h.dist)<30) for(const o of F){ if(o===h||o.finished)continue; const gap=o.dist-h.dist;   // 後方に離れた馬は開けた所＝ブロック対象外（デッドロック回避）
         if(gap>0&&gap<bg&&Math.abs(o.lane-h.lane)<0.7){ cap=Math.min(cap,o.speed); blk=true; } }   // blockLane 0.95→0.7
       let v=h._v; if(blk)v=Math.min(v,cap); h.speed=v;
       const sW=startS+h.dist, onBend=curveAt(sW)!==0, cg=STYLES[h.style].cg;
       if((DIST-h.dist)>480){ const HB={nige:0.5,senko:0.72,sashi:2.35,oikomi:2.55}, BS={nige:0.6,senko:0.9,sashi:1.15,oikomi:1.3}; const home=clamp((HB[h.style]??1.4)+h.laneBias*(BS[h.style]??1.1),0,6); h.target+=clamp(home-h.target,-0.5,0.5)*dt*0.5; }
       else{ if((h.style==="sashi"||h.style==="oikomi")&&h.target<3.4)h.target+=dt*0.9;
             if(cg>0&&h.target>1.4)h.target-=dt*0.5; }
-      if(blk) h.target=Math.min(onBend?4.5:6, h.target+(onBend?0.6:1.0)*dt);
+      if(blk){ const d=(h.id%2? -0.7 : 1.0); h.target=clamp(h.target + d*(onBend?0.7:1.2)*dt, 0, onBend?4.5:6.5); }  // 詰まったら左右に開いて抜ける（IDで散らしデッドロック回避）
       h.lane=clamp(h.lane+clamp(h.target-h.lane,-1.9*dt,1.9*dt),0,7);
       let gl=onBend?0.0026:0.0005;
       if(onBend){ let red=h.p.cornerSkill; if(h.ab==="corner")red+=0.5; gl*=clamp(1-red,0.35,1); }

@@ -11,7 +11,7 @@ function curveAt(s){ s=((s%TRK_P)+TRK_P)%TRK_P; return (s<TRK_LB || (s>=TRK_LB+T
 
 const cruiseBase=18.8, staFatigue=24;
 // 創発ペース／ハナ争い（Stage1）：先頭争いからペースを発生させ、スタミナ・縦長・失速へ波及させる
-const LEAD_ZONE=9, HANA_ESC=0.9, LONE_EASE=1.5, PACE_DRAIN=0.25;
+const LEAD_ZONE=9, HANA_ESC=0.9, LONE_EASE=1.5, PACE_DRAIN=0.25, FOLLOW_MAX=2.0;
 // 後続の役割ギャップ（馬身。先頭からの距離）。ペースで伸縮し、馬群を約8〜20馬身に束ねる
 const ROLEGAP={nige:1, senko:3.5, sashi:8, oikomi:13};
 const STYLES={
@@ -100,6 +100,7 @@ function race(DIST, P){
         } else if(!isPacer){                                        // 後続：先頭ペースに乗り役割ギャップへ寄せる（馬群を8〜20馬身に束ね・脱落防止）
           const tgtGap=((ROLEGAP[h.style]||6)+(h.id%4)*0.8)*2.4*paceFactor;   // 同脚質は少し散らす
           cg=(pace-cruiseBase)+clamp((gapToLead-tgtGap)*0.10, -0.5, 2.0);     // 基準＝先頭ペース（付いて行く）＋ギャップ補正
+          cg=Math.min(cg, FOLLOW_MAX);   // 追走の上限：暴走する先頭には付き合わず脚を溜める
           if(contest>0.1 && h.style==="senko" && gapToLead<LEAD_ZONE){ cg+=Math.min(1.6,HANA_ESC*contest)*0.4*(0.5+early*0.5); h._contesting=true; }
         }
         target=cruiseBase+cg+rnd(-0.15,0.15);

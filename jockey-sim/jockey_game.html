@@ -631,7 +631,7 @@ const CFG = {
 };
 
 // 創発ペース／ハナ争い（Stage1）。engine.js と同一。先頭争いからペースを発生させスタミナ・縦長・失速へ波及
-const PACE = { LEAD_ZONE:9, HANA_ESC:0.9, LONE_EASE:1.5, PACE_DRAIN:0.25 };
+const PACE = { LEAD_ZONE:9, HANA_ESC:0.9, LONE_EASE:1.5, PACE_DRAIN:0.25, FOLLOW_MAX:2.0 };  // FOLLOW_MAX=後続が先頭に付き合う上限（暴走先頭は行かせて脚を溜める）
 // 後続の役割ギャップ（馬身）。先頭ペースに乗り役割ギャップへ寄せて馬群を約8〜20馬身に束ねる
 const ROLEGAP = { nige:1, senko:3.5, sashi:8, oikomi:13 };
 
@@ -1523,17 +1523,16 @@ function stepRace(dt){
     if(!h.isPlayer){
       const onBend = pose.curve!==0;
       if(h.blocked) h.blockTimer+=dt; else h.blockTimer=Math.max(0,h.blockTimer-dt*0.5);
-      // 詰まったら持ち出す（コーナーでは無駄な大外を嫌い控えめ）＝原版の差し・追込の生命線を維持
-      if(h.blockTimer>0.5){ h.targetLane=Math.min(onBend?4.5:6, h.targetLane+ (onBend?0.6:1.0)); h.blockTimer=0; }
       const st=STYLES[h.style];
       if((CFG.DIST - h.dist) > 480){
-        // 道中：実際の馬群の置き所を脚質4段の勾配で再現。逃=最内ラチ→先行=好位の内→差し=中目→追込=後方中目。
-        //   先頭ほどラチに密集（散らし小）、後方ほど横に散る（散らし大）。脚質内外の平均は保存＝balance不変。
+        // 道中：脚質4段の勾配で内の置き所をキープ（逃=最内ラチ→先行=好位の内→差し=中目→追込=後方中目）。
+        //   詰まっても外へは流さない＝馬群は内ラチに固まる。先頭ほど密集・後方ほど横に散る。
         const HB={nige:0.5,senko:0.72,sashi:2.35,oikomi:2.55}, BS={nige:0.6,senko:0.9,sashi:1.15,oikomi:1.3};
         const home = clamp((HB[h.style]??1.4) + (h.laneBias||0)*(BS[h.style]??1.1), 0, 6);
-        h.targetLane += clamp(home - h.targetLane, -0.5,0.5)*dt*0.5 + (Math.random()-0.5)*dt*0.4;
+        h.targetLane += clamp(home - h.targetLane, -0.5,0.5)*dt*0.7 + (Math.random()-0.5)*dt*0.3;
       } else {
-        // 勝負所：差し・追込は最終コーナーで外へ持ち出してクリアな進路を作る
+        // 勝負所：詰まったら外へ持ち出してクリアな進路を作る＋差し追込は外・前は内ピタ
+        if(h.blockTimer>0.5){ h.targetLane=Math.min(onBend?4.5:6, h.targetLane+(onBend?0.6:1.0)); h.blockTimer=0; }
         if((h.style==="sashi"||h.style==="oikomi") && h.targetLane<3.4) h.targetLane += dt*0.9;
         if(st.cruiseGain>0 && h.targetLane>1.4) h.targetLane -= dt*0.5; // 前は内ピタで粘る
       }
@@ -1675,6 +1674,7 @@ function computeDesired(h, dt, r){
       } else if(!isPacer){                                   // 後続：先頭ペースに乗り役割ギャップへ寄せる（馬群を8〜20馬身に束ね・脱落防止）
         const tgtGap=((ROLEGAP[h.style]||6)+(h.num%4)*0.8)*2.4*paceFactor;   // 同脚質は少し散らす
         cg=(r.leaderSpeedSmooth-CFG.cruiseBase)+clamp((gapToLead-tgtGap)*0.10, -0.5, 2.0);   // 基準＝先頭ペース（付いて行く）＋ギャップ補正
+        cg=Math.min(cg, PACE.FOLLOW_MAX);   // 追走の上限：暴走する先頭(押すプレイヤー等)には付き合わず脚を溜める＝後で差す
         if(contest>0.1 && h.style==="senko" && gapToLead<PACE.LEAD_ZONE){ cg+=Math.min(1.6,PACE.HANA_ESC*contest)*0.4*(0.5+early*0.5); h._contesting=true; }
       }
       target = comfortable + cg + rand(-0.15,0.15);

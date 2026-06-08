@@ -2343,9 +2343,12 @@ function syncHorseMeshes(){
   if(playerRing){ scene.remove(playerRing); playerRing=null; }
   const nField=state.field.length;
   state.field.forEach((h)=>{
-    const g=(USE_GLTF_HORSE && gltfHorseProto)
-      ? makeGltfHorse(h.coat, h.color, capColor(h.num, nField))
-      : makeHorseMesh(h.color, h.coat, h.markings, h.isPlayer, capColor(h.num, nField));
+    let g;
+    try {
+      g=(USE_GLTF_HORSE && gltfHorseProto)
+        ? makeGltfHorse(h.coat, h.color, capColor(h.num, nField))
+        : makeHorseMesh(h.color, h.coat, h.markings, h.isPlayer, capColor(h.num, nField));
+    } catch(e){ console.warn("GLTF馬の生成に失敗→箱馬へフォールバック", e); g=makeHorseMesh(h.color, h.coat, h.markings, h.isPlayer, capColor(h.num, nField)); }
     g.traverse(o=>{ if(o.isMesh) o.castShadow=true; });   // 馬体は影を落とす
     scene.add(g);
     const sp=makeNumberSprite(String(h.num), h.color); scene.add(sp);
@@ -2502,15 +2505,14 @@ const Budget = {
 };
 
 // ===== ポストプロセス（Bloom→グレード/ビネット→出力）。POST=false で従来の直接描画に戻る（可逆） =====
-const POST = true;
+const POST = false;   // Composerが白いUI/白毛馬を光らせる問題のため一旦オフ（素のr160描画＝レビュー済み）。後日 実機を見ながら再調整
 let composer=null, bloomPass=null;
 function buildComposer(){
   if(!POST || !window.THREE_ADDONS) return;
   const A=window.THREE_ADDONS, cv=$("track");
   composer = new A.EffectComposer(renderer);
   composer.addPass(new A.RenderPass(scene, camera));
-  bloomPass = new A.UnrealBloomPass(new THREE.Vector2(cv.clientWidth||1, cv.clientHeight||1), 0.42, 0.6, 0.8); // strength,radius,threshold（夕景の西日/ハイライト）
-  composer.addPass(bloomPass);
+  // Bloom は白いUI（馬番/リング）や白毛馬を光らせすぎるため一旦無効。必要時は選択Bloomで西日のみに限定する。
   const grade = { uniforms:{ tDiffuse:{value:null}, warm:{value:new THREE.Color(1.04,1.0,0.95)}, sat:{value:1.08}, vig:{value:1.2} },
     vertexShader:`varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);} `,
     fragmentShader:`uniform sampler2D tDiffuse; uniform vec3 warm; uniform float sat,vig; varying vec2 vUv;

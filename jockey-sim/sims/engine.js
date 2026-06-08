@@ -95,9 +95,9 @@ function race(DIST, P){
       h._v=Math.max(0,h.speed+clamp(target-h.speed,-rate*dt,rate*dt));
     }
     for(const h of F){ if(h.finished)continue;
-      let cap=Infinity, blk=false; const bg=h.ab==="breaker"?6.5*0.8:6.5;
+      let cap=Infinity, blk=false; const bg=h.ab==="breaker"?4.5*0.8:4.5;   // blockGap 6.5→4.5
       for(const o of F){ if(o===h||o.finished)continue; const gap=o.dist-h.dist;
-        if(gap>0&&gap<bg&&Math.abs(o.lane-h.lane)<0.95){ cap=Math.min(cap,o.speed); blk=true; } }
+        if(gap>0&&gap<bg&&Math.abs(o.lane-h.lane)<0.7){ cap=Math.min(cap,o.speed); blk=true; } }   // blockLane 0.95→0.7
       let v=h._v; if(blk)v=Math.min(v,cap); h.speed=v;
       const sW=startS+h.dist, onBend=curveAt(sW)!==0, cg=STYLES[h.style].cg;
       if((DIST-h.dist)>480){ const home=clamp((cg>0?0.6:2.4)+h.laneBias,0,6); h.target+=clamp(home-h.target,-0.5,0.5)*dt*0.5; }
@@ -111,7 +111,7 @@ function race(DIST, P){
       if(!h.finished&&h.dist>=DIST){ const over=h.dist-DIST, ve=Math.max(0.1,h.speed*(1-h.lane*gl)); h.ft=t-over/ve; h.finished=true; }
     }
     // パスC：馬体接触の解消（本体 stepRace と同一・位置のみ＝速度/スタミナ不変。パワーで押し勝つ）
-    const BL=2.6, ML=0.85, kB=clamp(10*dt,0,1);
+    const BL=2.0, ML=0.6, kB=clamp(10*dt,0,1);   // bumpDistGap 2.6→2.0 / bumpLaneGap 0.85→0.6
     for(let i=0;i<F.length;i++){ const a=F[i]; if(a.finished)continue;
       for(let j=i+1;j<F.length;j++){ const b=F[j]; if(b.finished)continue;
         const dd=a.dist-b.dist; if(dd>BL||dd<-BL)continue;

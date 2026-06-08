@@ -607,13 +607,13 @@ const CFG = {
   laneRate: 1.9,         // 横移動速度(レーン/秒)
   groundLossStraight: 0.0005, // 直線で外を回るロス（小さい）
   groundLossBend: 0.0026,     // コーナーで外を回るロス（大きい＝イン取りの価値）
-  // ブロック判定
-  blockGap: 6.5,         // 前の馬との縦距離がこれ未満でブロック対象
-  blockLane: 0.95,       // 横の近さがこれ未満で同一進路とみなす
-  blockSideGap: 4.2,     // 横にこの距離内で並走されると進路を変えにくい（袋に入る）
-  // 接触（馬体ぶつかり）：横に重ならないよう押し分ける。位置のみ＝速度/スタミナの縦には触れない（balance保存）
-  bumpDistGap: 2.6,      // 縦にこの距離内なら馬体が並ぶ＝接触判定の対象
-  bumpLaneGap: 0.85,     // 確保したい横の最小間隔(レーン)。縦が重なるほどこの幅を要求（楕円の体当たり）
+  // ブロック判定（馬体サイズ相応に狭めた：壁になる範囲を縮小）
+  blockGap: 4.5,         // 前の馬との縦距離がこれ未満でブロック対象（6.5→4.5）
+  blockLane: 0.7,        // 横の近さがこれ未満で同一進路とみなす（0.95→0.7）
+  blockSideGap: 0.9,     // 横にこの距離内で並走されると進路を変えにくい（→0.9：真横に重なった時だけ）
+  // 接触（馬体ぶつかり）：横に重ならないよう押し分ける。位置のみ＝速度/スタミナの縦には触れない
+  bumpDistGap: 2.0,      // 縦にこの距離内なら馬体が並ぶ＝接触判定の対象（2.6→2.0）
+  bumpLaneGap: 0.6,      // 確保したい横の最小間隔(レーン)（0.85→0.6＝馬が近づける）
   bumpRate: 10,          // 押し分けの速さ(1/秒)。パワー差で押し勝つ側ほど動かない
   // スタミナ
   staFatigue: 24,        // この値を下回ると失速し始める
@@ -1470,7 +1470,7 @@ function stepRace(dt){
         if(o===h||o.finished) continue;
         const dgap = Math.abs(o.dist - h.dist);                 // 縦に近い＝並走
         const side = (o.lane - h.lane)*dir;                     // 進みたい側にいるか
-        if(dgap < CFG.blockSideGap && side>0 && side < 1.05){ sideBlocked=true; break; }
+        if(dgap < CFG.blockSideGap && side>0 && side < 0.45){ sideBlocked=true; break; }   // →0.45：真横に重なった時だけ塞ぐ
       }
       if(sideBlocked){
         want=0;                                                 // その方向へは出られない
@@ -1525,6 +1525,7 @@ function stepRace(dt){
       const over = h.dist - CFG.DIST;
       const vEff = Math.max(0.1, h.speed*groundFactor);
       h.finishTime = r.raceTime - over/vEff;   // 通過時刻
+      h._vfin = vEff;                          // 通過時の実効速度（着差を実速で算出＝精度up）
       h.finished=true;
       r.finishedCount++;
     }
@@ -1843,8 +1844,8 @@ function playerLaneSituation(){
     const gap=o.dist-p.dist, dl=o.lane-p.lane;            // gap>0=前方, dl>0=外側
     if(gap>0 && gap<CFG.blockGap && Math.abs(dl)<CFG.blockLane) front=true;
     if(Math.abs(gap)<CFG.blockSideGap){
-      if(dl<0 && dl>-1.05) inner=true;                    // 内に並走＝内へ入れない
-      if(dl>0 && dl< 1.05) outer=true;                    // 外に並走＝外へ出せない
+      if(dl<0 && dl>-0.45) inner=true;                    // 内に並走＝内へ入れない（→0.45）
+      if(dl>0 && dl< 0.45) outer=true;                    // 外に並走＝外へ出せない（→0.45）
     }
   }
   if(p.lane<=0.08) inner=true;                            // 最内ラチで頭打ち
@@ -2294,14 +2295,14 @@ function makeNumberSprite(num, color){
   x.fillStyle = isLight(color)?"#111":"#fff"; x.font="bold 56px 'Zen Kaku Gothic New', sans-serif";
   x.textAlign="center"; x.textBaseline="middle"; x.fillText(num,50,54);
   const tex=srgbTex(c); tex.anisotropy=2;
-  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex, transparent:true})); sp.scale.set(2.0,2.0,1);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex, transparent:true})); sp.scale.set(0.7,0.7,1);   // 1/3サイズ
   return sp;
 }
 /* ===== GLTF馬（実証用・フラグOFF既定）。USE_GLTF_HORSE=true で箱馬→GLTF馬へ。要視覚レビュー =====
    スライスで実証した GLTF ギャロップ馬を本体へ。毛色tint＋procedural騎手(シルク/枠番帽)を載せる。
    v1: rest-pose接地＋距離同期timeScale（足滑り防止）。per-frame接地IK/首pumpは次段。 */
-const USE_GLTF_HORSE = false;
-const HORSE_LEN_M = 3.0;     // 体長スケール（要調整）
+const USE_GLTF_HORSE = true;   // GLTF馬を本採用（箱馬→スライスのGLTFギャロップ馬＋procedural騎手）
+const HORSE_LEN_M = 6.0;     // 体長スケール（2倍に拡大）
 const HORSE_STRIDE = 7.0;    // 1完歩で進む距離(m)。脚回転を地上速度に同期
 let gltfHorseProto=null, gltfHorseClip=null;
 function loadGltfHorse(){
@@ -2325,14 +2326,26 @@ function makeGltfHorse(coatKey, silk, capCol){
   g.add(h);
   const mixer=new THREE.AnimationMixer(h);
   if(gltfHorseClip){ const a=mixer.clipAction(gltfHorseClip); a.play(); a.time=Math.random()*1.2; }
-  // 騎手（procedural・シルク＋枠番帽）。GLTF馬の背の高さに乗せる
-  const backY=(size.y*s)*0.72;
-  const silkMat=new THREE.MeshStandardMaterial({color:silk, roughness:.5});
-  const capMat =new THREE.MeshStandardMaterial({color:(capCol!=null?capCol:silk), roughness:.45});
-  const rider=new THREE.Mesh(new THREE.SphereGeometry(0.5,12,10), silkMat); rider.scale.set(0.5,0.54,0.46); rider.position.set(-0.1, backY+0.18, 0); rider.rotation.x=0.18; g.add(rider);
-  const arms =new THREE.Mesh(new THREE.BoxGeometry(0.30,0.15,0.46), silkMat); arms.position.set(0.28, backY+0.06, 0); g.add(arms);
-  const cap  =new THREE.Mesh(new THREE.SphereGeometry(0.16,12,10), capMat); cap.position.set(-0.06, backY+0.50, 0); g.add(cap);
-  g.userData={ gltf:true, mixer, rider, arms, cap, riderY:backY+0.18, armsY:backY+0.06, clipDur:(gltfHorseClip?gltfHorseClip.duration:0.5) };
+  // 騎手（クラウチング・コンパクト。馬に比例して小さめ・人体プロポーション）。背の前方(キ甲)に低く乗る・静的
+  const J=HORSE_LEN_M*0.044, backY=(size.y*s)*0.72, fwd=-HORSE_LEN_M*0.04;   // 鞍の位置：背の上に高く乗せる（埋まり解消）
+  const skinMat=new THREE.MeshStandardMaterial({color:0xc99e78, roughness:.75, transparent:true, opacity:0.55});
+  const silkMat=new THREE.MeshStandardMaterial({color:silk, roughness:.5, transparent:true, opacity:0.55});
+  const capMat =new THREE.MeshStandardMaterial({color:(capCol!=null?capCol:silk), roughness:.42, transparent:true, opacity:0.55});
+  const bootMat=new THREE.MeshStandardMaterial({color:0x171009, roughness:.5, transparent:true, opacity:0.55});
+  const CAP=(r,l)=>new THREE.CapsuleGeometry(r,l,5,9);
+  const jk=new THREE.Group(); jk.position.set(fwd, backY, 0);
+  const torso=new THREE.Mesh(CAP(J*0.26, J*1.5), silkMat); torso.position.set(-0.1*J, J*0.9, 0); torso.rotation.z=-0.7; jk.add(torso);     // 細い前傾の胴（さらに細く）
+  const head =new THREE.Mesh(new THREE.SphereGeometry(J*0.25,12,10), skinMat); head.position.set(J*0.85, J*1.55, 0); jk.add(head);        // 頭（小さく）
+  const cap  =new THREE.Mesh(new THREE.SphereGeometry(J*0.30,14,12), capMat); cap.scale.set(1,0.8,1); cap.position.set(J*0.82, J*1.70, 0); jk.add(cap);   // 枠番帽
+  for(const zz of [J*0.34,-J*0.34]){                                                                                                        // 腕（極細・前方下の手綱へ）
+    const arm=new THREE.Mesh(CAP(J*0.07, J*1.2), silkMat); arm.position.set(J*0.78, J*0.82, zz); arm.rotation.z=Math.PI/2-0.6; jk.add(arm);
+  }
+  for(const zz of [J*0.5,-J*0.5]){                                                                                                          // 脚（細い・膝上げ＋下腿は鐙へ＝ブーツ色）
+    const thigh=new THREE.Mesh(CAP(J*0.12, J*0.9), silkMat); thigh.position.set(J*0.15, J*0.42, zz); thigh.rotation.z=1.1; jk.add(thigh);
+    const shin =new THREE.Mesh(CAP(J*0.09, J*0.75), bootMat); shin.position.set(J*0.62, J*0.0, zz); shin.rotation.z=0.2; jk.add(shin);
+  }
+  g.add(jk);
+  g.userData={ gltf:true, mixer, clipDur:(gltfHorseClip?gltfHorseClip.duration:0.5) };   // 騎手は静的（rider駆動はしない）
   return g;
 }
 
@@ -2358,7 +2371,7 @@ function syncHorseMeshes(){
     horseMeshes.push({ h, group:g, sprite:sp, blob, _ld:0 });
   });
   Dust.init(); Dust.setGoing(state.race && state.race.going);
-  const ring=new THREE.Mesh(new THREE.RingGeometry(1.35,1.95,30),
+  const ring=new THREE.Mesh(new THREE.RingGeometry(0.5,0.72,30),
     new THREE.MeshBasicMaterial({color:0xffffff, side:THREE.DoubleSide, transparent:true, opacity:0.85, toneMapped:false}));
   ring.rotation.x=-Math.PI/2; ring.position.y=0.07; playerRing=ring; scene.add(ring);
   buildStartGate((state.race&&state.race.startS)||0, nField);   // 発走ゲートを始点に設置（馬房数＝頭数・閉じた状態）
@@ -2674,8 +2687,10 @@ function drawTrack(){
       ud.rider.position.y = ud.riderY - driving*0.06 + Math.abs(Math.sin(ph))*0.05*sp;
       if(ud.arms){ ud.arms.rotation.x = Math.sin(ph)*amp*0.8; ud.arms.position.y = (ud.armsY!=null?ud.armsY:1.40) - driving*0.05; }
     }
-    m.sprite.position.set(w.x, 2.45+bob, w.z);
-    m.sprite.material.opacity = h.finished? 0.5 : 1;
+    const numY = m.group.userData.gltf ? 4.0 : 2.45;        // GLTF(2倍)・少し低めに
+    m.sprite.position.set(w.x, numY+bob, w.z);
+    m.sprite.material.opacity = h.finished? 0.2 : 0.38;     // さらに半透明
+    m.sprite.material.depthTest = false;                    // 馬体に隠れず常に見える
     // 影（ブロブ）：地面に貼り付き、速度で少し伸びる
     if(m.blob){
       m.blob.visible = !h.finished || true;
@@ -2754,15 +2769,17 @@ function finishRace(){
   ranked.forEach((h,i)=> h.rank=i+1 );
   const p=state.player;
 
-  function margin(prevT, t){
+  function margin(prevT, t, v){
     if(prevT===null) return "—";
-    const g=t-prevT;
-    if(g<0.018) return "ハナ";
-    if(g<0.045) return "アタマ";
-    if(g<0.075) return "クビ";
-    if(g<0.13)  return "1/2";
-    const len=Math.max(0.5, Math.round((g*19/2.4)*2)/2);
-    return len+"馬身";
+    const d=(t-prevT)*(v||18);              // 着差（メートル）＝時間差×実効速度（精度up）
+    if(d<0.15) return "ハナ";
+    if(d<0.40) return "アタマ";
+    if(d<0.70) return "クビ";
+    if(d<1.20) return "1/2";
+    if(d<1.80) return "3/4";
+    const len=Math.round((d/2.4)*2)/2;      // 1馬身=2.4m
+    if(len>=10) return "大差";              // JRA：10馬身超は「大差」表示
+    return Math.max(1, len)+"馬身";
   }
 
   // 賞金・騎手ポイント
@@ -2790,7 +2807,7 @@ function finishRace(){
       <td>${h.name}${h.isPlayer?' <span style="color:var(--gold);font-size:10px;">(自分)</span>':''}</td>
       <td class="dim">${STYLES[h.style].name}</td>
       <td class="num">${h.popRank}人気</td>
-      <td class="num">${margin(prevT,h.finishTime)}</td>`;
+      <td class="num">${margin(prevT,h.finishTime,h._vfin)}</td>`;
     body.appendChild(tr);
     prevT=h.finishTime;
   });

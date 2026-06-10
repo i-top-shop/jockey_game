@@ -15,7 +15,7 @@
 
 <!-- PWA：インストール可能なアプリ化（相対パス＝GitHub Pages のサブパスでも動く） -->
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#0c1218">
+<meta name="theme-color" content="#070b12">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -31,33 +31,39 @@
 
 <style>
 /* ========================================================================
-   テーマ変数（黄昏の競馬中継：深いティールの芝 / 黒スレートUI / 金・緋の差し色）
+   デザインシステム v2「黄昏のプレミアム中継」
+   深いミッドナイトネイビー × 黄金。グラス面・金のグラデーション・発光アクセント。
    I-TOP向けメモ：色やバランスはここを変えれば全画面に反映されます
    ======================================================================== */
 :root{
-  --bg:#0c1218;            /* 画面外背景 */
-  --panel:#121b24;         /* パネル */
-  --panel-2:#0e161d;       /* パネル濃いめ */
-  --line:#23323f;          /* 罫線 */
+  --bg:#070b12;            /* 画面外背景（最暗部） */
+  --panel:#101a27;         /* パネル */
+  --panel-2:#0b1320;       /* パネル濃いめ */
+  --glass:rgba(11,18,29,.74);  /* レース中オーバーレイのグラス面 */
+  --line:#1e2c3c;          /* 罫線 */
+  --line-hi:rgba(255,255,255,.07); /* パネル上端のハイライト線 */
   --turf:#16412f;          /* 芝 */
   --turf-2:#1d5239;        /* 芝ハイライト */
-  --ink:#eef3f0;           /* 主要文字 */
-  --ink-dim:#9fb1ad;       /* 副文字 */
-  --gold:#e8b84b;          /* 金（アクセント） */
-  --gold-2:#caa033;
-  --crimson:#d23b3b;       /* 緋（仕掛け/ムチ系） */
-  --blue:#4aa3df;          /* 折り合い */
-  --green:#3fbf6f;         /* スタミナ良 */
-  --amber:#f0a93b;         /* 注意 */
-  --red:#e2473e;           /* 危険 */
-  --shadow:0 10px 30px rgba(0,0,0,.45);
+  --ink:#f2f6f2;           /* 主要文字 */
+  --ink-dim:#92a6a8;       /* 副文字 */
+  --gold:#f0c050;          /* 金（アクセント） */
+  --gold-2:#cf9a2e;
+  --gold-deep:#8a6c1d;
+  --gold-grad:linear-gradient(180deg,#ffe9a8 0%, #f0c050 40%, #cf9a2e 100%);
+  --crimson:#e0473e;       /* 緋（仕掛け/ムチ系） */
+  --blue:#54b0ec;          /* 折り合い */
+  --green:#46cf7c;         /* スタミナ良 */
+  --amber:#f5b13e;         /* 注意 */
+  --red:#ef5348;           /* 危険 */
+  --shadow:0 14px 40px rgba(0,0,0,.55);
 }
 
 *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html,body{ margin:0; padding:0; height:100%; }
 body{
   background:
-    radial-gradient(1200px 600px at 50% -10%, #15222c 0%, var(--bg) 60%),
+    radial-gradient(1100px 540px at 50% -8%, #16263a 0%, rgba(22,38,58,0) 62%),
+    radial-gradient(820px 420px at 88% 108%, #121a2c 0%, rgba(18,26,44,0) 55%),
     var(--bg);
   color:var(--ink);
   font-family:"Zen Kaku Gothic New", system-ui, sans-serif;
@@ -72,18 +78,21 @@ body{
   max-width:480px; margin:0 auto;
   height:100vh; height:100dvh;        /* iOS等のアドレスバー対策 */
   overflow:hidden;
-  background:var(--panel-2);
+  background:
+    radial-gradient(720px 360px at 50% -6%, rgba(40,62,90,.35) 0%, rgba(40,62,90,0) 60%),
+    var(--panel-2);
   box-shadow:var(--shadow);
   display:flex; flex-direction:column;
 }
 
 /* 画面切替：.screen を .active で表示 */
 .screen{ display:none; flex:1; min-height:0; }
-.screen.active{ display:flex; flex-direction:column; animation:screenIn .4s ease; }
-@keyframes screenIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+.screen.active{ display:flex; flex-direction:column; animation:screenIn .45s cubic-bezier(.22,.8,.3,1); }
+@keyframes screenIn{ from{ opacity:0; transform:translateY(14px) scale(.99); } to{ opacity:1; transform:none; } }
 
 /* スクロールする画面（タイトル/選択/結果） */
-.scroll{ flex:1; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:22px 18px 28px; }
+.scroll{ flex:1; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:22px 18px 28px; scrollbar-width:none; }
+.scroll::-webkit-scrollbar{ display:none; }
 
 h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; letter-spacing:.02em; }
 .dim{ color:var(--ink-dim); }
@@ -91,87 +100,162 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
 
 /* ====== 汎用ボタン ====== */
 .btn{
-  appearance:none; border:none; cursor:pointer;
+  appearance:none; cursor:pointer;
   font-family:"Zen Kaku Gothic New", sans-serif; font-weight:700;
-  color:var(--ink); background:#1b2a35; border:1px solid var(--line);
+  color:var(--ink);
+  background:linear-gradient(180deg,#1d2c3c 0%, #152233 100%);
+  border:1px solid #283a4d;
   border-radius:14px; padding:16px 18px; font-size:16px;
-  transition:transform .05s ease, background .15s ease, border-color .15s ease;
+  box-shadow:0 1px 0 var(--line-hi) inset, 0 6px 16px rgba(0,0,0,.28);
+  transition:transform .06s ease, filter .15s ease, border-color .15s ease;
 }
-.btn:active{ transform:translateY(1px) scale(.99); }
+.btn:active{ transform:translateY(1px) scale(.985); filter:brightness(1.12); }
 .btn.primary{
-  background:linear-gradient(180deg, var(--gold) 0%, var(--gold-2) 100%);
-  color:#1a1206; border-color:#8a6c1d; font-family:"Dela Gothic One",sans-serif;
-  box-shadow:0 8px 18px rgba(232,184,75,.25);
+  position:relative; overflow:hidden;
+  background:var(--gold-grad);
+  color:#221603; border-color:var(--gold-deep); font-family:"Dela Gothic One",sans-serif;
+  letter-spacing:.06em; text-shadow:0 1px 0 rgba(255,255,255,.35);
+  box-shadow:0 10px 26px rgba(240,192,80,.30), 0 1px 0 rgba(255,255,255,.55) inset, 0 -2px 0 rgba(0,0,0,.18) inset;
 }
-.btn.ghost{ background:transparent; }
+.btn.primary::after{                 /* 光のスイープ（高級感のあるシーン） */
+  content:""; position:absolute; top:-40%; bottom:-40%; left:-70%; width:42%;
+  background:linear-gradient(105deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.55) 50%, rgba(255,255,255,0) 100%);
+  transform:skewX(-22deg); animation:sheen 3.4s ease-in-out infinite; pointer-events:none;
+}
+@keyframes sheen{ 0%,55%{ left:-70%; } 90%,100%{ left:135%; } }
+.btn.ghost{ background:transparent; border-color:transparent; box-shadow:none; color:var(--ink-dim); }
 .btn.block{ width:100%; }
+/* 固定CTAバー（リストの下に沈まない出走ボタン） */
+.cta-bar{
+  position:sticky; bottom:0; z-index:5;
+  margin:4px -18px -28px; padding:14px 18px calc(20px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg, rgba(11,19,32,0) 0%, var(--panel-2) 34%);
+  pointer-events:none;
+}
+.cta-bar .btn{ pointer-events:auto; }
+.btn:disabled{ filter:grayscale(.85) brightness(.5); pointer-events:none; }
+.btn:disabled::after{ display:none; }   /* 無効中は光のスイープも止める */
 
-/* ====== タイトル画面 ====== */
-.title-wrap{ flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:18px; padding:24px; }
-.logo{
-  text-align:center; line-height:1.05;
+/* ====== タイトル画面（シネマティック黄昏） ====== */
+.title-wrap{ flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:16px; padding:24px; position:relative; overflow:hidden; }
+.title-sky{ position:absolute; inset:0; pointer-events:none; }
+.title-sky::before{                  /* 地平の残照（シルエットを浮かび上がらせる帯） */
+  content:""; position:absolute; left:0; right:0; bottom:14%; height:26%;
+  background:linear-gradient(180deg, rgba(222,140,72,0) 0%, rgba(222,140,72,.07) 55%, rgba(232,156,84,.16) 100%);
 }
-.logo .sub{ font-family:"Zen Kaku Gothic New"; font-weight:500; font-size:13px; color:var(--gold); letter-spacing:.35em; margin-bottom:10px; }
-.logo .main{ font-family:"Dela Gothic One"; font-size:46px; color:var(--ink);
-  text-shadow:0 2px 0 #000, 0 0 24px rgba(232,184,75,.18); }
-.logo .en{ font-family:"Dela Gothic One"; font-size:13px; color:var(--ink-dim); letter-spacing:.45em; margin-top:8px; }
+.title-sky .t-glow{
+  position:absolute; left:50%; top:34%; width:540px; height:540px; transform:translate(-50%,-50%);
+  background:radial-gradient(circle, rgba(240,170,80,.20) 0%, rgba(214,120,60,.10) 34%, rgba(214,120,60,0) 66%);
+}
+.title-sky .t-horizon{ position:absolute; left:0; right:0; bottom:0; width:100%; height:46%; }
+.title-sky .mote{
+  position:absolute; width:4px; height:4px; border-radius:50%;
+  background:rgba(245,205,120,.7); filter:blur(.5px); opacity:0;
+  animation:moteUp 7s linear infinite;
+}
+@keyframes moteUp{
+  0%{ transform:translateY(0) translateX(0); opacity:0; }
+  12%{ opacity:.8; }
+  80%{ opacity:.25; }
+  100%{ transform:translateY(-46vh) translateX(14px); opacity:0; }
+}
+.logo{ text-align:center; line-height:1.05; position:relative; animation:riseIn .8s cubic-bezier(.2,.8,.3,1) both; }
+.logo .sub{ font-family:"Zen Kaku Gothic New"; font-weight:500; font-size:12px; color:var(--gold); letter-spacing:.42em; margin-bottom:12px; text-indent:.42em; }
+.logo .main{
+  font-family:"Dela Gothic One"; font-size:64px;
+  background:linear-gradient(180deg,#fff6dc 8%, #f5cf6e 46%, #c98f24 88%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  filter:drop-shadow(0 3px 0 rgba(0,0,0,.85)) drop-shadow(0 0 26px rgba(240,192,80,.28));
+}
+.logo .en{ font-family:"Dela Gothic One"; font-size:12px; color:var(--ink-dim); letter-spacing:.52em; margin-top:12px; text-indent:.52em; }
+.logo .rule{
+  width:170px; height:1px; margin:14px auto 0;
+  background:linear-gradient(90deg, rgba(240,192,80,0), rgba(240,192,80,.8), rgba(240,192,80,0));
+}
+.title-copy{ font-size:13px; color:#d8c89a; letter-spacing:.2em; text-indent:.2em; animation:riseIn .8s .15s cubic-bezier(.2,.8,.3,1) both; }
+.title-cta{ width:100%; max-width:300px; animation:riseIn .8s .3s cubic-bezier(.2,.8,.3,1) both; }
+.title-cta .btn{ min-height:62px; font-size:19px; }
 .title-badge{
-  margin-top:6px; font-size:12px; color:var(--ink-dim);
-  border:1px solid var(--line); border-radius:999px; padding:6px 14px;
+  font-size:11.5px; color:var(--ink-dim); letter-spacing:.08em;
+  border:1px solid var(--line); border-radius:999px; padding:7px 16px;
+  background:rgba(13,21,33,.5); animation:riseIn .8s .42s cubic-bezier(.2,.8,.3,1) both;
 }
-.gallop-deco{
-  width:100%; max-width:320px; height:74px; opacity:.9;
-}
+@keyframes riseIn{ from{ opacity:0; transform:translateY(16px); } to{ opacity:1; transform:none; } }
 
 /* ====== 選択カード ====== */
-.section-title{ display:flex; align-items:baseline; gap:10px; margin-bottom:14px; }
-.section-title .no{ font-family:"Dela Gothic One"; color:var(--gold); font-size:22px; }
+.section-title{ display:flex; align-items:baseline; gap:6px 10px; margin-bottom:14px; flex-wrap:wrap; }
+.section-title .no{
+  font-family:"Dela Gothic One"; font-size:20px;
+  background:var(--gold-grad); -webkit-background-clip:text; background-clip:text; color:transparent;
+}
 .section-title h2{ font-size:18px; }
 .section-title .note{ margin-left:auto; font-size:11px; color:var(--ink-dim); }
 
 .card{
-  background:var(--panel); border:1px solid var(--line); border-radius:16px;
-  padding:14px; margin-bottom:12px; position:relative; overflow:hidden;
-  transition:border-color .15s ease, transform .05s ease;
+  background:linear-gradient(180deg, #121d2c 0%, var(--panel) 100%);
+  border:1px solid var(--line); border-radius:18px;
+  padding:14px 14px 14px 18px; margin-bottom:12px; position:relative; overflow:hidden;
+  box-shadow:0 1px 0 var(--line-hi) inset, 0 8px 22px rgba(0,0,0,.25);
+  transition:border-color .15s ease, transform .05s ease, box-shadow .2s ease;
 }
-.card:active{ transform:scale(.997); }
-.card.selected{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold) inset, 0 8px 20px rgba(0,0,0,.35); }
-.card .silk{ position:absolute; right:-18px; top:-18px; width:84px; height:84px; border-radius:50%; opacity:.16; }
-.card .row1{ display:flex; align-items:center; gap:10px; }
-.card .hname{ font-family:"Dela Gothic One"; font-size:18px; }
-.card .htag{ font-size:11px; color:#1a1206; background:var(--gold); padding:3px 8px; border-radius:6px; font-weight:700; }
-.card .style-tag{ font-size:11px; color:var(--ink); background:#22323f; border:1px solid var(--line); padding:3px 8px; border-radius:6px; }
+.card::before{                         /* 勝負服カラーの縦帯 */
+  content:""; position:absolute; left:0; top:0; bottom:0; width:5px;
+  background:var(--silk, transparent); opacity:.9;
+}
+.card:active{ transform:scale(.995); }
+.card.selected{
+  border-color:var(--gold);
+  box-shadow:0 0 0 1px var(--gold) inset, 0 0 26px rgba(240,192,80,.18), 0 10px 26px rgba(0,0,0,.4);
+}
+.card.selected::after{
+  content:"✓ 騎乗"; position:absolute; right:0; top:0; z-index:1;
+  font-size:11px; font-weight:800; color:#221603; background:var(--gold-grad);
+  padding:5px 12px 5px 14px; border-radius:0 0 0 12px;
+}
+.card .silk{ position:absolute; right:-26px; top:-26px; width:110px; height:110px; border-radius:50%; opacity:.13;
+  background:radial-gradient(circle at 35% 35%, #fff3, transparent 50%), var(--silk, #888); }
+.card .row1{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.card .hname{ font-family:"Dela Gothic One"; font-size:18px; text-shadow:0 2px 6px rgba(0,0,0,.5); }
+.card .htag{ font-size:11px; color:#221603; background:var(--gold-grad); padding:3px 9px; border-radius:6px; font-weight:800; }
+.card .style-tag{ font-size:11px; color:var(--ink); background:#1c2c3d; border:1px solid #2b405a; padding:3px 9px; border-radius:6px; }
 .abil-line{ display:flex; align-items:center; gap:7px; margin:8px 0 4px; flex-wrap:wrap; }
-.abil-line b{ font-size:13px; color:#f0c862; }
-.abil-badge{ font-size:10px; font-weight:700; color:#1a1407; background:linear-gradient(180deg,#f0c862,#d8a93f); padding:2px 7px; border-radius:5px; }
+.abil-line b{ font-size:13px; color:#f5d27a; }
+.abil-badge{ font-size:10px; font-weight:800; color:#221603; background:var(--gold-grad); padding:2.5px 8px; border-radius:5px; }
 .abil-desc{ font-size:11px; color:var(--ink-dim); }
-.apt-badge{ font-size:10px; font-weight:700; color:#06243a; background:linear-gradient(180deg,#76c6e8,#3f9fd0); padding:2px 7px; border-radius:5px; }
+.apt-badge{ font-size:10px; font-weight:800; color:#06243a; background:linear-gradient(180deg,#9fdcf5,#4aa9dc); padding:2.5px 8px; border-radius:5px; }
 .section-sub{ font-size:13px; font-weight:700; color:var(--ink); margin:4px 2px 8px; }
 .section-sub .dim2{ font-weight:400; font-size:11px; color:var(--ink-dim); }
 .dist-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-.dist-btn .t-name{ font-family:"Dela Gothic One"; font-size:17px; }
-.card .desc{ font-size:12.5px; color:var(--ink-dim); margin:8px 0 10px; line-height:1.5; }
+.dist-btn{ text-align:center; }
+.dist-btn .t-name{ font-family:"Dela Gothic One"; font-size:18px; }
+.card .desc{ font-size:12.5px; color:var(--ink-dim); margin:8px 0 10px; line-height:1.55; }
 
-/* ステータスバー（小） */
-.stat{ display:grid; grid-template-columns:62px 1fr 30px; align-items:center; gap:8px; margin:5px 0; }
-.stat .lab{ font-size:12px; color:var(--ink-dim); }
-.stat .meter{ height:8px; background:#0c151c; border-radius:6px; overflow:hidden; border:1px solid var(--line); }
-.stat .meter > i{ display:block; height:100%; border-radius:6px;
-  background:linear-gradient(90deg,#2e6f9e,#4aa3df); }
-.stat .val{ font-size:12px; text-align:right; color:var(--ink); font-variant-numeric:tabular-nums; }
+/* ステータス（2列グリッド・ティア発色） */
+.stats{ display:grid; grid-template-columns:1fr 1fr; gap:1px 14px; margin-top:2px; }
+.stat{ display:grid; grid-template-columns:58px 1fr 26px; align-items:center; gap:7px; margin:4px 0; }
+.stat .lab{ font-size:10.5px; color:var(--ink-dim); white-space:nowrap; }
+.stat .meter{ height:7px; background:#091017; border-radius:6px; overflow:hidden; border:1px solid #182434; }
+.stat .meter > i{ display:block; height:100%; border-radius:6px; background:linear-gradient(90deg,#3d566e,#5d7d99); }
+.stat .meter > i.t2{ background:linear-gradient(90deg,#2e6f9e,#54b0ec); }
+.stat .meter > i.t3{ background:linear-gradient(90deg,#2a9457,#46cf7c); }
+.stat .meter > i.t4{ background:linear-gradient(90deg,#cf9a2e,#ffe089); box-shadow:0 0 8px rgba(240,192,80,.55); }
+.stat .val{ font-size:11px; text-align:right; color:var(--ink); font-variant-numeric:tabular-nums; }
 
 /* 作戦選択 */
 .tactic-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .tactic{
-  background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 12px;
-  text-align:left; transition:border-color .15s ease, transform .05s ease;
+  background:linear-gradient(180deg, #121d2c 0%, var(--panel) 100%);
+  border:1px solid var(--line); border-radius:16px; padding:13px 12px;
+  text-align:left; color:var(--ink); cursor:pointer;
+  box-shadow:0 1px 0 var(--line-hi) inset;
+  transition:border-color .15s ease, transform .05s ease, box-shadow .2s ease;
 }
 .tactic:active{ transform:scale(.98); }
-.tactic.selected{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold) inset; }
+.tactic.selected{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold) inset, 0 0 22px rgba(240,192,80,.16); }
 .tactic .t-name{ font-family:"Dela Gothic One"; font-size:16px; }
-.tactic .t-kana{ font-size:11px; color:var(--gold); margin-bottom:6px; }
+.tactic .t-kana{ font-size:10.5px; color:var(--gold); letter-spacing:.12em; margin-bottom:5px; }
 .tactic .t-desc{ font-size:11.5px; color:var(--ink-dim); line-height:1.45; }
-.fit{ font-size:11px; margin-top:6px; }
+.fit{ font-size:11px; margin-top:7px; font-weight:700; }
 .fit.good{ color:var(--green); }
 .fit.mid{ color:var(--amber); }
 .fit.bad{ color:var(--red); }
@@ -179,110 +263,156 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
 /* ====== レース画面 ====== */
 #screen-race.active{ display:flex; flex-direction:column; }
 
-/* 上部HUD */
+/* 上部HUD（中継グラフィック風ストリップ） */
 .hud{
-  padding:8px 12px 6px; background:linear-gradient(180deg,#0e161d,#0c1319);
-  border-bottom:1px solid var(--line);
+  padding:8px 12px 7px;
+  background:linear-gradient(180deg,#101a28 0%, #0a1220 100%);
+  border-bottom:1px solid #233a52;
+  box-shadow:0 1px 0 var(--line-hi) inset;
 }
-.hud .top{ display:flex; align-items:center; gap:10px; font-size:12px; }
-.hud .course{ color:var(--gold); font-weight:700; }
-.hud .pace{ margin-left:auto; color:var(--ink-dim); }
-.hud .pace b{ color:var(--ink); }
+.hud .top{ display:flex; align-items:center; gap:9px; font-size:11.5px; padding-right:42px; }  /* 右端はサウンドボタンを避ける */
+.hud .course{
+  color:#221603; font-weight:800; letter-spacing:.04em;
+  background:var(--gold-grad); border-radius:5px; padding:2px 8px;
+}
+.hud .going,.hud .pace{ color:var(--ink-dim); }
+.hud .pace{ margin-left:auto; }
+.hud .pace b{
+  color:var(--ink); font-weight:800; padding:1.5px 8px; border-radius:5px;
+  background:#1a2a3c; border:1px solid #2b405a;
+}
+.hud .pace b[data-pl="0"]{ color:#9fc8ef; border-color:#36577a; }
+.hud .pace b[data-pl="2"]{ color:#ffd089; border-color:#7a5a1d; background:#2c2210; }
+.hud .pace b[data-pl="3"]{ color:#ff9d92; border-color:#84302b; background:#2e1512; }
 .rankbox{ display:flex; align-items:baseline; gap:6px; }
-.rankbox .r{ font-family:"Dela Gothic One"; font-size:26px; line-height:1; color:var(--gold); }
+.rankbox .r{
+  font-family:"Dela Gothic One"; font-size:30px; line-height:1;
+  background:var(--gold-grad); -webkit-background-clip:text; background-clip:text; color:transparent;
+  filter:drop-shadow(0 2px 0 rgba(0,0,0,.6));
+}
 .rankbox .of{ font-size:12px; color:var(--ink-dim); }
 
-/* 進行ゲージ（残り距離） */
-.progress{ margin-top:7px; height:12px; background:#0a1117; border:1px solid var(--line);
-  border-radius:8px; position:relative; overflow:hidden; }
-.progress > .fill{ position:absolute; left:0; top:0; bottom:0; width:0%;
-  background:linear-gradient(90deg,#2c6f4c,#3fbf6f); }
-.progress > .mark400{ position:absolute; top:-3px; bottom:-3px; left:75%; width:2px; background:var(--gold); }
+/* 進行ゲージ（残り距離・自馬マーカー付き） */
+.progress{ margin-top:7px; height:13px; background:#070d14; border:1px solid #213348;
+  border-radius:8px; position:relative; }
+.progress > .fill{ position:absolute; left:0; top:0; bottom:0; width:0%; border-radius:7px 0 0 7px;
+  background:linear-gradient(90deg,#22663f,#46cf7c); box-shadow:0 0 10px rgba(70,207,124,.35); }
+.progress > .mark400{ position:absolute; top:-3px; bottom:-3px; left:75%; width:2px; background:var(--gold); box-shadow:0 0 6px rgba(240,192,80,.8); }
 .progress > .mark400::after{ content:"残400"; position:absolute; top:-13px; left:-14px; font-size:9px; color:var(--gold); white-space:nowrap; }
-.distlabel{ display:flex; justify-content:space-between; font-size:11px; color:var(--ink-dim); margin-top:3px; }
+.progress > .ph{
+  position:absolute; top:50%; left:0%; width:9px; height:9px; margin:-4.5px 0 0 -4.5px;
+  background:#fff; border:2px solid var(--gold); border-radius:50%;
+  box-shadow:0 0 8px rgba(240,192,80,.9); transition:left .12s linear;
+}
+.distlabel{ display:flex; justify-content:space-between; font-size:11px; color:var(--ink-dim); margin-top:4px; }
 .distlabel b{ color:var(--ink); font-variant-numeric:tabular-nums; }
 
 /* キャンバス（コース） */
 .track-wrap{ position:relative; flex:1; min-height:0; background:#0a0e14; }
 #track{ width:100%; height:100%; display:block; }
-.cam-btn{ position:absolute; top:10px; right:56px; z-index:6; font-family:"Zen Kaku Gothic New"; font-size:11px; font-weight:700;
-  color:#dfe7ee; background:rgba(12,18,24,.62); border:1px solid rgba(255,255,255,.18); border-radius:8px;
-  padding:7px 10px; backdrop-filter:blur(4px); cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.cam-btn{ position:absolute; top:10px; right:58px; z-index:6; font-family:"Zen Kaku Gothic New"; font-size:11px; font-weight:700;
+  color:#e6edf4; background:var(--glass); border:1px solid rgba(255,255,255,.16); border-radius:10px;
+  padding:8px 11px; backdrop-filter:blur(8px); box-shadow:0 1px 0 var(--line-hi) inset, 0 4px 14px rgba(0,0,0,.35);
+  cursor:pointer; -webkit-tap-highlight-color:transparent; }
 .cam-btn:active{ transform:scale(.95); }
+.pause-btn{ position:absolute; top:10px; right:10px; z-index:20; width:40px; height:40px; border-radius:10px;
+  border:1px solid rgba(255,255,255,.16); background:var(--glass); color:#dde6ee; font-size:15px;
+  cursor:pointer; backdrop-filter:blur(8px); box-shadow:0 1px 0 var(--line-hi) inset, 0 4px 14px rgba(0,0,0,.35); }
+.pause-btn:active{ transform:scale(.94); }
+.pause-overlay{ position:absolute; inset:0; z-index:30; display:none; flex-direction:column; align-items:center; justify-content:center; gap:13px;
+  background:rgba(5,8,13,.84); backdrop-filter:blur(6px); }
+.pause-overlay .po-title{ font-family:"Dela Gothic One",sans-serif; font-size:21px; letter-spacing:.16em; margin-bottom:8px;
+  background:var(--gold-grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.pause-overlay .btn{ min-width:220px; }
 .sound-btn{ position:fixed; top:9px; right:9px; z-index:60; width:38px; height:38px; border-radius:10px;
-  border:1px solid rgba(255,255,255,.18); background:rgba(12,18,24,.72); color:#fff; font-size:17px;
-  cursor:pointer; -webkit-tap-highlight-color:transparent; backdrop-filter:blur(4px); }
+  border:1px solid rgba(255,255,255,.16); background:var(--glass); color:#fff; font-size:17px;
+  cursor:pointer; -webkit-tap-highlight-color:transparent; backdrop-filter:blur(8px); }
 .sound-btn:active{ transform:scale(.94); }
 .sound-btn.off{ opacity:.55; }
 /* レース中の各種オーバーレイ */
 .overlay-center{ position:absolute; inset:0; z-index:8; display:flex; flex-direction:column;
   align-items:center; justify-content:center; pointer-events:none; text-align:center; }
-.gate-text{ font-family:"Dela Gothic One"; font-size:40px; color:var(--ink);
-  text-shadow:0 3px 0 #000, 0 0 30px rgba(0,0,0,.6); }
-.gate-sub{ font-size:13px; color:var(--ink-dim); margin-top:8px; }
-.go-flash{ font-family:"Dela Gothic One"; font-size:64px; color:var(--gold);
-  text-shadow:0 0 30px rgba(232,184,75,.5); animation:pop .25s ease; }
-@keyframes pop{ from{ transform:scale(.6); opacity:0 } to{ transform:scale(1); opacity:1 } }
-.flash-msg{ position:absolute; top:10px; left:50%; transform:translateX(-50%);
-  background:rgba(210,59,59,.92); color:#fff; padding:6px 14px; border-radius:999px;
-  font-size:13px; font-weight:700; opacity:0; transition:opacity .2s ease; pointer-events:none; }
-.flash-msg.show{ opacity:1; }
-.straight-banner{ position:absolute; top:8px; left:50%; transform:translateX(-50%);
-  font-family:"Dela Gothic One"; font-size:18px; color:var(--gold); letter-spacing:.2em;
-  opacity:0; transition:opacity .3s ease; text-shadow:0 2px 8px #000; }
-.straight-banner.show{ opacity:1; }
+.gate-text{ font-family:"Dela Gothic One"; font-size:44px; color:var(--ink);
+  text-shadow:0 4px 0 #000, 0 0 36px rgba(0,0,0,.7); }
+.gate-sub{ font-size:13px; color:var(--ink-dim); margin-top:8px; letter-spacing:.1em; }
+.go-flash{ font-family:"Dela Gothic One"; font-size:70px;
+  background:var(--gold-grad); -webkit-background-clip:text; background-clip:text; color:transparent;
+  filter:drop-shadow(0 0 34px rgba(240,192,80,.55)) drop-shadow(0 3px 0 rgba(0,0,0,.7));
+  animation:pop .3s cubic-bezier(.2,1.4,.4,1); }
+@keyframes pop{ from{ transform:scale(.5); opacity:0 } to{ transform:scale(1); opacity:1 } }
+.flash-msg{ position:absolute; top:10px; left:50%; transform:translateX(-50%) translateY(-4px);
+  background:rgba(224,71,62,.94); color:#fff; padding:7px 16px; border-radius:999px;
+  font-size:13px; font-weight:800; letter-spacing:.04em; opacity:0;
+  box-shadow:0 6px 18px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.25) inset;
+  transition:opacity .2s ease, transform .2s ease; pointer-events:none; }
+.flash-msg.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+.straight-banner{ position:absolute; top:8px; left:50%; transform:translateX(-50%) scale(.92);
+  font-family:"Dela Gothic One"; font-size:19px; letter-spacing:.26em; text-indent:.26em;
+  background:var(--gold-grad); -webkit-background-clip:text; background-clip:text; color:transparent;
+  filter:drop-shadow(0 2px 8px #000) drop-shadow(0 0 18px rgba(240,192,80,.4));
+  opacity:0; transition:opacity .3s ease, transform .3s ease; }
+.straight-banner.show{ opacity:1; transform:translateX(-50%) scale(1); }
 .going b{ color:#cfe0ff; }
 .myinfo{ display:flex; gap:8px; margin-top:7px; }
-.chip{ font-size:11px; font-weight:700; padding:3px 9px; border-radius:7px; border:1px solid var(--line); }
-.chip-style{ color:#e7eef4; background:#22323f; }
-.chip-abil{ color:#1a1407; background:linear-gradient(180deg,#f0c862,#d8a93f); border-color:#caa23a; }
+.chip{ font-size:11px; font-weight:700; padding:3px 10px; border-radius:7px; border:1px solid var(--line); }
+.chip-style{ color:#e7eef4; background:#1c2c3d; border-color:#2b405a; }
+.chip-abil{ color:#221603; background:var(--gold-grad); border-color:var(--gold-deep); font-weight:800; }
 .abil-msg{ position:absolute; top:46%; left:50%; transform:translate(-50%,-50%) scale(.7);
-  font-family:"Dela Gothic One"; font-size:26px; color:#1a1407; letter-spacing:.04em;
-  background:linear-gradient(180deg,#ffdf8a,#e8b84b); padding:8px 22px; border-radius:12px;
-  box-shadow:0 6px 24px rgba(0,0,0,.5), 0 0 0 3px rgba(255,255,255,.35) inset;
-  opacity:0; transition:opacity .18s ease, transform .18s ease; pointer-events:none; white-space:nowrap; }
+  font-family:"Dela Gothic One"; font-size:26px; color:#221603; letter-spacing:.04em;
+  background:var(--gold-grad); padding:9px 24px; border-radius:13px;
+  box-shadow:0 10px 32px rgba(0,0,0,.55), 0 0 36px rgba(240,192,80,.45), 0 0 0 3px rgba(255,255,255,.4) inset;
+  opacity:0; transition:opacity .18s ease, transform .18s cubic-bezier(.2,1.4,.4,1); pointer-events:none; white-space:nowrap; }
 .abil-msg.show{ opacity:1; transform:translate(-50%,-50%) scale(1); }
 
 /* マイ馬ゲージ（スタミナ・折り合い） */
-.gauges{ display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:7px 12px;
-  background:#0e161d; border-top:1px solid var(--line); }
+.gauges{ display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:8px 12px;
+  background:linear-gradient(180deg,#0e1826,#0b1320); border-top:1px solid #233a52; }
 .gauge .glab{ font-size:11px; color:var(--ink-dim); display:flex; justify-content:space-between; margin-bottom:3px; }
-.gauge .glab b{ font-variant-numeric:tabular-nums; }
-.gbar{ height:12px; background:#0a1117; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
-.gbar > i{ display:block; height:100%; width:50%; border-radius:8px; transition:width .12s linear, background .2s linear; }
+.gauge .glab b{ font-variant-numeric:tabular-nums; color:var(--ink); }
+.gbar{ height:13px; background:#070d14; border:1px solid #213348; border-radius:8px; overflow:hidden; position:relative; }
+.gbar::after{ content:""; position:absolute; inset:0 0 50%; background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,0)); border-radius:8px 8px 0 0; pointer-events:none; }
+.gbar > i{ display:block; height:100%; width:50%; border-radius:7px; transition:width .12s linear, background .2s linear; }
+.gbar > i.low{ animation:gaugePulse .7s ease-in-out infinite; }
+@keyframes gaugePulse{ 0%,100%{ filter:brightness(1); } 50%{ filter:brightness(1.65); } }
 
 /* 操作ボタン群（親指で押しやすい配置：下部固定） */
-.controls{ background:linear-gradient(180deg,#0e161d,#0a1117); border-top:1px solid var(--line);
-  padding:8px 10px calc(10px + env(safe-area-inset-bottom)); }
+.controls{ background:linear-gradient(180deg,#0e1826,#080e18); border-top:1px solid #233a52;
+  padding:8px 10px calc(10px + env(safe-area-inset-bottom)); box-shadow:0 1px 0 var(--line-hi) inset; }
 .ctrl-row{ display:grid; gap:8px; }
 .ctrl-row.pos{ grid-template-columns:1fr 1fr; margin-bottom:8px; }
 .ctrl-row.gear{ grid-template-columns:1fr 1fr; }
 .ctrl-row.whip{ grid-template-columns:1fr; margin-top:8px; }
-.cbtn.whip{ background:linear-gradient(180deg,#e0a23a,#c4842a); color:#1a1206; border-color:#8a6c1d; min-height:50px; }
-.cbtn.whip .ja{ font-size:16px; letter-spacing:.12em; }
-.cbtn.whip .en{ color:#5a4310; }
-.cbtn.whip:disabled{ background:#2a2620; color:#6b6457; border-color:#3a342a; }
-.cbtn.whip:disabled .en{ color:#6b6457; }
-.cbtn.whip.cooling{ filter:brightness(.8) saturate(.7); }
+.cbtn.whip{ background:linear-gradient(180deg,#ef6a4a 0%, #cf3e30 100%); color:#fff; border-color:#8a2a1d; min-height:52px;
+  box-shadow:0 8px 20px rgba(224,71,62,.30), 0 1px 0 rgba(255,255,255,.3) inset; }
+.cbtn.whip .ja{ font-size:17px; letter-spacing:.14em; font-family:"Dela Gothic One",sans-serif; text-shadow:0 1px 2px rgba(0,0,0,.3); }
+.cbtn.whip .en{ color:#ffd6c8; }
+.cbtn.whip:disabled{ background:#241d1c; color:#6b5d57; border-color:#382e2a; box-shadow:none; }
+.cbtn.whip:disabled .en{ color:#6b5d57; }
+.cbtn.whip.cooling{ filter:brightness(.75) saturate(.6); }
 .cbtn{
   appearance:none; border:1px solid var(--line); border-radius:14px;
-  color:var(--ink); background:#1a2935; font-family:"Zen Kaku Gothic New"; font-weight:700;
+  color:var(--ink); background:linear-gradient(180deg,#1c2c3c,#142031); font-family:"Zen Kaku Gothic New"; font-weight:700;
   font-size:15px; padding:14px 6px; min-height:58px; cursor:pointer;
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
-  transition:transform .05s ease, background .12s ease, border-color .12s ease, opacity .12s;
+  box-shadow:0 1px 0 var(--line-hi) inset, 0 5px 14px rgba(0,0,0,.3);
+  transition:transform .05s ease, filter .12s ease, border-color .12s ease, opacity .12s;
 }
-.cbtn:active{ transform:translateY(1px) scale(.98); }
+.cbtn:active{ transform:translateY(1px) scale(.97); filter:brightness(1.18); }
 .cbtn:disabled{ opacity:.4; }
 .cbtn .ja{ font-size:17px; }
-.cbtn .en{ font-size:9px; color:var(--ink-dim); letter-spacing:.1em; }
-.cbtn.pos{ background:#15303a; border-color:#1f4a56; }
-.cbtn.gdown{ background:#163a52; border-color:#1f5b78; }
-.cbtn.gup{ background:#3a2a16; border-color:#7a5a1d; }
-.cbtn.gup .ja{ color:#f0c862; }
+.cbtn .en{ font-size:9px; color:var(--ink-dim); letter-spacing:.14em; }
+.cbtn.pos{ background:linear-gradient(180deg,#173441,#10232f); border-color:#235260; min-height:46px; padding:9px 6px; }
+.cbtn.pos .ja{ font-size:14px; }
+.cbtn.gdown{ background:linear-gradient(180deg,#1b4364,#132c44); border-color:#27628c; min-height:64px; }
+.cbtn.gdown .ja{ color:#9fd0f5; }
+.cbtn.gup{ background:linear-gradient(180deg,#54401c,#36280f); border-color:#8a6c1d; min-height:64px;
+  box-shadow:0 1px 0 rgba(255,255,255,.12) inset, 0 6px 18px rgba(240,192,80,.16); }
+.cbtn.gup .ja{ color:#ffd97e; font-family:"Dela Gothic One",sans-serif; }
 /* スピードメーター */
 .speedo{ position:absolute; top:8px; left:8px; z-index:6; width:128px;
-  background:rgba(8,12,18,.66); border:1px solid rgba(255,255,255,.12); border-radius:12px;
-  padding:6px 8px 7px; backdrop-filter:blur(4px); text-align:center; }
+  background:var(--glass); border:1px solid rgba(255,255,255,.14); border-radius:14px;
+  padding:6px 8px 7px; backdrop-filter:blur(8px); text-align:center;
+  box-shadow:0 1px 0 var(--line-hi) inset, 0 6px 18px rgba(0,0,0,.4); }
 .speedo .sp-svg{ width:100%; height:50px; display:block; }
 .speedo .sp-read{ margin-top:-26px; line-height:1; }
 .speedo .sp-read b{ font-family:"Dela Gothic One"; font-size:23px; color:#fff; }
@@ -296,22 +426,25 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
 .speedo .gear-pips .pip.on{ background:#5fb0b0; }
 .speedo .gear-pips .pip.push{ background:#e0a23a; }
 .speedo .gear-pips .pip.hot{ background:#d23b3b; }
-/* 実況 */
+/* 実況（中継ローワーサード風） */
 .commentary{ position:absolute; left:8px; right:8px; bottom:8px; z-index:5; pointer-events:none;
-  background:rgba(8,12,18,.72); border:1px solid rgba(255,255,255,.1); border-radius:10px;
-  padding:7px 11px; font-size:12.5px; line-height:1.45; color:#e7eef4; backdrop-filter:blur(4px);
+  background:var(--glass); border:1px solid rgba(255,255,255,.12); border-left:3px solid var(--gold); border-radius:10px;
+  padding:7px 11px 7px 12px; font-size:12.5px; line-height:1.5; color:#e9f0f4; backdrop-filter:blur(8px);
+  box-shadow:0 6px 18px rgba(0,0,0,.4);
   min-height:18px; opacity:0; transition:opacity .25s ease; }
 .commentary.show{ opacity:1; }
-.commentary .lead{ color:#f0c862; font-weight:700; }
+.commentary .lead{ color:#f5d27a; font-weight:700; }
 /* 出走前カード（出馬表・展開予測） */
-.gate-card{ width:min(94%,420px); background:rgba(12,18,26,.92); border:1px solid rgba(255,255,255,.14);
-  border-radius:14px; padding:13px 15px; margin-bottom:14px; text-align:left; box-shadow:0 12px 40px rgba(0,0,0,.5); }
+.gate-card{ width:min(94%,420px); background:rgba(10,16,26,.92); border:1px solid rgba(255,255,255,.14);
+  border-radius:16px; padding:14px 16px; margin-bottom:14px; text-align:left; backdrop-filter:blur(8px);
+  box-shadow:0 16px 48px rgba(0,0,0,.55), 0 1px 0 var(--line-hi) inset; }
 .gate-card .gc-row{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin:3px 0; font-size:12.5px; }
-.gate-card .gc-row .k{ color:var(--ink-dim); }
-.gate-card .gc-pace{ font-family:"Dela Gothic One"; font-size:16px; color:#f0c862; }
-.gate-card .gc-read{ font-size:12px; color:#cfe0ff; margin-top:7px; line-height:1.5; border-top:1px solid rgba(255,255,255,.1); padding-top:7px; }
-.gate-card .gc-you{ margin-top:7px; font-size:12.5px; }
-.gate-card .gc-you b{ color:#fff; }
+.gate-card .gc-row .k{ color:var(--ink-dim); font-size:11px; letter-spacing:.1em; }
+.gate-card .gc-pace{ font-family:"Dela Gothic One"; font-size:17px;
+  background:var(--gold-grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.gate-card .gc-read{ font-size:12px; color:#cfe0ff; margin-top:8px; line-height:1.55; border-top:1px solid rgba(255,255,255,.1); padding-top:8px; }
+.gate-card .gc-you{ margin-top:8px; font-size:12.5px; line-height:1.6; }
+.gate-card .gc-you b{ color:#ffe089; }
 .cbtn:disabled{ opacity:.35; pointer-events:none; }
 .cbtn.cooling{ opacity:.5; }
 
@@ -319,22 +452,51 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
 .start-zone{ padding:10px 14px calc(14px + env(safe-area-inset-bottom)); }
 #btn-start{
   width:100%; min-height:64px; font-size:22px; font-family:"Dela Gothic One";
-  border-radius:16px; color:#1a1206;
-  background:linear-gradient(180deg,#e8b84b,#caa033); border:1px solid #8a6c1d;
+  border-radius:16px; color:#221603;
+  background:var(--gold-grad); border:1px solid var(--gold-deep);
+  box-shadow:0 10px 26px rgba(240,192,80,.3);
 }
 #btn-start:disabled{ filter:grayscale(.6) brightness(.7); }
 
 /* ====== 結果画面 ====== */
-.result-head{ text-align:center; margin-bottom:14px; }
-.result-rank{ font-family:"Dela Gothic One"; font-size:64px; line-height:1; }
-.result-rank.win{ color:var(--gold); text-shadow:0 0 30px rgba(232,184,75,.4); }
-.result-rank.place{ color:var(--ink); }
+.result-head{ text-align:center; margin-bottom:14px; position:relative; padding-top:8px; }
+.result-fx{ position:absolute; left:50%; top:34px; width:340px; height:340px; transform:translate(-50%,-50%);
+  pointer-events:none; overflow:visible; }
+.result-fx .rays{ position:absolute; inset:0; border-radius:50%; opacity:0; }
+.result-fx.win .rays{
+  opacity:1;
+  background:
+    radial-gradient(circle, rgba(240,192,80,.30) 0%, rgba(240,192,80,.10) 36%, rgba(240,192,80,0) 64%),
+    repeating-conic-gradient(from 0deg, rgba(255,222,138,.16) 0deg 9deg, rgba(255,222,138,0) 9deg 24deg);
+  -webkit-mask:radial-gradient(circle, #000 0%, #000 42%, transparent 72%);
+          mask:radial-gradient(circle, #000 0%, #000 42%, transparent 72%);
+  animation:raysSpin 14s linear infinite;
+}
+@keyframes raysSpin{ to{ transform:rotate(360deg); } }
+.result-fx .cf{ position:absolute; top:-12px; width:7px; height:11px; border-radius:2px; opacity:0;
+  animation:cfFall 2.8s ease-in infinite; }
+@keyframes cfFall{
+  0%{ transform:translateY(0) rotate(0deg); opacity:0; }
+  8%{ opacity:.95; }
+  100%{ transform:translateY(330px) rotate(560deg); opacity:0; }
+}
+.result-rank{ font-family:"Dela Gothic One"; font-size:68px; line-height:1; position:relative;
+  animation:rankIn .55s cubic-bezier(.2,1.3,.4,1) both; }
+@keyframes rankIn{ from{ opacity:0; transform:scale(.55); } to{ opacity:1; transform:scale(1); } }
+.result-rank.win{
+  background:linear-gradient(180deg,#fff6dc 8%, #f5cf6e 46%, #c98f24 88%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  filter:drop-shadow(0 0 30px rgba(240,192,80,.45)) drop-shadow(0 3px 0 rgba(0,0,0,.7));
+}
+.result-rank.place{ color:var(--ink); text-shadow:0 3px 0 rgba(0,0,0,.6); }
 .result-rank.lose{ color:var(--ink-dim); }
-.result-sub{ font-size:13px; color:var(--ink-dim); margin-top:6px; }
-.result-reward{ margin-top:12px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
-.result-reward .pill{ font-size:12px; font-weight:700; padding:5px 11px; border-radius:999px; border:1px solid var(--line); background:#161f2a; color:#e7eef4; }
+.result-sub{ font-size:13px; color:var(--ink-dim); margin-top:8px; position:relative; }
+.result-reward{ margin-top:12px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap; position:relative; }
+.result-reward .pill{ font-size:12px; font-weight:700; padding:6px 12px; border-radius:999px;
+  border:1px solid var(--line); background:rgba(20,30,44,.8); color:#e7eef4;
+  box-shadow:0 1px 0 var(--line-hi) inset; }
 .result-reward .pill b{ color:var(--gold); }
-.result-reward .pill.up{ background:linear-gradient(180deg,#3a2f12,#2a2410); border-color:#caa23a; }
+.result-reward .pill.up{ background:linear-gradient(180deg,#3d3012,#291f0c); border-color:#caa23a; }
 .result-reward .pill.up b{ color:#ffdf8a; }
 .result-reward .pill.lv b{ color:#76c6e8; }
 /* 騎手成長（結果画面） */
@@ -351,7 +513,8 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
 .jockey-grow .jg-up-amt{ font-size:11px; color:var(--green); text-align:right; font-variant-numeric:tabular-nums; font-weight:700; }
 /* 進路インジケータ（レース中・前/内/外の空き） */
 .lane-ind{ position:absolute; top:128px; right:8px; z-index:6; display:none; flex-direction:column; gap:4px;
-  background:rgba(8,12,18,.62); border:1px solid rgba(255,255,255,.12); border-radius:9px; padding:6px; backdrop-filter:blur(4px); }
+  background:var(--glass); border:1px solid rgba(255,255,255,.14); border-radius:11px; padding:6px; backdrop-filter:blur(8px);
+  box-shadow:0 1px 0 var(--line-hi) inset, 0 6px 18px rgba(0,0,0,.4); }
 .lane-ind.show{ display:flex; }
 .lane-ind .li-title{ font-size:9px; letter-spacing:.16em; color:var(--ink-dim); text-align:center; margin-bottom:1px; }
 .lane-ind .li-cell{ width:44px; text-align:center; font-size:12px; font-weight:700; padding:4px 0; border-radius:6px;
@@ -370,7 +533,8 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
           mask:radial-gradient(circle at 50% 44%, transparent 32%, #000 78%); }
 /* 実況の順位ボード */
 .order-board{ position:absolute; top:128px; left:8px; z-index:6; width:98px; display:none;
-  background:rgba(8,12,18,.62); border:1px solid rgba(255,255,255,.12); border-radius:9px; padding:5px 5px 6px; backdrop-filter:blur(4px); }
+  background:var(--glass); border:1px solid rgba(255,255,255,.14); border-radius:11px; padding:5px 5px 6px; backdrop-filter:blur(8px);
+  box-shadow:0 1px 0 var(--line-hi) inset, 0 6px 18px rgba(0,0,0,.4); }
 .order-board .ob-head{ font-size:9px; letter-spacing:.18em; color:var(--ink-dim); text-align:center; margin-bottom:3px; }
 .order-board .ob-row{ display:flex; align-items:center; gap:5px; padding:2px 3px; border-radius:4px; font-size:11px; }
 .order-board .ob-row.me{ background:rgba(232,184,75,.22); }
@@ -386,21 +550,30 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
 .photo-finish .pf-flash{ position:absolute; inset:0; background:#fff; opacity:0; }
 .photo-finish .pf-flash.go{ animation:pfFlash .5s ease; }
 @keyframes pfFlash{ 0%{ opacity:.9; } 100%{ opacity:0; } }
-.advice{ background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--gold);
-  border-radius:10px; padding:12px 14px; margin:14px 0; font-size:13px; line-height:1.6; }
-.advice b{ color:var(--gold); }
+.advice{ background:linear-gradient(180deg,#121d2c,var(--panel)); border:1px solid var(--line); border-left:3px solid var(--gold);
+  border-radius:12px; padding:13px 15px; margin:14px 0; font-size:13px; line-height:1.65;
+  box-shadow:0 1px 0 var(--line-hi) inset, 0 6px 16px rgba(0,0,0,.22); }
+.advice b{ color:#f5d27a; }
 .result-table{ width:100%; border-collapse:collapse; font-size:13px; margin-top:6px; }
 .result-table th,.result-table td{ padding:8px 6px; border-bottom:1px solid var(--line); text-align:left; }
-.result-table th{ color:var(--ink-dim); font-weight:500; font-size:11px; }
-.result-table td.r{ font-family:"Dela Gothic One"; color:var(--gold); width:30px; }
-.result-table tr.me td{ background:rgba(232,184,75,.08); }
+.result-table th{ color:var(--ink-dim); font-weight:500; font-size:11px; letter-spacing:.08em; }
+.result-table td.r{ font-family:"Dela Gothic One"; color:var(--ink-dim); width:30px; }
+.result-table tr:nth-child(-n+3) td.r{ color:var(--gold); }
+.result-table tr.me td{ background:rgba(240,192,80,.09); }
+.result-table tr.me td:first-child{ border-radius:8px 0 0 8px; }
+.result-table tr.me td:last-child{ border-radius:0 8px 8px 0; }
 .result-table tr.won td.r{ color:var(--gold); font-weight:800; }
 .result-table .num{ font-variant-numeric:tabular-nums; text-align:right; }
+.result-table .rdot{ display:inline-block; width:9px; height:9px; border-radius:3px; margin-right:6px;
+  vertical-align:baseline; border:1px solid rgba(255,255,255,.35); }
 .result-actions{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; }
 
 .hr{ height:1px; background:var(--line); margin:16px 0; border:none; }
 .foot-note{ font-size:10.5px; color:#6f7f7b; line-height:1.6; text-align:center; margin-top:14px; }
-.title-career{ margin-top:12px; font-size:12px; color:#cfe0ff; background:rgba(20,28,38,.6); border:1px solid var(--line); border-radius:999px; padding:7px 16px; }
+.title-career{ margin-top:4px; font-size:12px; color:#cfe0ff; background:rgba(16,26,40,.7);
+  border:1px solid #2b405a; border-radius:999px; padding:8px 18px;
+  box-shadow:0 1px 0 var(--line-hi) inset, 0 6px 16px rgba(0,0,0,.3);
+  animation:riseIn .8s .5s cubic-bezier(.2,.8,.3,1) both; }
 .title-career b{ color:var(--gold); }
 </style>
 <!-- Three.js r160 ＋ addons（esbuildバンドル）を window.THREE / window.THREE_ADDONS へ提供。
@@ -414,28 +587,69 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
   <!-- ============ 1. タイトル画面 ============ -->
   <section id="screen-title" class="screen active">
     <div class="title-wrap">
+      <!-- 背景：黄昏の競馬場（夕陽グロー＋スタンド/ラチのシルエット＋舞う光） -->
+      <div class="title-sky" aria-hidden="true">
+        <div class="t-glow"></div>
+        <svg class="t-horizon" viewBox="0 0 480 220" preserveAspectRatio="xMidYMax meet" fill="none">
+          <!-- 残照の地平 -->
+          <rect x="0" y="148" width="480" height="2.5" fill="#d59a63" opacity=".45"/>
+          <!-- スタンドのシルエット -->
+          <g fill="#050910">
+            <path d="M28 150 L28 96 L52 96 L52 80 L196 80 L196 96 L220 96 L220 150 Z"/>
+            <path d="M40 96 L208 96 L196 64 L52 64 Z"/>
+            <rect x="118" y="44" width="5" height="36"/>
+          </g>
+          <!-- スタンドの灯り -->
+          <g fill="#f0c078" opacity=".95">
+            <rect x="44" y="104" width="9" height="3.4"/><rect x="62" y="104" width="9" height="3.4"/>
+            <rect x="80" y="104" width="9" height="3.4"/><rect x="98" y="104" width="9" height="3.4"/>
+            <rect x="116" y="104" width="9" height="3.4"/><rect x="134" y="104" width="9" height="3.4"/>
+            <rect x="152" y="104" width="9" height="3.4"/><rect x="170" y="104" width="9" height="3.4"/>
+            <rect x="53" y="116" width="9" height="3.4" opacity=".7"/><rect x="89" y="116" width="9" height="3.4" opacity=".7"/>
+            <rect x="125" y="116" width="9" height="3.4" opacity=".7"/><rect x="161" y="116" width="9" height="3.4" opacity=".7"/>
+            <rect x="40" y="84" width="160" height="2" opacity=".35"/>
+          </g>
+          <!-- ターフビジョン -->
+          <g>
+            <rect x="316" y="92" width="86" height="44" rx="4" fill="#050910"/>
+            <rect x="322" y="98" width="74" height="32" rx="2" fill="#1d3854"/>
+            <rect x="328" y="104" width="40" height="4" rx="2" fill="#3f74a8" opacity=".8"/>
+            <rect x="328" y="113" width="56" height="3" rx="1.5" fill="#33608c" opacity=".6"/>
+            <rect x="328" y="121" width="30" height="3" rx="1.5" fill="#33608c" opacity=".6"/>
+            <rect x="352" y="136" width="6" height="14" fill="#050910"/><rect x="364" y="136" width="6" height="14" fill="#050910"/>
+          </g>
+          <!-- ラチ（コースの白い柵） -->
+          <g stroke="#3d4a5c" stroke-width="2.5">
+            <line x1="0" y1="176" x2="480" y2="176"/>
+            <line x1="12" y1="176" x2="12" y2="196"/><line x1="72" y1="176" x2="72" y2="196"/>
+            <line x1="132" y1="176" x2="132" y2="196"/><line x1="192" y1="176" x2="192" y2="196"/>
+            <line x1="252" y1="176" x2="252" y2="196"/><line x1="312" y1="176" x2="312" y2="196"/>
+            <line x1="372" y1="176" x2="372" y2="196"/><line x1="432" y1="176" x2="432" y2="196"/>
+          </g>
+          <!-- 疾走の流線 -->
+          <g stroke="#caa14e" stroke-linecap="round" opacity=".5">
+            <line x1="282" y1="162" x2="338" y2="162" stroke-width="3"/>
+            <line x1="252" y1="168" x2="330" y2="168" stroke-width="2"/>
+            <line x1="300" y1="156" x2="342" y2="156" stroke-width="2"/>
+          </g>
+        </svg>
+        <div class="mote" style="left:18%; bottom:30%; animation-delay:0s;"></div>
+        <div class="mote" style="left:72%; bottom:24%; animation-delay:1.6s;"></div>
+        <div class="mote" style="left:44%; bottom:18%; animation-delay:3.1s; width:3px; height:3px;"></div>
+        <div class="mote" style="left:86%; bottom:38%; animation-delay:4.4s; width:3px; height:3px;"></div>
+        <div class="mote" style="left:30%; bottom:42%; animation-delay:5.5s;"></div>
+      </div>
       <div class="logo">
         <div class="sub">日本競馬風 ジョッキー体験</div>
         <div class="main">蹄音</div>
         <div class="en">H I Z U M E O T O</div>
+        <div class="rule"></div>
       </div>
-      <!-- 装飾：疾走する馬群のシルエット（SVG） -->
-      <svg class="gallop-deco" viewBox="0 0 320 74" fill="none" aria-hidden="true">
-        <line x1="0" y1="60" x2="320" y2="60" stroke="#23323f" stroke-width="2"/>
-        <g fill="#1d5239">
-          <ellipse cx="60" cy="50" rx="18" ry="9"/><ellipse cx="120" cy="46" rx="18" ry="9"/>
-          <ellipse cx="185" cy="52" rx="18" ry="9"/><ellipse cx="248" cy="47" rx="18" ry="9"/>
-        </g>
-        <g fill="#e8b84b"><circle cx="120" cy="46" r="5"/></g>
-        <g stroke="#2c4a3c" stroke-width="2" opacity=".7">
-          <line x1="20" y1="40" x2="38" y2="40"/><line x1="14" y1="48" x2="34" y2="48"/>
-          <line x1="80" y1="34" x2="100" y2="34"/><line x1="150" y1="42" x2="168" y2="42"/>
-        </g>
-      </svg>
-      <button id="btn-to-select" class="btn primary block" style="max-width:280px;">レースに挑む</button>
+      <div class="title-copy">最高の騎乗で、能力差を覆せ。</div>
+      <div class="title-cta"><button id="btn-to-select" class="btn primary block">レースに挑む</button></div>
       <div class="title-badge">12頭立て ／ 芝1200・1600・2000m</div>
       <div class="title-career" id="title-career" style="display:none;"></div>
-      <div class="foot-note">本ゲームの馬名・騎手名・競馬場名はすべて架空です。<br>実在のJRA・団体・人物とは一切関係ありません。</div>
+      <div class="foot-note" style="position:relative;">本ゲームの馬名・騎手名・競馬場名はすべて架空です。<br>実在のJRA・団体・人物とは一切関係ありません。</div>
     </div>
   </section>
 
@@ -444,8 +658,8 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
     <div class="scroll">
       <div class="section-title"><span class="no">01</span><h2>騎乗する馬を選ぶ</h2><span class="note">脚質の向き不向きが変わる</span></div>
       <div id="horse-list"></div>
-      <button id="btn-to-tactic" class="btn primary block" disabled>この馬で出走 →</button>
       <button id="btn-back-title" class="btn ghost block" style="margin-top:10px;">← タイトルへ</button>
+      <div class="cta-bar"><button id="btn-to-tactic" class="btn primary block" disabled>この馬で出走 →</button></div>
     </div>
   </section>
 
@@ -459,8 +673,8 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
       <div class="section-sub" style="margin-top:16px;">脚質を選ぶ</div>
       <div class="tactic-grid" id="tactic-grid"></div>
       <div style="margin-top:14px;" class="dim center" id="tactic-hint">脚質を選ぶと相性が表示されます</div>
-      <button id="btn-to-race" class="btn primary block" style="margin-top:16px;" disabled>枠入り → レース開始</button>
-      <button id="btn-back-horse" class="btn ghost block" style="margin-top:10px;">← 馬を選び直す</button>
+      <button id="btn-back-horse" class="btn ghost block" style="margin-top:14px;">← 馬を選び直す</button>
+      <div class="cta-bar"><button id="btn-to-race" class="btn primary block" disabled>枠入り → レース開始</button></div>
     </div>
   </section>
 
@@ -480,6 +694,7 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
           <div class="progress">
             <div class="fill" id="prog-fill"></div>
             <div class="mark400"></div>
+            <i class="ph" id="prog-horse"></i>
           </div>
           <div class="distlabel"><span>残り <b id="dist-val">1600</b> m</span><span id="phase-val">道中</span></div>
         </div>
@@ -493,9 +708,9 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
     <!-- コース（canvas） -->
     <div class="track-wrap">
       <canvas id="track"></canvas>
-      <button id="btn-pause" aria-label="一時停止" style="position:absolute; top:8px; right:8px; z-index:20; width:40px; height:40px; border-radius:10px; border:1px solid rgba(255,255,255,.18); background:rgba(10,14,20,.55); color:#cdd6df; font-size:15px; cursor:pointer;">⏸</button>
-      <div id="pause-overlay" style="position:absolute; inset:0; z-index:30; display:none; flex-direction:column; align-items:center; justify-content:center; gap:14px; background:rgba(6,9,14,.82);">
-        <div style="font-family:'Dela Gothic One',sans-serif; font-size:20px; color:#f0c862; letter-spacing:.12em; margin-bottom:6px;">一時停止</div>
+      <button id="btn-pause" class="pause-btn" aria-label="一時停止">⏸</button>
+      <div id="pause-overlay" class="pause-overlay">
+        <div class="po-title">一時停止</div>
         <button id="btn-resume" class="btn primary" style="min-width:210px;">続ける</button>
         <button id="btn-retry" class="btn" style="min-width:210px;">リトライ</button>
         <button id="btn-quit" class="btn" style="min-width:210px;">やめる</button>
@@ -567,6 +782,7 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
   <section id="screen-result" class="screen">
     <div class="scroll">
       <div class="result-head">
+        <div class="result-fx" id="result-fx"><div class="rays"></div></div>
         <div class="result-rank" id="result-rank">-</div>
         <div class="result-sub" id="result-sub"></div>
         <div class="result-reward" id="result-reward"></div>
@@ -641,6 +857,8 @@ const rand=(a,b)=>a+Math.random()*(b-a);
 const randInt=(a,b)=>Math.floor(rand(a,b+1));
 const choice=arr=>arr[Math.floor(Math.random()*arr.length)];
 const $=id=>document.getElementById(id);
+// ハプティクス（対応端末のみ。Android Chrome等。iOS Safariは無視される＝無害）
+const vib=ms=>{ try{ if(navigator.vibrate) navigator.vibrate(ms); }catch(e){} };
 
 /* ---------- 永続化（Save 抽象レイヤ） ----------
    配布形態に依存しない単一の入口。
@@ -885,6 +1103,7 @@ function renderHorseList(){
     const abil = ABILITIES[h.ability];
     const card = document.createElement("div");
     card.className = "card" + (state.selectedHorseIdx===idx?" selected":"");
+    card.style.setProperty("--silk", h.silk);   // 勝負服カラーの縦帯（CSS ::before が参照）
     card.innerHTML = `
       <div class="silk" style="background:${h.silk}"></div>
       <div class="row1">
@@ -894,14 +1113,16 @@ function renderHorseList(){
       <div class="abil-line"><span class="abil-badge">固有</span><b>${abil.name}</b><span class="abil-desc">${abil.desc}</span></div>
       <div class="abil-line"><span class="apt-badge">適性</span><b>${aptLabel(h.stats.aptDist)}</b><span class="abil-desc">得意 ${h.stats.aptDist}m 前後</span></div>
       <div class="desc">${h.desc}</div>
-      ${statRow("スピード",h.stats.speed)}
-      ${statRow("スタミナ",h.stats.stamina)}
-      ${statRow("瞬発力",h.stats.instant)}
-      ${statRow("パワー",h.stats.power)}
-      ${statRow("出脚",h.stats.gate)}
-      ${statRow("コーナリング",h.stats.corner)}
-      ${statRow("根性",h.stats.guts)}
-      ${statRow("気性",h.stats.temper)}
+      <div class="stats">
+        ${statRow("スピード",h.stats.speed)}
+        ${statRow("スタミナ",h.stats.stamina)}
+        ${statRow("瞬発力",h.stats.instant)}
+        ${statRow("パワー",h.stats.power)}
+        ${statRow("出脚",h.stats.gate)}
+        ${statRow("コーナー",h.stats.corner)}
+        ${statRow("根性",h.stats.guts)}
+        ${statRow("気性",h.stats.temper)}
+      </div>
     `;
     card.addEventListener("click",()=>{
       state.selectedHorseIdx = idx;
@@ -912,8 +1133,9 @@ function renderHorseList(){
   });
 }
 function statRow(label,val){
+  const tier = val>=90?" t4" : val>=80?" t3" : val>=68?" t2" : "";   // 数値帯で発色を変える（90+金/80+緑/68+青）
   return `<div class="stat"><span class="lab">${label}</span>
-    <span class="meter"><i style="width:${val}%"></i></span>
+    <span class="meter"><i class="${tier.trim()}" style="width:${val}%"></i></span>
     <span class="val">${val}</span></div>`;
 }
 
@@ -928,6 +1150,7 @@ function distFit(aptDist, m){ const d=Math.abs(m-aptDist); return d<=200?["good"
 function renderTacticScreen(){
   const h = CANDIDATES[state.selectedHorseIdx];
   // 選択中の馬カード（得意距離つき）
+  $("chosen-horse").style.setProperty("--silk", h.silk);
   $("chosen-horse").innerHTML = `
     <div class="silk" style="background:${h.silk}"></div>
     <div class="row1"><span class="hname">${h.name}</span><span class="htag">騎乗馬</span></div>
@@ -1385,7 +1608,7 @@ function updateGate(dt){
     else if(c<4.5){ if(r._cd!==1){r._cd=1; Sfx.blip(780,0.09);} gt.textContent="1"; gs.textContent="構えて…"; }
     else { // 発走（自動・反射神経は不要。出はゲート駐立＝パワー/調子で決まる）
       r.goTime=c;
-      Sfx.bell(); Sfx.startCrowd(); Sfx.startRumble();
+      Sfx.bell(); Sfx.startCrowd(); Sfx.startRumble(); vib(30);
       gt.innerHTML='<span class="go-flash">発走！</span>';
       gs.textContent="";
       beginRun();
@@ -1757,7 +1980,7 @@ function doWhip(){
   const boost = (h.p.whipPow||1.4) * Math.pow(0.55, uses) * (1 + jSkill("drive")*0.10);  // 1発目が最大、叩くほど逓減。騎手「追い」最大+10%
   h._whipBoost = boost; h.whipTimer = 1.6; h.whipCd = 0.75; h._whips = uses+1;
   h.stamina = Math.max(0, h.stamina - 1.5);                // ひと押しの脚使い
-  Sfx.whip();
+  Sfx.whip(); vib(22);
   if(boost < 0.4){ flash("もう反応が鈍い…","#c9762e"); }
   else { flash("ムチ！","#e8b84b"); if(uses===0) jcall(`${h.name}にムチが入った！　最後の脚を引き出す！`, true); }
 }
@@ -1773,6 +1996,7 @@ function shiftGear(delta){
   h._lastGearDir = dir;
   const prev=h.gear; h.gear=ng;
   Sfx.blip(dir>0?560:380, 0.05, "square");   // シフト音
+  vib(8);
   // 仕掛け地点（初めてギア5以上）
   if(h.gear>=7 && h._commitAt===null){ h._commitAt=h.dist; jcall(`${h.name}、ここで仕掛けた！　残り${Math.max(0,Math.round(CFG.DIST-h.dist))}m！`, true); }
   else if(h.gear===10 && prev<10){ jcall(`${h.name}、全力！　最後の力を振り絞る！`, true); }
@@ -1907,19 +2131,24 @@ function render(){
   const ms=$("my-style"); if(ms) ms.textContent = "脚質 "+STYLES[p.style].name;
   const ma=$("my-abil"); if(ma) ma.textContent = "固有 "+(ABILITIES[p.ability]?ABILITIES[p.ability].name:"—");
 
-  // --- 残り距離・進行ゲージ ---
+  // --- 残り距離・進行ゲージ（自馬マーカー付き） ---
   const remain = Math.max(0, Math.round(CFG.DIST - p.dist));
   $("dist-val").textContent = remain;
-  $("prog-fill").style.width = clamp(p.dist/CFG.DIST*100,0,100)+"%";
+  const progPct = clamp(p.dist/CFG.DIST*100,0,100);
+  $("prog-fill").style.width = progPct+"%";
+  const ph=$("prog-horse"); if(ph) ph.style.left = progPct+"%";
 
   // --- フェーズ表示（残り距離ベース） ---
   const rem2 = CFG.DIST - p.dist;
   let phaseTxt = rem2>CFG.DIST*0.55? "道中（序盤）" : p.dist<CFG.straightDist? "中盤・位置取り" : "直線！";
   $("phase-val").textContent = p.finished? "ゴール" : phaseTxt;
 
-  // --- ペース表示（創発ペース4段階） ---
-  const pace = ["スロー","平均","ハイ","超ハイ"][r.paceLevel!=null? r.paceLevel : 1];
-  $("pace-val").textContent = r.started? pace : "—";
+  // --- ペース表示（創発ペース4段階。色は data-pl でCSSが変える） ---
+  const plv = r.paceLevel!=null? r.paceLevel : 1;
+  const pace = ["スロー","平均","ハイ","超ハイ"][plv];
+  const pv=$("pace-val");
+  pv.textContent = r.started? pace : "—";
+  if(r.started) pv.setAttribute("data-pl", plv); else pv.removeAttribute("data-pl");
 
   // --- スタミナ／折り合いゲージ ---
   setGauge($("sta-bar"),$("sta-num"), p.stamina, "stamina");
@@ -2017,13 +2246,16 @@ function setGauge(bar,num,val,type){
   val=clamp(val,0,100);
   bar.style.width = val+"%";
   num.textContent = Math.round(val);
-  let col;
+  let col, low;
   if(type==="stamina"){
-    col = val>50? "var(--green)" : val>25? "var(--amber)" : "var(--red)";
+    col = val>50? "linear-gradient(90deg,#2a9457,#46cf7c)" : val>25? "linear-gradient(90deg,#c4842a,#f5b13e)" : "linear-gradient(90deg,#b3322a,#ef5348)";
+    low = val<=25;
   }else{
-    col = val>50? "var(--blue)" : val>CFG.compPull? "var(--amber)" : "var(--red)";
+    col = val>50? "linear-gradient(90deg,#2e6f9e,#54b0ec)" : val>CFG.compPull? "linear-gradient(90deg,#c4842a,#f5b13e)" : "linear-gradient(90deg,#b3322a,#ef5348)";
+    low = val<=CFG.compPull;
   }
   bar.style.background = col;
+  bar.classList.toggle("low", !!low);   // 危険域は明滅して知らせる
 }
 
 /* ===================== コース幾何（オーバルトラック / 右回り） =====================
@@ -2842,7 +3074,7 @@ function finishRace(){
     if(h.isPlayer) tr.className="me";
     if(h.rank===1) tr.classList.add("won");
     tr.innerHTML=`<td class="r">${h.rank}</td>
-      <td>${h.name}${h.isPlayer?' <span style="color:var(--gold);font-size:10px;">(自分)</span>':''}</td>
+      <td><i class="rdot" style="background:${h.color}"></i>${h.name}${h.isPlayer?' <span style="color:var(--gold);font-size:10px;">(自分)</span>':''}</td>
       <td class="dim">${STYLES[h.style].name}</td>
       <td class="num">${h.popRank}人気</td>
       <td class="num">${margin(prevT,h.finishTime,h._vfin)}</td>`;
@@ -2854,9 +3086,26 @@ function finishRace(){
   const rk=$("result-rank"), sub=$("result-sub");
   rk.textContent = p.rank+"着";
   rk.className = "result-rank " + (p.rank===1?"win": p.rank<=3?"place":"lose");
+  // 勝利演出：金の光彩＋紙吹雪（1着のみ。CSSアニメ任せ＝負荷ほぼゼロ）
+  const fx=$("result-fx");
+  if(fx){
+    fx.className = "result-fx" + (p.rank===1?" win":"");
+    fx.querySelectorAll(".cf").forEach(e=>e.remove());
+    if(p.rank===1){
+      const cols=["#f0c050","#ef5348","#54b0ec","#46cf7c","#ffffff","#e884b0"];
+      for(let i=0;i<26;i++){
+        const c=document.createElement("i"); c.className="cf";
+        c.style.left=(Math.random()*100)+"%";
+        c.style.background=cols[i%cols.length];
+        c.style.animationDelay=(Math.random()*2.4)+"s";
+        c.style.animationDuration=(2.3+Math.random()*1.5)+"s";
+        fx.appendChild(c);
+      }
+    }
+  }
   const phr = p.rank===1?"勝利！ 完璧な騎乗だ":
               p.rank<=3?"好騎乗！ 馬券圏内に好走":
-              p.rank<=5?"惜しい。あと一歩":"powerless… 巻き返しを期そう";
+              p.rank<=5?"惜しい。あと一歩":"完敗…次のレースで巻き返そう";
   sub.textContent = `${p.rank} / ${CFG.N} 着　${phr}　（${p.popRank}番人気・単勝${p.odds}倍）`;
   // 賞金・ポイント表示
   const rw=$("result-reward");
@@ -2997,8 +3246,8 @@ $("btn-retry").addEventListener("click", ()=>{ resumeRace(); initRace(); });
 $("btn-quit").addEventListener("click", ()=>{ resumeRace(); cancelAnimationFrame(state.raf); try{Sfx.stopCrowd();Sfx.stopRumble();Voice.stop();}catch(e){} showScreen("title"); });
 
 // レース操作ボタン
-$("btn-in").addEventListener("click", ()=>{ const h=state.player; if(h&&!h.finished) h.targetLane=clamp(h.targetLane-1,0,7); });
-$("btn-out").addEventListener("click", ()=>{ const h=state.player; if(h&&!h.finished) h.targetLane=clamp(h.targetLane+1,0,7); });
+$("btn-in").addEventListener("click", ()=>{ const h=state.player; if(h&&!h.finished){ h.targetLane=clamp(h.targetLane-1,0,7); vib(6); } });
+$("btn-out").addEventListener("click", ()=>{ const h=state.player; if(h&&!h.finished){ h.targetLane=clamp(h.targetLane+1,0,7); vib(6); } });
 $("btn-geardown").addEventListener("click", ()=> shiftGear(-1));
 $("btn-gearup").addEventListener("click", ()=> shiftGear(+1));
 $("btn-whip").addEventListener("click", doWhip);

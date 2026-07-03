@@ -274,7 +274,9 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
 .hud .course{
   color:#221603; font-weight:800; letter-spacing:.04em;
   background:var(--gold-grad); border-radius:5px; padding:2px 8px;
+  white-space:nowrap; display:inline-flex; align-items:center; gap:5px;   /* レース名（格バッジ付き）を途中改行させない */
 }
+.hud .course .grade-badge{ font-size:9.5px; padding:1.5px 6px; margin-left:-3px; }
 .hud .going,.hud .pace{ color:var(--ink-dim); }
 .hud .pace{ margin-left:auto; }
 .hud .pace b{
@@ -575,6 +577,63 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
   box-shadow:0 1px 0 var(--line-hi) inset, 0 6px 16px rgba(0,0,0,.3);
   animation:riseIn .8s .5s cubic-bezier(.2,.8,.3,1) both; }
 .title-career b{ color:var(--gold); }
+
+/* ====== キャリア（騎乗依頼・レースの格・騎手手帳） ====== */
+/* 格バッジ：JRA準拠の配色（GⅠ青/GⅡ赤/GⅢ緑）。条件戦/OPは控えめ */
+.grade-badge{ display:inline-block; font-family:"Dela Gothic One"; font-size:11px; letter-spacing:.04em;
+  padding:3px 10px; border-radius:6px; color:#fff; vertical-align:middle;
+  box-shadow:0 1px 0 rgba(255,255,255,.25) inset, 0 3px 8px rgba(0,0,0,.35); }
+.grade-badge.cond{ background:#3a4a5e; color:#cfe0ea; }
+.grade-badge.open{ background:#5a4a7a; }
+.grade-badge.g3{ background:#2faf4f; }
+.grade-badge.g2{ background:#d63c33; }
+.grade-badge.g1{ background:#2a6fd6; }
+/* 騎乗依頼画面 */
+.offer-status{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:11px 13px; margin-bottom:12px;
+  box-shadow:0 1px 0 var(--line-hi) inset; }
+.offer-status .os-row{ display:flex; align-items:center; gap:8px; font-size:12px; color:var(--ink-dim); margin-top:6px; }
+.offer-status .os-row:first-child{ margin-top:0; }
+.offer-status .os-row b{ color:var(--gold); font-variant-numeric:tabular-nums; }
+.offer-status .os-bar{ flex:1; height:8px; background:#0c151c; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+.offer-status .os-bar > i{ display:block; height:100%; border-radius:6px; background:linear-gradient(90deg,#caa033,#e8b84b); }
+.offer-status .os-bar.trust > i{ background:linear-gradient(90deg,#3a8fb0,#54b0ec); }
+.offer-race{ background:linear-gradient(180deg,#152234,var(--panel-2)); border:1px solid #2b405a; border-radius:14px;
+  padding:14px 15px; margin-bottom:14px; box-shadow:0 1px 0 var(--line-hi) inset, 0 8px 22px rgba(0,0,0,.3); }
+.offer-race .or-meet{ font-size:10.5px; letter-spacing:.22em; color:var(--ink-dim); margin-bottom:6px; }
+.offer-race .or-name{ font-family:"Dela Gothic One"; font-size:19px; color:var(--ink); display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
+.offer-race .or-cond{ font-size:12px; color:var(--ink-dim); margin-top:7px; }
+.offer-race .or-cond b{ color:var(--ink); }
+.offer-pop{ display:inline-block; font-size:10.5px; font-weight:800; padding:3px 9px; border-radius:999px; border:1px solid var(--line); }
+.offer-pop.fav{ color:#221603; background:var(--gold-grad); border-color:var(--gold-deep); }
+.offer-pop.mid{ color:var(--ink); background:#1c2c3d; border-color:#2b405a; }
+.offer-pop.dark{ color:#ffb3ad; background:rgba(210,59,59,.16); border-color:rgba(210,59,59,.5); }
+.offer-hint{ font-size:11.5px; color:var(--ink-dim); margin-top:8px; line-height:1.5; }
+.offer-hint b{ color:#f5d27a; }
+.offer-accept{ margin-top:11px; width:100%; padding:13px 14px; font-size:14.5px; }
+/* 騎手手帳（戦績・プログレッション） */
+.cr-block{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-bottom:12px;
+  box-shadow:0 1px 0 var(--line-hi) inset; }
+.cr-block .cr-head{ font-size:10px; letter-spacing:.2em; color:var(--ink-dim); margin-bottom:9px; }
+.cr-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.cr-cell{ background:#0d1622; border:1px solid var(--line); border-radius:10px; padding:9px 6px; text-align:center; }
+.cr-cell .v{ font-family:"Dela Gothic One"; font-size:17px; color:var(--gold); }
+.cr-cell .k{ font-size:10px; color:var(--ink-dim); margin-top:3px; }
+.cr-grade-row{ display:flex; align-items:center; gap:9px; padding:7px 2px; border-bottom:1px solid var(--line); font-size:12.5px; }
+.cr-grade-row:last-child{ border-bottom:none; }
+.cr-grade-row .cg-wins{ margin-left:auto; font-variant-numeric:tabular-nums; color:var(--ink); }
+.cr-grade-row .cg-wins b{ color:var(--gold); font-family:"Dela Gothic One"; }
+.cr-grade-row .cg-lock{ margin-left:auto; font-size:11px; color:var(--ink-dim); }
+.cr-title-row{ display:flex; align-items:baseline; gap:8px; padding:7px 2px; border-bottom:1px solid var(--line); font-size:12.5px; }
+.cr-title-row:last-child{ border-bottom:none; }
+.cr-title-row .tt-race{ font-weight:700; color:#ffe9a8; }
+.cr-title-row .tt-horse{ color:var(--ink-dim); font-size:11.5px; }
+.cr-empty{ font-size:12px; color:var(--ink-dim); padding:6px 2px; }
+/* 結果画面：レース名の帯 */
+.result-race{ display:none; align-items:center; justify-content:center; gap:9px; margin-bottom:8px; flex-wrap:wrap;
+  font-family:"Dela Gothic One"; font-size:15px; color:var(--ink); }
+.result-race.show{ display:flex; }
+.result-reward .pill.g1win{ background:linear-gradient(180deg,#173263,#0f2246); border-color:#2a6fd6; }
+.result-reward .pill.g1win b{ color:#8ec2ff; }
 </style>
 <!-- Three.js r160 ＋ addons（esbuildバンドル）を window.THREE / window.THREE_ADDONS へ提供。
      本体は通常スクリプトのまま使用。smokeはmoduleを無視するため検証不変。再生成: npm run bundle -->
@@ -646,10 +705,36 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
         <div class="rule"></div>
       </div>
       <div class="title-copy">最高の騎乗で、能力差を覆せ。</div>
-      <div class="title-cta"><button id="btn-to-select" class="btn primary block">レースに挑む</button></div>
-      <div class="title-badge">12頭立て ／ 芝1200・1600・2000m</div>
+      <div class="title-cta">
+        <button id="btn-career" class="btn primary block">騎乗依頼を受ける</button>
+        <button id="btn-to-select" class="btn block" style="margin-top:10px;">フリーレース</button>
+        <button id="btn-career-view" class="btn ghost block" style="margin-top:2px;">騎手手帳（戦績・GⅠタイトル）</button>
+      </div>
+      <div class="title-badge">条件戦からGⅠへ ／ 芝1200・1600・2000m</div>
       <div class="title-career" id="title-career" style="display:none;"></div>
       <div class="foot-note" style="position:relative;">本ゲームの馬名・騎手名・競馬場名はすべて架空です。<br>実在のJRA・団体・人物とは一切関係ありません。</div>
+    </div>
+  </section>
+
+  <!-- ============ 1.5 騎乗依頼画面（キャリアモード） ============ -->
+  <section id="screen-offers" class="screen">
+    <div class="scroll">
+      <div class="section-title"><span class="no">01</span><h2>騎乗依頼</h2><span class="note">どの馬で勝つかも騎手の腕</span></div>
+      <div id="offer-status" class="offer-status"></div>
+      <div id="offer-race" class="offer-race"></div>
+      <div id="offer-list"></div>
+      <button id="btn-offer-refresh" class="btn block" style="margin-top:10px;">別の開催を探す</button>
+      <button id="btn-offers-title" class="btn ghost block" style="margin-top:6px;">← タイトルへ</button>
+    </div>
+  </section>
+
+  <!-- ============ 1.6 騎手手帳（戦績・プログレッション） ============ -->
+  <section id="screen-career" class="screen">
+    <div class="scroll">
+      <div class="section-title"><span class="no">帳</span><h2>騎手手帳</h2><span class="note">歩みはここに刻まれる</span></div>
+      <div id="career-body"></div>
+      <button id="btn-career-back" class="btn ghost block" style="margin-top:8px;">← タイトルへ</button>
+      <button id="btn-career-reset" class="btn ghost block" style="margin-top:2px; color:#ef8a8a;">キャリアを初期化（全データ削除）</button>
     </div>
   </section>
 
@@ -668,8 +753,10 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
     <div class="scroll">
       <div class="section-title"><span class="no">02</span><h2>作戦（脚質）を決める</h2></div>
       <div id="chosen-horse" class="card" style="margin-bottom:16px;"></div>
-      <div class="section-sub">距離を選ぶ <span class="dim2">― 馬の得意距離に合わせると有利</span></div>
-      <div class="dist-grid" id="dist-grid"></div>
+      <div id="dist-section">
+        <div class="section-sub">距離を選ぶ <span class="dim2">― 馬の得意距離に合わせると有利</span></div>
+        <div class="dist-grid" id="dist-grid"></div>
+      </div>
       <div class="section-sub" style="margin-top:16px;">脚質を選ぶ</div>
       <div class="tactic-grid" id="tactic-grid"></div>
       <div style="margin-top:14px;" class="dim center" id="tactic-hint">脚質を選ぶと相性が表示されます</div>
@@ -683,7 +770,7 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
     <!-- 上部HUD -->
     <div class="hud">
       <div class="top">
-        <span class="course">北嶺競馬場</span>
+        <span class="course" id="course-label">北嶺競馬場</span>
         <span class="dim" id="race-dist-label">芝1600m</span>
         <span class="going">馬場 <b id="going-val">—</b></span>
         <span class="pace">ペース <b id="pace-val">—</b></span>
@@ -783,6 +870,7 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
     <div class="scroll">
       <div class="result-head">
         <div class="result-fx" id="result-fx"><div class="rays"></div></div>
+        <div class="result-race" id="result-race"></div>
         <div class="result-rank" id="result-rank">-</div>
         <div class="result-sub" id="result-sub"></div>
         <div class="result-reward" id="result-reward"></div>
@@ -793,7 +881,11 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
         <thead><tr><th>着</th><th>馬名</th><th>脚質</th><th class="num">人気</th><th class="num">着差</th></tr></thead>
         <tbody id="result-body"></tbody>
       </table>
-      <div class="result-actions">
+      <div class="result-actions" id="result-actions-career" style="display:none;">
+        <button id="btn-next-offer" class="btn primary">次の騎乗依頼へ</button>
+        <button id="btn-result-record" class="btn">騎手手帳を見る</button>
+      </div>
+      <div class="result-actions" id="result-actions-free">
         <button id="btn-replay" class="btn primary">同じ馬でもう一度</button>
         <button id="btn-rehorse" class="btn">馬を選び直す</button>
       </div>
@@ -891,7 +983,8 @@ Save.init();
 const JSKILLS = ["start","settle","handle","drive"];   // スタート/折り合い/さばき/追い
 const JSKILL_JA = { start:"スタート", settle:"折り合い", handle:"馬群さばき", drive:"追い" };
 function defaultCareer(){
-  return { funds:0, points:0, races:0, wins:0, places:0,
+  return { funds:0, points:0, races:0, wins:0, places:0, trust:20, meets:0,
+           gradeWins:{ cond:0, open:0, g3:0, g2:0, g1:0 }, titles:[],
            jockey:{ level:1, xp:0, skills:{ start:0, settle:0, handle:0, drive:0 } } };
 }
 function loadCareer(){
@@ -899,12 +992,45 @@ function loadCareer(){
   if(s && s.career){
     const c=s.career;
     d.funds=c.funds|0; d.points=c.points|0; d.races=c.races|0; d.wins=c.wins|0; d.places=c.places|0;
+    // v2以降のキャリア拡張（v1セーブには無い → 既定値のまま＝後方互換）
+    d.trust=clamp(c.trust!=null? c.trust:20, 0, 100); d.meets=c.meets|0;
+    if(c.gradeWins) GRADE_ORDER.forEach(k=> d.gradeWins[k]=c.gradeWins[k]|0);
+    if(Array.isArray(c.titles)) d.titles=c.titles.slice(0,200);
     if(c.jockey){ d.jockey.level=c.jockey.level||1; d.jockey.xp=c.jockey.xp||0;
       if(c.jockey.skills) JSKILLS.forEach(k=> d.jockey.skills[k]=clamp(c.jockey.skills[k]||0,0,100)); }
   }
   return d;
 }
-function saveCareer(){ return Save.write({ v:1, career:state.career }); }
+function saveCareer(){ return Save.write({ v:2, career:state.career }); }
+
+/* ---------- レースの格（グレード）＋番組表 ----------
+   賞金/騎手Pの倍率と「ライバル能力帯」だけを動かす（物理・AIロジックは不変）。
+   フリーレースは従来のライバル帯（66〜93）のまま＝balance_check の前提を汚さない。
+   解放は騎手Pの累計。JRA準拠の配色（GⅠ青/GⅡ赤/GⅢ緑）はCSS .grade-badge 側。 */
+const GRADE_ORDER = ["cond","open","g3","g2","g1"];
+const GRADES = {
+  cond:{ key:"cond", name:"条件戦",   prizeMul:1.0, ptsMul:1.0, rival:[58,86], unlockP:0,
+         desc:"駆け出し騎手の主戦場。まずはここで腕と信頼を積む。" },
+  open:{ key:"open", name:"オープン", prizeMul:1.6, ptsMul:1.3, rival:[64,90], unlockP:120,
+         desc:"重賞への登竜門。相手は一段強くなる。" },
+  g3:  { key:"g3",  name:"GⅢ",      prizeMul:2.4, ptsMul:1.7, rival:[68,92], unlockP:300,
+         desc:"重賞。全国区の強豪が集う。" },
+  g2:  { key:"g2",  name:"GⅡ",      prizeMul:3.4, ptsMul:2.2, rival:[72,94], unlockP:650,
+         desc:"GⅠの前哨戦。一線級との真剣勝負。" },
+  g1:  { key:"g1",  name:"GⅠ",      prizeMul:5.0, ptsMul:3.0, rival:[76,96], unlockP:1100,
+         desc:"最高峰。勝てば騎手手帳に永久に刻まれる。" },
+};
+// レース名はすべて架空。GⅠは距離別の3大競走＝集めるタイトル
+const RACE_NAMES = {
+  cond:["こもれび特別","北嶺日和特別","若草特別","霜月特別","茜雲特別","初音特別"],
+  open:["北嶺ステークス","黄昏ステークス","蹄音オープン","栄光ステークス","疾風ステークス"],
+  g3:  ["北嶺記念","暁光賞","銀嶺賞","飛燕賞","天空杯"],
+  g2:  ["金鐙賞","鳳雛賞","蒼穹杯","雷鳴ステークス"],
+};
+const G1_RACES = { 1200:"鳳凰スプリント", 1600:"黄金マイル大賞典", 2000:"天嶺記念" };
+function gradeBadge(gk){ const G=GRADES[gk]; return `<span class="grade-badge ${gk}">${G.name}</span>`; }
+function unlockedGrades(){ const P=(state.career&&state.career.points)|0; return GRADE_ORDER.filter(k=>GRADES[k].unlockP<=P); }
+function nextLockedGrade(){ const P=(state.career&&state.career.points)|0; const k=GRADE_ORDER.find(k=>GRADES[k].unlockP>P); return k? GRADES[k]:null; }
 // 騎手スキルの効き（0..1）。操作有効性に乗る補正の素。最大効果は呼び出し側で ≤10% にクランプ。
 function jSkill(key){ const j=state.career && state.career.jockey; return j? clamp((j.skills[key]||0)/100,0,1):0; }
 // 騎手レベル＝4スキル合計から導出（1..9）
@@ -1073,6 +1199,9 @@ const RIVAL_COLORS = ["#e08a3a","#8e6fd0","#3fbf6f","#df6fa0","#5fb0b0","#b0833a
 /* ---------- ゲーム状態 ---------- */
 const state = {
   screen:"title",
+  mode:"free",         // "free"=従来のフリーレース / "career"=騎乗依頼（格・信頼度あり）
+  offerSet:null,       // 騎乗依頼画面の開催データ（レース＋ライバル確定＋依頼3件）
+  careerRace:null,     // 受諾中の依頼（buildFieldがこのスペックから場を再現＝リトライでも同一レース）
   selectedHorseIdx:null,
   selectedStyle:null,
   selectedDistance:1600,   // 1200 / 1600 / 2000
@@ -1091,7 +1220,7 @@ function showScreen(id){
   $("screen-"+id).classList.add("active");
   if(id==="title"){
     const C=state.career, el=$("title-career");
-    if(el){ if(C&&C.races>0){ el.style.display="block"; el.innerHTML=`騎手Lv <b>${jLevel()}</b>　<b>${C.wins}</b>勝 / ${C.races}戦　騎手P <b>${C.points}</b>　獲得賞金 <b>${C.funds}</b>万${Save.ok?"":"　<span style=\"color:#9fb1ad;\">(体験版:保存なし)</span>"}`; } else el.style.display="none"; }
+    if(el){ if(C&&C.races>0){ el.style.display="block"; el.innerHTML=`騎手Lv <b>${jLevel()}</b>　<b>${C.wins}</b>勝 / ${C.races}戦　騎手P <b>${C.points}</b>${(C.titles&&C.titles.length)?`　GⅠ <b>${C.titles.length}</b>冠`:""}${Save.ok?"":"　<span style=\"color:#9fb1ad;\">(体験版:保存なし)</span>"}`; } else el.style.display="none"; }
   }
 }
 
@@ -1149,14 +1278,26 @@ function aptLabel(d){ return d<=1200?"短距離":d<=1400?"マイル（短め）"
 function distFit(aptDist, m){ const d=Math.abs(m-aptDist); return d<=200?["good","◎ ピッタリ"]:d<=400?["mid","○ こなせる"]:["bad","△ 忙しい/長い"]; }
 function renderTacticScreen(){
   const h = CANDIDATES[state.selectedHorseIdx];
-  // 選択中の馬カード（得意距離つき）
+  const crc = (state.mode==="career") ? state.careerRace : null;
+  // キャリア（騎乗依頼）では距離はレース側で確定＝距離選択を隠す
+  const ds=$("dist-section"); if(ds) ds.style.display = crc? "none":"block";
+  // 選択中の馬カード（キャリアではレース情報も載せる）
+  const raceLine = crc
+    ? `<div class="abil-line">${gradeBadge(crc.gradeKey)}<b>${crc.name}</b><span class="abil-desc">芝${crc.dist}m・想定${crc.offer.estPop}番人気・調子 ${crc.offer.condition.label}</span></div>`
+    : "";
   $("chosen-horse").style.setProperty("--silk", h.silk);
   $("chosen-horse").innerHTML = `
     <div class="silk" style="background:${h.silk}"></div>
-    <div class="row1"><span class="hname">${h.name}</span><span class="htag">騎乗馬</span></div>
+    <div class="row1"><span class="hname">${h.name}</span><span class="htag">${crc?"騎乗依頼":"騎乗馬"}</span></div>
+    ${raceLine}
     <div class="abil-line"><span class="abil-badge">固有</span><b>${ABILITIES[h.ability].name}</b><span class="abil-desc">${ABILITIES[h.ability].desc}</span></div>
     <div class="abil-line"><span class="apt-badge">適性</span><b>${aptLabel(h.stats.aptDist)}</b><span class="abil-desc">得意距離 ${h.stats.aptDist}m 前後</span></div>
     <div class="desc">${h.desc}</div>`;
+  // 脚質未選択なら出走ボタンを無効化（依頼受諾直後など）
+  $("btn-to-race").disabled = !state.selectedStyle;
+  $("tactic-hint").textContent = state.selectedStyle
+    ? `${state.selectedDistance}m・「${STYLES[state.selectedStyle].name}」で出走します`
+    : "脚質を選ぶと相性が表示されます";
   // 距離グリッド
   const dg = $("dist-grid"); dg.innerHTML="";
   DISTANCES.forEach(d=>{
@@ -1201,6 +1342,145 @@ function adjacentStyle(h,key){
   return bi.some(b=>Math.abs(b-ki)===1);
 }
 
+/* ============================ 騎乗依頼（キャリアモード） ============================
+   1開催＝1レース（格・距離・レース名）＋ライバル11頭を先に確定し、騎乗依頼を3件提示する。
+   ライバルが確定しているので「想定人気」は受諾後の実人気と一致する（乱数の嘘がない）。
+   依頼は 本命級／中位／人気薄 の3band。人気薄で勝てば騎手P+30＆信頼度が大きく上がる。 */
+function makeOfferSet(){
+  const C = state.career || (state.career=defaultCareer());
+  const un = unlockedGrades();
+  // 開催する格：解放済みの上位を厚めに（最上位45%／次点30%／残りは全体から）
+  let gk;
+  if(un.length===1) gk=un[0];
+  else { const r=Math.random();
+    gk = r<0.45? un[un.length-1] : r<0.75? un[un.length-2] : un[randInt(0,un.length-1)]; }
+  const dist = choice([1200,1600,2000]);
+  const name = gk==="g1" ? G1_RACES[dist] : choice(RACE_NAMES[gk]);
+
+  // ライバル11頭をこの時点で確定（想定人気の根拠。受諾後も同じ相手と走る）
+  const names=[...RIVAL_NAMES].sort(()=>Math.random()-0.5).slice(0,CFG.N-1);
+  const colors=[...RIVAL_COLORS].sort(()=>Math.random()-0.5);
+  const rivals=names.map((nm,i)=>{
+    const sp=genRivalSpec(gk), cond=rollCondition();
+    return { name:nm, color:colors[i%colors.length], style:sp.style, ability:sp.ability, stats:sp.stats,
+             coat:choice(COAT_KEYS), markings:randMarkings(),
+             condition:cond, weight:440+randInt(0,9)*8, weightChange:randInt(-12,12),
+             _ability:abilityScore(sp.stats, sp.ability, cond.f) };
+  });
+
+  // 依頼3件：全候補30頭の「このライバル相手なら何番人気か」を先に確定し、
+  // 本命級(≤2)／中位(3〜5)／人気薄(≥6) の人気帯から1頭ずつ選ぶ＝格が変わってもジレンマが保たれる。
+  // 信頼度45未満のうちは真の本命は主戦騎手に回る＝2〜4番人気どまり（結果を出して信頼を積む動機づけ）
+  const cands=CANDIDATES.map((c,i)=>{
+    const cond=rollCondition();
+    const ab=abilityScore(c.stats, c.ability, cond.f);
+    return { candIdx:i, condition:cond, weight:440+randInt(0,9)*8, weightChange:randInt(-12,12),
+             _ability:ab, estPop: 1 + rivals.filter(rv=>rv._ability>ab).length };
+  }).sort(()=>Math.random()-0.5);
+  const used=new Set();
+  const pickBy=(...preds)=>{
+    for(const pr of preds){ const o=cands.find(x=>!used.has(x.candIdx) && pr(x)); if(o){ used.add(o.candIdx); return o; } }
+    const o=cands.find(x=>!used.has(x.candIdx)); used.add(o.candIdx); return o;
+  };
+  const favPred = C.trust>=45 ? (x=>x.estPop<=2) : (x=>x.estPop>=2 && x.estPop<=4);
+  const offers=[
+    pickBy(favPred, x=>x.estPop<=5),                    // 本命級（信頼が無いうちは対抗どまり）
+    pickBy(x=>x.estPop>=3 && x.estPop<=5, x=>x.estPop<=7),  // 中位
+    pickBy(x=>x.estPop>=6, x=>x.estPop>=4),             // 人気薄（勝てば大金星）
+  ].sort((a,b)=>a.estPop-b.estPop);
+
+  return { gradeKey:gk, dist, name, rivals, offers };
+}
+function renderOffers(){
+  const C=state.career, set=state.offerSet; if(!set) return;
+  const G=GRADES[set.gradeKey];
+  // ステータス帯：騎手P・信頼度・次の格解放
+  const nx=nextLockedGrade();
+  $("offer-status").innerHTML =
+    `<div class="os-row">騎手Lv <b>${jLevel()}</b>　通算 <b>${C.wins}</b>勝　騎手P <b>${C.points}</b></div>`+
+    `<div class="os-row"><span>信頼度</span><span class="os-bar trust"><i style="width:${clamp(C.trust,0,100)}%"></i></span><b>${Math.round(C.trust)}</b><span>/100</span></div>`+
+    (nx? `<div class="os-row"><span>${nx.name}解放まで</span><span class="os-bar"><i style="width:${clamp(C.points/nx.unlockP*100,0,100)}%"></i></span><b>あと${Math.max(0,nx.unlockP-C.points)}P</b></div>`
+       : `<div class="os-row">全ての格が解放済み。残るはGⅠタイトルの完全制覇。</div>`);
+  // 開催レースのヘッダ
+  $("offer-race").innerHTML =
+    `<div class="or-meet">第${(C.meets|0)+1}戦　北嶺競馬場</div>`+
+    `<div class="or-name">${gradeBadge(set.gradeKey)}<span>${set.name}</span></div>`+
+    `<div class="or-cond">芝<b>${set.dist}m</b>　賞金×<b>${G.prizeMul}</b>　騎手P×<b>${G.ptsMul}</b><br>${G.desc}</div>`;
+  // 依頼カード3枚
+  const list=$("offer-list"); list.innerHTML="";
+  set.offers.forEach((of,k)=>{
+    const h=CANDIDATES[of.candIdx];
+    const [fc,ft]=distFit(h.stats.aptDist, set.dist);
+    const pop = of.estPop<=2? ["fav", `想定${of.estPop}番人気・本命級`]
+              : of.estPop<=4? ["mid", `想定${of.estPop}番人気・中位`]
+              :               ["dark",`想定${of.estPop}番人気・人気薄`];
+    const hint = of.estPop>=5 ? `<b>勝てば大金星</b>：人気薄ボーナス騎手P+30、信頼度も大きく上がる。`
+               : of.estPop<=2 ? `勝って当然の本命。堅実に稼げるが、凡走すれば信頼を落とす。`
+               :                `展開ひとつで上を狙える中位人気。読みと仕掛けの見せ所。`;
+    const card=document.createElement("div");
+    card.className="card"; card.style.setProperty("--silk", h.silk);
+    card.innerHTML = `
+      <div class="silk" style="background:${h.silk}"></div>
+      <div class="row1"><span class="hname">${h.name}</span><span class="offer-pop ${pop[0]}">${pop[1]}</span></div>
+      <div class="abil-line"><span class="abil-badge">固有</span><b>${ABILITIES[h.ability].name}</b><span class="abil-desc">${ABILITIES[h.ability].desc}</span></div>
+      <div class="abil-line"><span class="apt-badge">適性</span><b>${aptLabel(h.stats.aptDist)}</b><span class="abil-desc">今回${set.dist}m：<span class="fit ${fc}" style="display:inline;padding:1px 7px;">${ft}</span></span></div>
+      <div class="stats">
+        ${statRow("スピード",h.stats.speed)}
+        ${statRow("スタミナ",h.stats.stamina)}
+        ${statRow("瞬発力",h.stats.instant)}
+        ${statRow("気性",h.stats.temper)}
+      </div>
+      <div class="offer-hint">当日の調子：<b>${of.condition.label}</b><br>${hint}</div>
+      <button class="btn primary offer-accept">この依頼を受ける →</button>`;
+    card.querySelector(".offer-accept").addEventListener("click", ()=> acceptOffer(k));
+    list.appendChild(card);
+  });
+}
+function acceptOffer(k){
+  const set=state.offerSet; if(!set || !set.offers[k]) return;
+  state.mode="career";
+  state.careerRace={ gradeKey:set.gradeKey, dist:set.dist, name:set.name, rivals:set.rivals, offer:set.offers[k] };
+  state.selectedHorseIdx=set.offers[k].candIdx;
+  state.selectedDistance=set.dist;      // 距離はレース側で確定（作戦画面では脚質のみ選ぶ）
+  state.selectedStyle=null;
+  renderTacticScreen(); showScreen("tactic");
+}
+
+/* ============================ 騎手手帳（戦績・プログレッション） ============================ */
+function renderCareerScreen(){
+  const C=state.career || defaultCareer();
+  const J=C.jockey||{skills:{}};
+  const winRate=C.races? Math.round(C.wins/C.races*100):0;
+  const skillBars=JSKILLS.map(k=>{
+    const v=Math.round(J.skills[k]||0);
+    return `<div class="jg-skill"><span class="jg-k">${JSKILL_JA[k]}</span><span class="jg-bar"><i style="width:${v}%"></i></span><span class="jg-up-amt">${v}</span></div>`;
+  }).join("");
+  const grades=GRADE_ORDER.map(k=>{
+    const G=GRADES[k], unlocked=G.unlockP<=C.points;
+    return `<div class="cr-grade-row">${gradeBadge(k)}`+
+      (unlocked? `<span class="cg-wins"><b>${C.gradeWins[k]|0}</b> 勝</span>`
+               : `<span class="cg-lock">🔒 騎手P ${G.unlockP} で解放（あと${G.unlockP-C.points}）</span>`)+
+      `</div>`;
+  }).join("");
+  const titles=(C.titles&&C.titles.length)
+    ? C.titles.map(t=>`<div class="cr-title-row"><span class="tt-race">🏆 ${t.race}</span><span class="tt-horse">${t.horse}・${t.dist}m・${t.pop}番人気</span></div>`).join("")
+    : `<div class="cr-empty">まだGⅠタイトルは無い。3つの大競走（鳳凰スプリント／黄金マイル大賞典／天嶺記念）の制覇を目指せ。</div>`;
+  $("career-body").innerHTML =
+    `<div class="cr-block"><div class="cr-head">通算成績</div>
+      <div class="cr-grid">
+        <div class="cr-cell"><div class="v">${C.wins}</div><div class="k">勝利</div></div>
+        <div class="cr-cell"><div class="v">${C.races}</div><div class="k">騎乗</div></div>
+        <div class="cr-cell"><div class="v">${winRate}%</div><div class="k">勝率</div></div>
+        <div class="cr-cell"><div class="v">${C.points}</div><div class="k">騎手P</div></div>
+        <div class="cr-cell"><div class="v">${C.funds}</div><div class="k">賞金(万)</div></div>
+        <div class="cr-cell"><div class="v">${Math.round(C.trust)}</div><div class="k">信頼度</div></div>
+      </div></div>`+
+    `<div class="cr-block"><div class="cr-head">騎手Lv ${jLevel()} ― スキル（操作の有効性に作用・各≦10%）</div><div class="jockey-grow" style="margin-top:0; border:none; padding:0; background:transparent;"><div class="jg-skills">${skillBars}</div></div></div>`+
+    `<div class="cr-block"><div class="cr-head">レースの格 と 勝利数</div>${grades}</div>`+
+    `<div class="cr-block"><div class="cr-head">GⅠタイトル（${(C.titles||[]).length}）</div>${titles}</div>`+
+    (Save.ok? "" : `<div class="cr-empty">※体験版：この環境ではリロードで消えます（セーブ不可）</div>`);
+}
+
 /* ============================ 馬ステータス → 走行パラメータ変換 ============================ */
 // スピード/スタミナ/瞬発力/気性 を実際の物理係数へ。
 function deriveParams(stats, ability){
@@ -1240,9 +1520,51 @@ function topSpeed(h){
 }
 
 /* ============================ 出走馬の生成 ============================ */
+// 当日の調子（buildField/騎乗依頼で共用）
+function rollCondition(){
+  const cr=Math.random();
+  return cr<0.22? {label:"絶好調", f:1.04} : cr<0.74? {label:"普通", f:1.0}
+       : cr<0.90? {label:"地味", f:0.985} : {label:"不調", f:0.965};
+}
+// 人気算出用の隠れ能力スコア（固有・調子込み・乱数±9）。騎乗依頼の想定人気と実人気を一致させるため共用化
+const AB_BONUS = { burst:6, stayer:5, fighter:5, settle:4, corner:4, frontsoul:3, rocket:3, breaker:4, widerush:3, mud:0, fast:2, hotblood:7 };
+function abilityScore(stats, ability, condF){
+  const s=stats;
+  return s.speed*0.8 + s.stamina*0.8 + s.instant*0.9 + s.power*0.35 + s.guts*0.45 + s.temper*0.15
+       + (AB_BONUS[ability]||0) + (condF-1)*120 + rand(-9,9);
+}
+// ライバル1頭ぶんのスペックを生成。gradeKey があれば格の能力帯［lo,hi］、無ければ従来レンジ（フリーレース）
+function genRivalSpec(gradeKey){
+  const st = choice(Object.keys(STYLES));
+  const ab = choice(RIVAL_ABILITIES);
+  let stats;
+  if(gradeKey){
+    const [lo,hi] = GRADES[gradeKey].rival;
+    const power=randInt(lo-2,hi);
+    stats = {
+      speed:randInt(lo,hi), stamina:randInt(lo,hi),
+      instant:randInt(lo-2,hi), temper:randInt(55,90),
+      power, guts:randInt(lo-4,hi), aptDist:choice([1200,1400,1600,1800,2000]),
+      gate:clamp(power+(ab==="rocket"?9:0)+randInt(-6,6),50,99),
+      corner:clamp(power+(ab==="corner"?9:0)+randInt(-6,6),50,99),
+    };
+  } else {
+    const power=randInt(62,92);
+    stats = {
+      speed:randInt(66,93), stamina:randInt(66,93),
+      instant:randInt(64,92), temper:randInt(55,90),
+      power, guts:randInt(60,92), aptDist:choice([1200,1400,1600,1800,2000]),
+      gate:clamp(power+(ab==="rocket"?9:0)+randInt(-6,6),50,99),
+      corner:clamp(power+(ab==="corner"?9:0)+randInt(-6,6),50,99),
+    };
+  }
+  if(ab==="hotblood"){ stats.speed+=4; stats.instant+=4; }   // 気性難＝素の能力は高い
+  return { style:st, ability:ab, stats };
+}
 function buildField(){
   const field = [];
   const player = CANDIDATES[state.selectedHorseIdx];
+  const crc = (state.mode==="career") ? state.careerRace : null;   // 受諾中の依頼（確定スペック）
 
   // 1) プレイヤー馬
   field.push(makeHorse({
@@ -1251,47 +1573,44 @@ function buildField(){
     ability:player.ability, coat:player.coat, markings:randMarkings(),
   }));
 
-  // 2) ライバル（N-1頭）：ランダム脚質・能力・固有・毛色
-  const names = [...RIVAL_NAMES].sort(()=>Math.random()-0.5).slice(0,CFG.N-1);
-  const colors=[...RIVAL_COLORS].sort(()=>Math.random()-0.5);
-  const styleKeys = Object.keys(STYLES);
-  names.forEach((nm,i)=>{
-    const st = choice(styleKeys);
-    const ab = choice(RIVAL_ABILITIES);
-    const power=randInt(62,92);
-    const stats = {
-      speed:randInt(66,93), stamina:randInt(66,93),
-      instant:randInt(64,92), temper:randInt(55,90),
-      power, guts:randInt(60,92), aptDist:choice([1200,1400,1600,1800,2000]),
-      gate:clamp(power+(ab==="rocket"?9:0)+randInt(-6,6),50,99),
-      corner:clamp(power+(ab==="corner"?9:0)+randInt(-6,6),50,99),
-    };
-    if(ab==="hotblood"){ stats.speed+=4; stats.instant+=4; }   // 気性難＝素の能力は高い
-    field.push(makeHorse({
-      name:nm, color:colors[i%colors.length], isPlayer:false, style:st,
-      stats, ability:ab, coat:choice(COAT_KEYS), markings:randMarkings(),
-    }));
-  });
+  // 2) ライバル（N-1頭）
+  if(crc){
+    // キャリア：開催時に確定したスペックから再現（リトライしても同じ相手＝同じレース）
+    crc.rivals.forEach(sp=>{
+      field.push(makeHorse({
+        name:sp.name, color:sp.color, isPlayer:false, style:sp.style,
+        stats:{...sp.stats}, ability:sp.ability, coat:sp.coat, markings:sp.markings,
+      }));
+    });
+  } else {
+    // フリーレース：従来どおり毎回ランダム
+    const names = [...RIVAL_NAMES].sort(()=>Math.random()-0.5).slice(0,CFG.N-1);
+    const colors=[...RIVAL_COLORS].sort(()=>Math.random()-0.5);
+    names.forEach((nm,i)=>{
+      const sp=genRivalSpec(null);
+      field.push(makeHorse({
+        name:nm, color:colors[i%colors.length], isPlayer:false, style:sp.style,
+        stats:sp.stats, ability:sp.ability, coat:choice(COAT_KEYS), markings:randMarkings(),
+      }));
+    });
+  }
 
   // 3) 馬体重・調子（コンディション）を付与
-  field.forEach(h=>{
-    const cr=Math.random();
-    h.condition = cr<0.22? {label:"絶好調", f:1.04} : cr<0.74? {label:"普通", f:1.0}
-                : cr<0.90? {label:"地味", f:0.985} : {label:"不調", f:0.965};
-    const base = 440 + randInt(0,9)*8;                 // 440〜512kg
-    h.weight = base;
-    h.weightChange = randInt(-12,12);                  // 前走比 ±
+  //    キャリアでは開催時に確定済み（想定人気の根拠）＝ここでは適用のみ
+  field.forEach((h,i)=>{
+    const sp = crc ? (h.isPlayer? crc.offer : crc.rivals[i-1]) : null;
+    h.condition   = sp? sp.condition   : rollCondition();
+    h.weight      = sp? sp.weight      : 440 + randInt(0,9)*8;   // 440〜512kg
+    h.weightChange= sp? sp.weightChange: randInt(-12,12);        // 前走比 ±
+    if(sp) h._ability = sp._ability;                             // 人気の根拠も開催時のまま
     // 調子を派生パラメータへ反映（±数%・単独で勝敗は決めない）
     h.p.baseTop *= h.condition.f;
     h.p.drainResist *= h.condition.f;
   });
 
   // 4) 人気（オッズ）を隠れ能力で算出 → 強い馬ほど人気（固有・調子も加味）
-  const abBonus = { burst:6, stayer:5, fighter:5, settle:4, corner:4, frontsoul:3, rocket:3, breaker:4, widerush:3, mud:0, fast:2, hotblood:7 };
   field.forEach(h=>{
-    const s=h.stats;
-    h._ability = s.speed*0.8 + s.stamina*0.8 + s.instant*0.9 + s.power*0.35 + s.guts*0.45 + s.temper*0.15
-               + (abBonus[h.ability]||0) + (h.condition.f-1)*120 + rand(-9,9);
+    if(h._ability==null) h._ability = abilityScore(h.stats, h.ability, h.condition.f);
   });
   const byAbility=[...field].sort((a,b)=>b._ability-a._ability);
   byAbility.forEach((h,i)=>{
@@ -1350,8 +1669,10 @@ function initRace(){
   CFG.DIST = state.selectedDistance || 1600;
   CFG.straightDist = CFG.DIST - 400;                              // 残り400m＝直線
   const startS = ((TRK_P - (CFG.DIST % TRK_P)) % TRK_P);          // dist=DISTでゴール線(s=0)に来る開始s
-  // HUD距離表示・残400マーカー位置を更新
+  // HUD距離表示・レース名・残400マーカー位置を更新
   const dl=$("race-dist-label"); if(dl) dl.textContent = `芝${CFG.DIST}m`;
+  const crcHud=(state.mode==="career")? state.careerRace : null;
+  const cl=$("course-label"); if(cl) cl.innerHTML = crcHud? `${gradeBadge(crcHud.gradeKey)} ${crcHud.name}` : "北嶺競馬場";
   const m4=document.querySelector(".progress > .mark400"); if(m4) m4.style.left = ((CFG.DIST-400)/CFG.DIST*100)+"%";
 
   buildField();
@@ -1414,8 +1735,10 @@ function renderGateCard(){
   const el=$("gate-card"); if(!el) return;
   const r=state.race, p=state.player, fc=r.forecast;
   const wc = p.weightChange>0? `+${p.weightChange}` : `${p.weightChange}`;
+  const crc=(state.mode==="career")? state.careerRace : null;
+  const raceLabel = crc? `${crc.name}（${GRADES[crc.gradeKey].name}）` : "北嶺競馬場";
   el.innerHTML = `
-    <div class="gc-row"><span class="k">レース</span><b>北嶺競馬場　芝${CFG.DIST}m　馬場:${r.going.label}</b></div>
+    <div class="gc-row"><span class="k">レース</span><b>${raceLabel}　芝${CFG.DIST}m　馬場:${r.going.label}</b></div>
     <div class="gc-row"><span class="k">想定ペース</span><span class="gc-pace">${fc.pace}</span></div>
     <div class="gc-read">${fc.read}</div>
     <div class="gc-you">あなた：<b>${p.name}</b>（${p.num}番・${p.popRank}番人気/単勝${p.odds}倍）<br>
@@ -3052,15 +3375,34 @@ function finishRace(){
     return Math.max(1, len)+"馬身";
   }
 
-  // 賞金・騎手ポイント
+  // 賞金・騎手ポイント（キャリアはレースの格で倍率が掛かる）
   const C = state.career || (state.career=defaultCareer());
+  const crc = (state.mode==="career") ? state.careerRace : null;
+  const G = crc ? GRADES[crc.gradeKey] : null;
+  const unlockedBefore = unlockedGrades().length;
   const distMul = CFG.DIST>=2000?1.3: CFG.DIST>=1600?1.1:1.0;
   const baseP=[0,1000,400,250,150,100,60,40,30][p.rank] || 20;
-  const prize=Math.round(baseP*distMul);
+  const prize=Math.round(baseP*distMul*(G?G.prizeMul:1));
   let pts=[0,50,24,16,10,6,3][p.rank] || 1;
+  if(G) pts=Math.round(pts*G.ptsMul);
   let upset=false;
   if(p.rank===1 && p.popRank>=5){ pts+=30; upset=true; }
   C.funds+=prize; C.points+=pts; C.races++; if(p.rank===1) C.wins++; if(p.rank<=2) C.places++;
+
+  // キャリア：格別勝利・GⅠタイトル・信頼度（勝てば上がる。本命での凡走は下がる）
+  let g1win=false;
+  if(crc){
+    if(p.rank===1){
+      C.gradeWins[crc.gradeKey]=(C.gradeWins[crc.gradeKey]|0)+1;
+      if(crc.gradeKey==="g1"){ g1win=true; C.titles.push({ race:crc.name, horse:p.name, dist:CFG.DIST, pop:p.popRank }); }
+    }
+    const dTrust = p.rank===1? (upset?12:8) : p.rank<=3? 4
+                 : (p.popRank<=2 && p.rank>=8)? -6 : p.rank>=6? -2 : 0;
+    C.trust=clamp((C.trust==null?20:C.trust)+dTrust, 0, 100);
+    C.meets=(C.meets|0)+1;
+  }
+  // 騎手Pの累計で新しい格が解放されたか（結果画面で告知）
+  const newGrade = unlockedGrades().length>unlockedBefore ? GRADES[unlockedGrades()[unlockedGrades().length-1]] : null;
 
   // 騎手成長：今レースの騎乗内容に応じて4スキルへXPを配分（人気薄勝ちは大きく加算）
   const grew = awardJockeyXP(p, upset);
@@ -3103,18 +3445,32 @@ function finishRace(){
       }
     }
   }
-  const phr = p.rank===1?"勝利！ 完璧な騎乗だ":
+  const phr = g1win?"GⅠ制覇！ 歴史に名を刻んだ":
+              p.rank===1?"勝利！ 完璧な騎乗だ":
               p.rank<=3?"好騎乗！ 馬券圏内に好走":
               p.rank<=5?"惜しい。あと一歩":"完敗…次のレースで巻き返そう";
   sub.textContent = `${p.rank} / ${CFG.N} 着　${phr}　（${p.popRank}番人気・単勝${p.odds}倍）`;
+  // レース名の帯（キャリアのみ）
+  const rrEl=$("result-race");
+  if(rrEl){
+    if(crc){ rrEl.innerHTML=`${gradeBadge(crc.gradeKey)}<span>${crc.name}</span>`; rrEl.classList.add("show"); }
+    else { rrEl.classList.remove("show"); rrEl.innerHTML=""; }
+  }
   // 賞金・ポイント表示
   const rw=$("result-reward");
   if(rw) rw.innerHTML =
+    (g1win? `<span class="pill g1win">🏆 GⅠ「${crc.name}」制覇 <b>${C.titles.length}冠</b></span>`:"")+
     `<span class="pill${upset?' up':''}">獲得賞金 <b>${prize}</b>万</span>`+
     `<span class="pill${upset?' up':''}">騎手P <b>+${pts}</b>${upset?'（人気薄勝ち!）':''}</span>`+
+    (newGrade? `<span class="pill up">🔓 <b>${newGrade.name}</b> が解放！</span>`:"")+
+    (crc? `<span class="pill">信頼度 <b>${Math.round(C.trust)}</b>/100</span>`:"")+
     `<span class="pill lv">騎手Lv <b>${grew?grew.level:jLevel()}</b></span>`+
     `<span class="pill">通算 <b>${C.wins}</b>勝 / ${C.points}P / ${C.funds}万</span>`+
     (Save.ok? "" : `<span class="pill" style="color:#ef8a8a;">※体験版（セーブ不可）</span>`);
+  // 結果画面の次アクション：キャリアは「次の依頼へ」、フリーは従来（もう一度/選び直す）
+  const raC=$("result-actions-career"), raF=$("result-actions-free");
+  if(raC) raC.style.display = crc? "grid":"none";
+  if(raF) raF.style.display = crc? "none":"grid";
 
   renderJockeyGrowth(grew);
   $("result-advice").innerHTML = buildAdvice(p);
@@ -3234,11 +3590,25 @@ function buildAdvice(p){
 
 /* ============================ イベント結線 ============================ */
 // 画面遷移ボタン
-$("btn-to-select").addEventListener("click", ()=>{ renderHorseList(); showScreen("horse"); });
+$("btn-to-select").addEventListener("click", ()=>{ state.mode="free"; state.careerRace=null; renderHorseList(); showScreen("horse"); });
 $("btn-back-title").addEventListener("click", ()=> showScreen("title"));
 $("btn-to-tactic").addEventListener("click", ()=>{ renderTacticScreen(); showScreen("tactic"); });
-$("btn-back-horse").addEventListener("click", ()=> showScreen("horse"));
+$("btn-back-horse").addEventListener("click", ()=>{
+  if(state.mode==="career"){ renderOffers(); showScreen("offers"); }   // 依頼選択へ戻る
+  else showScreen("horse");
+});
 $("btn-to-race").addEventListener("click", ()=> initRace());
+// キャリア（騎乗依頼・騎手手帳）
+$("btn-career").addEventListener("click", ()=>{ state.offerSet=makeOfferSet(); renderOffers(); showScreen("offers"); });
+$("btn-offer-refresh").addEventListener("click", ()=>{ state.offerSet=makeOfferSet(); renderOffers(); });
+$("btn-offers-title").addEventListener("click", ()=> showScreen("title"));
+$("btn-career-view").addEventListener("click", ()=>{ renderCareerScreen(); showScreen("career"); });
+$("btn-career-back").addEventListener("click", ()=> showScreen("title"));
+$("btn-career-reset").addEventListener("click", ()=>{
+  if(!window.confirm || window.confirm("キャリア（戦績・スキル・タイトル）を全て消去します。よろしいですか？")){
+    Save.clear(); state.career=defaultCareer(); saveCareer(); renderCareerScreen();
+  }
+});
 // ポーズ操作
 $("btn-pause").addEventListener("click", pauseRace);
 $("btn-resume").addEventListener("click", resumeRace);
@@ -3261,8 +3631,10 @@ $("btn-sound").addEventListener("click", ()=>{
 document.addEventListener("pointerdown", ()=>{ Sfx.init(); Sfx.resume(); Voice.init(); Voice.prime(); }, true);
 
 // 結果画面
-$("btn-replay").addEventListener("click", ()=> initRace());           // 同じ馬・同じ作戦
+$("btn-replay").addEventListener("click", ()=> initRace());           // 同じ馬・同じ作戦（フリーのみ）
 $("btn-rehorse").addEventListener("click", ()=>{ renderHorseList(); showScreen("horse"); });
+$("btn-next-offer").addEventListener("click", ()=>{ state.offerSet=makeOfferSet(); renderOffers(); showScreen("offers"); });
+$("btn-result-record").addEventListener("click", ()=>{ renderCareerScreen(); showScreen("career"); });
 $("btn-to-title2").addEventListener("click", ()=> showScreen("title"));
 
 // 起動時：キャンバスのサイズ取得用に一度だけ参照

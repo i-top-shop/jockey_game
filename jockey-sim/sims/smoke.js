@@ -72,6 +72,52 @@ check("キャリアが保存された(localStorageにraces>0)", () => {
   if(!raw) return false; const c=JSON.parse(raw).career; return c && c.races>=1 ? ("races="+c.races+" Lv経験XP="+c.jockey.xp) : false;
 });
 
+console.log("\n=== キャリアモード（騎乗依頼 → 格付きレース → 手帳） ===");
+check("キャリア関数が存在", () => ["makeOfferSet","renderOffers","acceptOffer","renderCareerScreen","unlockedGrades"].every(f=>typeof window[f]==="function"));
+check("騎乗依頼画面へ（依頼3件）", () => {
+  click("btn-career");
+  return $("screen-offers").classList.contains("active") && $("offer-list").children.length===3;
+});
+check("開催ヘッダに格バッジとレース名", () => /grade-badge/.test($("offer-race").innerHTML) && $("offer-race").textContent.length>10);
+check("別の開催を探す（再生成）", () => { click("btn-offer-refresh"); return $("offer-list").children.length===3; });
+check("依頼を受諾→作戦画面（距離は固定）", () => {
+  $("offer-list").children[0].querySelector(".offer-accept").dispatchEvent(new window.Event("click",{bubbles:true}));
+  return $("screen-tactic").classList.contains("active") && $("dist-section").style.display==="none" && $("btn-to-race").disabled===true;
+});
+check("想定人気とライバル11頭が確定", () => {
+  const cr=window.eval("state.careerRace");   // stateはconst＝window非公開のためevalで参照
+  return cr && cr.rivals.length===11 && cr.offer.estPop>=1 ? ("estPop="+cr.offer.estPop+" grade="+cr.gradeKey+" race="+cr.name) : false;
+});
+check("脚質選択→出走", () => {
+  Array.from($("tactic-grid").children).find(b=>/せんこう|先行/.test(b.textContent)).dispatchEvent(new window.Event("click",{bubbles:true}));
+  click("btn-to-race");
+  return $("screen-race").classList.contains("active");
+});
+check("HUDにレース名（格バッジ）", () => /grade-badge/.test($("course-label").innerHTML));
+check("想定人気＝実人気（開催時確定の検証）", () => {
+  const est=window.eval("state.careerRace.offer.estPop"), act=window.eval("state.player.popRank");
+  return est===act ? ("想定"+est+"番人気=実"+act+"番人気") : ("不一致 est="+est+" act="+act);
+});
+check("キャリアレース完走", () => {
+  window.beginRun();
+  for(let i=0;i<4000;i++){ window.stepRace(0.18); if(i%25===0) window.render(); }
+  window.finishRace(); return true;
+});
+check("結果にレース名帯＋キャリア用アクション", () =>
+  $("result-race").classList.contains("show") && $("result-actions-career").style.display==="grid" && $("result-actions-free").style.display==="none");
+check("セーブv2（格別勝利/信頼度/開催数）", () => {
+  const raw = window.localStorage.getItem("hizumeoto_save_v1");
+  if(!raw) return false; const s=JSON.parse(raw);
+  const c=s.career;
+  return s.v===2 && c.gradeWins && typeof c.trust==="number" && c.meets>=1
+    ? ("trust="+c.trust+" meets="+c.meets+" gradeWins="+JSON.stringify(c.gradeWins)) : false;
+});
+check("次の騎乗依頼へ→依頼画面", () => { click("btn-next-offer"); return $("screen-offers").classList.contains("active") && $("offer-list").children.length===3; });
+check("騎手手帳が描画される", () => {
+  click("btn-offers-title"); click("btn-career-view");
+  return $("screen-career").classList.contains("active") && /通算成績/.test($("career-body").textContent) && /GⅠタイトル/.test($("career-body").textContent);
+});
+
 window.close();
 console.log("\n収集エラー数: " + errors.length);
 if(errors.length){ errors.slice(0,12).forEach(e=>console.log("  - "+String(e).slice(0,180))); process.exit(1); }

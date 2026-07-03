@@ -3925,8 +3925,8 @@ function finishRace(){
     S.raceNo++; S.playerPrize=(S.playerPrize|0)+prize; if(p.rank===1) S.playerWins=(S.playerWins|0)+1;
     const w0=ranked[0];
     if(!w0.isPlayer && w0.jockey) S.jockeyWins[w0.jockey.name]=(S.jockeyWins[w0.jockey.name]|0)+1;
-    // 他場開催のAI勝ち鞍：毎開催、無作為の3騎手に+1（リーディングが生きて動く。年間で上位≈7〜9勝）
-    for(let k=0;k<3;k++){ const j=choice(JOCKEY_PERSONAS); S.jockeyWins[j.name]=(S.jockeyWins[j.name]|0)+1; }
+    // 他場開催のAI勝ち鞍：毎開催、無作為の2騎手に+1（リーディングが生きて動く。年間首位≈6〜8勝＝本気で勝てば競り合える）
+    for(let k=0;k<2;k++){ const j=choice(JOCKEY_PERSONAS); S.jockeyWins[j.name]=(S.jockeyWins[j.name]|0)+1; }
     // 年度末（12戦消化）→ 表彰・年度史へ記録・翌年へ
     if(S.raceNo>=12){
       const standings=seasonStandings(S);

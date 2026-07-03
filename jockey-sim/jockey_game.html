@@ -1782,7 +1782,8 @@ function initRace(){
   state.paused=false; $("pause-overlay").style.display="none";   // ポーズ状態をリセット
   // レース名コール（収録実況があれば「天嶺記念、まもなく発走です」）
   { const rn=(state.mode==="career" && state.careerRace)? state.careerRace.name : null;
-    jcall(rn? `${rn}、まもなく発走です。` : "まもなく発走です。", true, rn? ["r:"+rn,"p:gate_soon"] : ["p:gate_soon"]); }
+    const gs=choice([["まもなく発走です。","p:gate_soon"],["各馬、態勢が整いました。まもなく発走です。","p:gate_soon_2"]]);
+    jcall(rn? `${rn}、${gs[0]}` : gs[0], true, rn? ["r:"+rn, gs[1]] : [gs[1]]); }
   showScreen("race");
   resizeCanvas();          // ※display後に採寸（＋3Dシーン初期化）
   syncHorseMeshes();       // 出走馬に合わせて3Dモデルを生成
@@ -2089,8 +2090,12 @@ function beginRun(){
   r.started=true; r.phase="running";
   // 収録実況の先読み：このレースで使う馬名（全馬・2トーン）＋主要句をキャッシュへ
   if(VoiceBank.enabled){
-    const keys=["p:gate_open","p:corner_final","p:straight_in","p:leads_now","p:duel","p:win_is","p:photo",
-                "p:sashikireru_ka","p:toraeru","p:whip_in","p:shikaketa","p:zenryoku"];
+    const keys=["p:gate_open","p:gate_open_2","p:corner_final","p:corner_final_2","p:corner_final_3",
+                "p:straight_in","p:straight_in_2","p:straight_in_3","p:leads_now","p:leads_now_2",
+                "p:duel","p:duel_2","p:duel_3","p:mo_nobiru","p:mo_nobiru_2",
+                "p:win_is","p:win_is_2","p:win_is_3","p:photo","p:photo_2",
+                "p:sashikireru_ka","p:sashikireru_ka_2","p:sashikireru_ka_3","p:toraeru","p:toraeru_2",
+                "p:whip_in","p:whip_in_2","p:shikaketa","p:shikaketa_2","p:zenryoku","p:zenryoku_2"];
     state.field.forEach(h=>{ keys.push("n:"+h.name, "N:"+h.name); });
     VoiceBank.prefetch(keys);
   }
@@ -2126,8 +2131,11 @@ function beginRun(){
   });
   // 実況：発走
   const pq2 = pq==="good"?"好スタートを切った":pq==="slow"?"やや出遅れた":"五分のスタート";
-  jcall(`ゲートが開いた！　${state.player.name}は${pq2}。`, true,
-    ["p:gate_open", "n:"+state.player.name, pq==="good"?"p:start_good":pq==="slow"?"p:start_slow":"p:start_ok"]);
+  { const op=choice([["ゲートが開いた！","p:gate_open"],["一斉にスタートした！","p:gate_open_2"]]);
+    const st=pq==="good"? choice([["は好スタートを切った！","p:start_good"],["、抜群のスタートだ！","p:start_good_2"]])
+           : pq==="slow"? choice([["は出遅れた！","p:start_slow"],["、痛恨の出遅れだ！","p:start_slow_2"]])
+           : ["は五分のスタート。","p:start_ok"];
+    jcall(`${op[0]}　${state.player.name}${st[0]}`, true, [op[1], "n:"+state.player.name, st[1]]); }
   if(typeof openStartGate==="function") openStartGate();   // 発走ゲートを開く
 }
 
@@ -2345,9 +2353,14 @@ function updateSqueeze(dt, r){
         if(inReach){
           sq.stage="hold"; sq.t=0;
           flash(sq.kind==="cover"?"被された！前が壁！":"包まれた！出口が無い！", "#d23b3b");
-          jcall(sq.kind==="cover" ? `${rv.name}が外から蓋をした！　${p.name}、行き場がない！`
-                                  : `${p.name}、内で包まれた！　我慢のしどころ！`, true,
-                sq.kind==="cover" ? ["n:"+rv.name,"p:futa","n:"+p.name,"p:ikiba_nai"] : ["n:"+p.name,"p:tsutsumareta"]);
+          if(sq.kind==="cover"){
+            const fv=choice([["が外から蓋をした！","p:futa"],["が進路に立ちはだかる！","p:futa_2"]]);
+            const iv=choice([["、行き場がない！","p:ikiba_nai"],["、前が壁だ！","p:ikiba_nai_2"]]);
+            jcall(`${rv.name}${fv[0]}　${p.name}${iv[0]}`, true, ["n:"+rv.name, fv[1], "n:"+p.name, iv[1]]);
+          } else {
+            const tv=choice([["、内で包まれた！　我慢のしどころだ！","p:tsutsumareta"],["、馬群の中で我慢、我慢！","p:tsutsumareta_2"]]);
+            jcall(`${p.name}${tv[0]}`, true, ["n:"+p.name, tv[1]]);
+          }
         } else {
           // 予兆の間に位置を変えて回避成功＝「先読みのさばき」
           p._sqEscapes++;
@@ -2575,7 +2588,9 @@ function doWhip(){
   h.stamina = Math.max(0, h.stamina - 1.5);                // ひと押しの脚使い
   Sfx.whip(); vib(22);
   if(boost < 0.4){ flash("もう反応が鈍い…","#c9762e"); }
-  else { flash("ムチ！","#e8b84b"); if(uses===0) jcall(`${h.name}にムチが入った！　最後の脚を引き出す！`, true, ["n:"+h.name,"p:whip_in"]); }
+  else { flash("ムチ！","#e8b84b"); if(uses===0){
+    const wv=choice([["にムチが入った！　最後の脚を引き出す！","p:whip_in"],["、右ムチが飛んだ！　反応するか！","p:whip_in_2"]]);
+    jcall(`${h.name}${wv[0]}`, true, ["n:"+h.name, wv[1]]); } }
 }
 // ギアの上げ下げ。悪天候で上げ下げ（特に反転）を繰り返すと折り合いを欠く
 function shiftGear(delta){
@@ -2591,8 +2606,12 @@ function shiftGear(delta){
   Sfx.blip(dir>0?560:380, 0.05, "square");   // シフト音
   vib(8);
   // 仕掛け地点（初めてギア5以上）
-  if(h.gear>=7 && h._commitAt===null){ h._commitAt=h.dist; jcall(`${h.name}、ここで仕掛けた！　残り${Math.max(0,Math.round(CFG.DIST-h.dist))}m！`, true, ["n:"+h.name,"p:shikaketa"]); }
-  else if(h.gear===10 && prev<10){ jcall(`${h.name}、全力！　最後の力を振り絞る！`, true, ["n:"+h.name,"p:zenryoku"]); }
+  if(h.gear>=7 && h._commitAt===null){ h._commitAt=h.dist;
+    const kv=choice([["、ここで仕掛けた！","p:shikaketa"],["、満を持して動いた！","p:shikaketa_2"]]);
+    jcall(`${h.name}${kv[0]}　残り${Math.max(0,Math.round(CFG.DIST-h.dist))}m！`, true, ["n:"+h.name, kv[1]]); }
+  else if(h.gear===10 && prev<10){
+    const zv=choice([["、全力だ！　最後の力を振り絞る！","p:zenryoku"],["、渾身の追いだ！","p:zenryoku_2"]]);
+    jcall(`${h.name}${zv[0]}`, true, ["n:"+h.name, zv[1]]); }
   // 悪天候でギアがガチャつくと警告＋折り合い悪化（実処理は computeDesired）
   if((r.going.bad||0)>0 && h._gearChurn>2.2){ flash("ギアの乱れ！折り合いを欠く","#c9762e"); }
   syncGearUI();
@@ -2635,28 +2654,39 @@ function callRace(){
     said.pace=1;
     const ls=r.leaderSpeedSmooth;
     const pl = ls>CFG.cruiseBase+0.8?"ハイペース": ls<CFG.cruiseBase-0.4?"スローペース":"平均ペース";
-    jcall(`先頭は${lead.num}番${lead.name}。${pl}の入り。`);
+    jcall(choice([`先頭は${lead.num}番${lead.name}。${pl}の入り。`,
+                  `${pl}の立ち上がり。ハナを取ったのは${lead.name}。`]));
   }
   // 向正面〜３コーナー
   if(!said.mid && lead.dist>CFG.DIST*0.45 && lead.dist<CFG.DIST*0.62){
     said.mid=1;
     const prank = playerRank();
-    jcall(`隊列が固まる。${p.name}は${prank}番手で折り合う。`);
+    jcall(choice([`隊列が固まる。${p.name}は${prank}番手で折り合う。`,
+                  `${p.name}は${prank}番手。じっくり脚をためる。`]));
   }
   // 勝負所（残り500m手前）
   if(!said.corner && remain<520 && remain>360){
     said.corner=1;
-    jcall(`最終コーナー、ここから勝負！　各馬仕掛けるタイミングを計る。`, true, ["p:corner_final"]);
+    { const c=choice([
+        ["最終コーナー！　ここから勝負だ！","p:corner_final"],
+        ["勝負どころの最終コーナー！　隊列が動いた！","p:corner_final_2"],
+        ["最終コーナーを回る！　ここからが本当の勝負だ！","p:corner_final_3"]]);
+      jcall(c[0], true, [c[1]]); }
   }
   // 直線
   if(!said.straight && lead.dist>=CFG.straightDist){
     said.straight=1;
-    jcall(`直線に入った！　先頭は${lead.num}番${lead.name}！`, true, ["p:straight_in","n:"+lead.name,"p:leads_now"]);
+    { const si=choice([["直線に入った！","p:straight_in"],["さあ最後の直線！","p:straight_in_2"],["直線勝負だ！","p:straight_in_3"]]);
+      const ln=choice([["が先頭だ！","p:leads_now"],["が粘り込みを図る！","p:leads_now_2"]]);
+      jcall(`${si[0]}　${lead.name}${ln[0]}`, true, [si[1], "n:"+lead.name, ln[1]]); }
   }
   // ゴール前の接戦
   if(!said.duel && remain<140 && !p.finished){
     const near = field.filter(o=>!o.finished && Math.abs(o.dist-p.dist)<2.6 && o!==p).length;
-    if(near>=1){ said.duel=1; jcall(`ゴール前、${p.name}も伸びる！　大接戦だ！`, true, ["p:duel","n:"+p.name,"p:mo_nobiru"]); }
+    if(near>=1){ said.duel=1;
+      const du=choice([["ゴール前、大接戦だ！","p:duel"],["叩き合いだ！どちらも譲らない！","p:duel_2"],["壮絶な追い比べだ！","p:duel_3"]]);
+      const mn=choice([["も伸びる、伸びる！","p:mo_nobiru"],["も食い下がる！","p:mo_nobiru_2"]]);
+      jcall(`${du[0]}　${p.name}${mn[0]}`, true, [du[1], "n:"+p.name, mn[1]]); }
   }
 
   // ---- 動的実況：局面の変化を実時間で拾い、重要度順に1つだけ。クールダウンで間引く ----
@@ -2666,22 +2696,29 @@ function callRace(){
     if(now - (r._dynT||0) > 1.5){
       const pr=playerRank(), cand=[];
       // 差し（残り140m以内で順位を上げた）＝最優先
-      if(remain<140 && pr < r._pRankPrev) cand.push({pri:10, text:`差し切れるか、${p.name}！`, lead:true, vo:["p:sashikireru_ka","N:"+p.name]});
+      if(remain<140 && pr < r._pRankPrev){
+        const sv=choice([["差し切れるか、","p:sashikireru_ka"],["届くか、届くのか、","p:sashikireru_ka_2"],["一気に突き抜けるか、","p:sashikireru_ka_3"]]);
+        cand.push({pri:10, text:`${sv[0]}${p.name}！`, lead:true, vo:[sv[1],"N:"+p.name]});
+      }
       // 直線で前をとらえにかかる
       if(p.dist>=CFG.straightDist){
         let aheadGap=Infinity;
         for(const o of field){ if(o===p||o.finished) continue; const g=o.dist-p.dist; if(g>0&&g<aheadGap) aheadGap=g; }
-        if(aheadGap<3.2 && pr>1) cand.push({pri:7, text:`${p.name}、前をとらえる勢いだ！`, lead:true, vo:["n:"+p.name,"p:toraeru"]});
+        if(aheadGap<3.2 && pr>1){
+          const tv=choice([["が前をとらえる勢いだ！","p:toraeru"],["が射程圏にとらえた！","p:toraeru_2"]]);
+          cand.push({pri:7, text:`${p.name}${tv[0]}`, lead:true, vo:["n:"+p.name, tv[1]]});
+        }
       }
       // 前で行った馬の失速（脚が上がる）
       for(const o of field){ if(o.finished) continue;
         if(o.stamina<CFG.staFatigue-2 && STYLES[o.style].cruiseGain>0 && o.dist>CFG.DIST*0.6 && !((r._stall||{})[o.num])){
-          (r._stall||(r._stall={}))[o.num]=1; cand.push({pri:6, text:`${o.num}番${o.name}、脚が上がった！`, lead:false}); break; } }
+          (r._stall||(r._stall={}))[o.num]=1;
+          cand.push({pri:6, text:choice([`${o.num}番${o.name}、脚が上がった！`,`${o.name}、苦しくなった！後続が迫る！`]), lead:false}); break; } }
       // プレイヤーの順位変動
       if(pr < r._pRankPrev && pr<=6) cand.push({pri:5, text:`${p.name}、${pr}番手に進出！`, lead:false});
       else if(pr > r._pRankPrev && pr>=4) cand.push({pri:3, text:`${p.name}、やや後退。仕掛けどころを計る。`, lead:false});
       // 先頭交代
-      if(lead.num!==r._leadNumPrev) cand.push({pri:4, text:`先頭が替わった、${lead.num}番${lead.name}！`, lead:false});
+      if(lead.num!==r._leadNumPrev) cand.push({pri:4, text:choice([`先頭が替わった、${lead.num}番${lead.name}！`,`${lead.name}が先頭に立った！`]), lead:false});
       if(cand.length){
         cand.sort((a,b)=>b.pri-a.pri);
         const c=cand[0];
@@ -4100,11 +4137,13 @@ function finishRace(){
   // 写真判定（1〜2着が際どい）→ 映画的シネマ（サイドカメラ→フリーズフレーム→シャッター）の後に結果
   const m12 = ranked.length>1 ? (ranked[1].finishTime - ranked[0].finishTime) : 1;
   const sayWin=()=>{ const t=`1着は、${ranked[0].name}！`;
-    if(VoiceBank.enabled){ VoiceBank.play(["p:win_is","N:"+ranked[0].name]).then(ok=>{ if(!ok) Voice.say(t); }); }
+    const wv=choice(["p:win_is","p:win_is_2","p:win_is_3"]);
+    if(VoiceBank.enabled){ VoiceBank.play([wv,"N:"+ranked[0].name]).then(ok=>{ if(!ok) Voice.say(t); }); }
     else Voice.say(t); };
   const reveal = ()=>{ Sfx.jingle(p.rank===1); sayWin(); setTimeout(()=>{Sfx.stopCrowd(); Sfx.stopRumble(); Sfx.stopWind();},2200); cancelAnimationFrame(state.raf); showScreen("result"); };
   if(m12 < 0.03){
-    jcall("際どい！　写真判定だ！", true, ["p:photo"]);
+    { const pv=choice([["際どい！　写真判定だ！","p:photo"],["ゴール前ほとんど並んだ！　写真判定だ！","p:photo_2"]]);
+      jcall(pv[0], true, [pv[1]]); }
     try{ PhotoCine.begin(ranked); }catch(e){}   // WebGL不在（無頭テスト等）でも安全に
     showPhotoFinish(()=>{ PhotoCine.end(); reveal(); });
   } else {

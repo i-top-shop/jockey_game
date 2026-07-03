@@ -155,11 +155,29 @@ check("PhotoCine.begin/end（フリーズ位置の設定と解除）", () => {
   return ok===true;
 });
 
+console.log("\n=== シーズン制／ゴール前リプレイ ===");
+check("シーズンがセーブされた(v3: season.raceNo>=1)", () => {
+  const s=JSON.parse(window.localStorage.getItem("hizumeoto_save_v1"));
+  const S=s.career.season;
+  return s.v===3 && S && S.raceNo>=1 ? ("year="+S.year+" raceNo="+S.raceNo+" playerWins="+S.playerWins) : false;
+});
+check("リーディング集計が動く(jockeyWins合計>=3)", () => {
+  const s=JSON.parse(window.localStorage.getItem("hizumeoto_save_v1"));
+  const tot=Object.values(s.career.season.jockeyWins).reduce((a,b)=>a+b,0);
+  return tot>=3 ? ("AI勝ち鞍計="+tot) : ("tot="+tot);
+});
+check("リプレイ関数と記録バッファが存在", () =>
+  typeof window.startReplay==="function" && typeof window.replayLoop==="function" &&
+  window.eval("state.race._rec && state.race._rec.length>10") ? ("記録点="+window.eval("state.race._rec.length")) : false);
+check("結果画面にリプレイボタン", () => !!$("btn-replay-view"));
+
 check("次の騎乗依頼へ→依頼画面", () => { click("btn-next-offer"); return $("screen-offers").classList.contains("active") && $("offer-list").children.length===3; });
+check("依頼画面にリーディング表示", () => /リーディング|1位/.test($("offer-status").textContent) && /12戦/.test($("offer-status").textContent));
 check("騎手手帳が描画される", () => {
   click("btn-offers-title"); click("btn-career-view");
   return $("screen-career").classList.contains("active") && /通算成績/.test($("career-body").textContent) && /GⅠタイトル/.test($("career-body").textContent);
 });
+check("騎手手帳にリーディングと年度史", () => /リーディング/.test($("career-body").textContent) && /年度史/.test($("career-body").textContent));
 
 window.close();
 console.log("\n収集エラー数: " + errors.length);

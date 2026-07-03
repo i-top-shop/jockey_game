@@ -529,6 +529,12 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
 .lane-ind .li-cell.warn{ background:rgba(232,162,58,.26); color:#ffd48a; border-color:rgba(232,162,58,.8);
   animation:sqWarn .5s ease-in-out infinite alternate; }
 @keyframes sqWarn{ from{ box-shadow:0 0 0 0 rgba(232,162,58,.0); } to{ box-shadow:0 0 10px 2px rgba(232,162,58,.45); } }
+/* リプレイバナー（ゴール前リプレイ中の表示） */
+.replay-banner{ position:absolute; top:14px; left:50%; transform:translateX(-50%); z-index:8; display:none;
+  font-family:"Dela Gothic One"; font-size:14px; letter-spacing:.14em; color:#fff;
+  background:rgba(200,40,40,.85); border:1px solid rgba(255,255,255,.35); border-radius:9px; padding:6px 16px;
+  box-shadow:0 6px 18px rgba(0,0,0,.4); animation:pfPulse 1.2s ease infinite; }
+.replay-banner.show{ display:block; }
 /* シネマ用ビネット */
 .vignette{ position:absolute; inset:0; z-index:4; pointer-events:none;
   box-shadow:inset 0 0 120px 24px rgba(0,0,0,.55); }
@@ -807,6 +813,7 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
         <button id="btn-quit" class="btn" style="min-width:210px;">やめる</button>
       </div>
       <div class="straight-banner" id="straight-banner">直 線！</div>
+      <div class="replay-banner" id="replay-banner">📺 リプレイ</div>
       <div class="abil-msg" id="abil-msg">末脚爆発！</div>
       <div class="flash-msg" id="flash-msg">前が壁！</div>
       <div class="commentary" id="commentary"></div>
@@ -880,6 +887,8 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
         <div class="result-reward" id="result-reward"></div>
       </div>
       <div class="jockey-grow" id="result-jockey" style="display:none;"></div>
+      <div class="jockey-grow" id="result-season" style="display:none;"></div>
+      <button id="btn-replay-view" class="btn block" style="margin-top:12px;">📺 ゴール前リプレイ</button>
       <div class="advice" id="result-advice"></div>
       <table class="result-table">
         <thead><tr><th>着</th><th>馬名</th><th>脚質</th><th class="num">人気</th><th class="num">着差</th></tr></thead>
@@ -986,9 +995,11 @@ Save.init();
    AIには一切影響しない＝balance_check のAI地力バランスは不変（CLAUDE.md ±15%思想を遵守）。 */
 const JSKILLS = ["start","settle","handle","drive"];   // スタート/折り合い/さばき/追い
 const JSKILL_JA = { start:"スタート", settle:"折り合い", handle:"馬群さばき", drive:"追い" };
+function defaultSeason(){ return { year:1, raceNo:0, playerWins:0, playerPrize:0, jockeyWins:{} }; }
 function defaultCareer(){
   return { funds:0, points:0, races:0, wins:0, places:0, trust:20, meets:0,
            gradeWins:{ cond:0, open:0, g3:0, g2:0, g1:0 }, titles:[],
+           season:defaultSeason(), history:[],   // シーズン制（年間12戦・リーディング争い）＋年度史
            jockey:{ level:1, xp:0, skills:{ start:0, settle:0, handle:0, drive:0 } } };
 }
 function loadCareer(){
@@ -1000,12 +1011,22 @@ function loadCareer(){
     d.trust=clamp(c.trust!=null? c.trust:20, 0, 100); d.meets=c.meets|0;
     if(c.gradeWins) GRADE_ORDER.forEach(k=> d.gradeWins[k]=c.gradeWins[k]|0);
     if(Array.isArray(c.titles)) d.titles=c.titles.slice(0,200);
+    // v3: シーズン＋年度史（無ければ第1年の頭から＝後方互換）
+    if(c.season) d.season={ ...defaultSeason(), ...c.season, jockeyWins:{...(c.season.jockeyWins||{})} };
+    if(Array.isArray(c.history)) d.history=c.history.slice(-50);
     if(c.jockey){ d.jockey.level=c.jockey.level||1; d.jockey.xp=c.jockey.xp||0;
       if(c.jockey.skills) JSKILLS.forEach(k=> d.jockey.skills[k]=clamp(c.jockey.skills[k]||0,0,100)); }
   }
   return d;
 }
-function saveCareer(){ return Save.write({ v:2, career:state.career }); }
+function saveCareer(){ return Save.write({ v:3, career:state.career }); }
+// リーディング順位表：あなた＋AI騎手8名を勝利数降順で（同数はあなたを上に＝夢を優先）
+function seasonStandings(S){
+  const rows=[{ name:"あなた", wins:S.playerWins|0, me:true }];
+  JOCKEY_PERSONAS.forEach(j=>{ rows.push({ name:j.name, wins:S.jockeyWins[j.name]|0, tag:j.tag }); });
+  rows.sort((a,b)=> b.wins-a.wins || (a.me?-1:(b.me?1:0)));
+  return rows;
+}
 
 /* ---------- レースの格（グレード）＋番組表 ----------
    賞金/騎手Pの倍率と「ライバル能力帯」だけを動かす（物理・AIロジックは不変）。
@@ -1419,7 +1440,15 @@ function renderOffers(){
     `<div class="os-row">騎手Lv <b>${jLevel()}</b>　通算 <b>${C.wins}</b>勝　騎手P <b>${C.points}</b></div>`+
     `<div class="os-row"><span>信頼度</span><span class="os-bar trust"><i style="width:${clamp(C.trust,0,100)}%"></i></span><b>${Math.round(C.trust)}</b><span>/100</span></div>`+
     (nx? `<div class="os-row"><span>${nx.name}解放まで</span><span class="os-bar"><i style="width:${clamp(C.points/nx.unlockP*100,0,100)}%"></i></span><b>あと${Math.max(0,nx.unlockP-C.points)}P</b></div>`
-       : `<div class="os-row">全ての格が解放済み。残るはGⅠタイトルの完全制覇。</div>`);
+       : `<div class="os-row">全ての格が解放済み。残るはGⅠタイトルの完全制覇。</div>`)+
+    (()=>{ // シーズン：リーディング上位3名＋宿命のライバル（首位のAI騎手）
+      const S=C.season||defaultSeason();
+      const st=seasonStandings(S);
+      const top3=st.slice(0,3).map((e,i)=>`${i+1}位 ${e.me?"<b>あなた</b>":e.name} ${e.wins}勝`).join("　");
+      const rival=st.find(e=>!e.me && e.wins>0);
+      return `<div class="os-row">第${S.year}年 ${S.raceNo}/12戦　${top3}</div>`+
+             (rival? `<div class="os-row">今年のライバル：<b>${rival.name}</b>（${rival.tag}・${rival.wins}勝）</div>`:"");
+    })();
   // 開催レースのヘッダ
   $("offer-race").innerHTML =
     `<div class="or-meet">第${(C.meets|0)+1}戦　北嶺競馬場</div>`+
@@ -1496,6 +1525,19 @@ function renderCareerScreen(){
       </div></div>`+
     `<div class="cr-block"><div class="cr-head">騎手Lv ${jLevel()} ― スキル（操作の有効性に作用・各≦10%）</div><div class="jockey-grow" style="margin-top:0; border:none; padding:0; background:transparent;"><div class="jg-skills">${skillBars}</div></div></div>`+
     `<div class="cr-block"><div class="cr-head">レースの格 と 勝利数</div>${grades}</div>`+
+    (()=>{ // シーズン順位表＋年度史
+      const S=C.season||defaultSeason();
+      const rows=seasonStandings(S).map((e,i)=>
+        `<div class="cr-grade-row"><span style="width:26px;font-family:'Dela Gothic One';color:${i===0?"var(--gold)":"var(--ink-dim)"};">${i+1}</span>`+
+        `<span${e.me?' style="color:var(--gold);font-weight:800;"':''}>${e.name}</span>`+
+        `<span class="cg-wins"><b>${e.wins}</b> 勝</span></div>`).join("");
+      const hist=(C.history&&C.history.length)
+        ? C.history.slice(-8).reverse().map(hh=>`<div class="cr-title-row"><span class="tt-race">第${hh.year}年</span>`+
+            `<span class="tt-horse">${hh.rank===1?"🏆 リーディング獲得":"リーディング "+hh.leading+"（"+hh.leadWins+"勝）"}・あなた${hh.wins}勝/${hh.rank}位</span></div>`).join("")
+        : `<div class="cr-empty">まだ年度史はない。年間12戦を戦い抜け。</div>`;
+      return `<div class="cr-block"><div class="cr-head">第${S.year}年 リーディング（${S.raceNo}/12戦）</div>${rows}</div>`+
+             `<div class="cr-block"><div class="cr-head">年度史</div>${hist}</div>`;
+    })()+
     `<div class="cr-block"><div class="cr-head">GⅠタイトル（${(C.titles||[]).length}）</div>${titles}</div>`+
     (Save.ok? "" : `<div class="cr-empty">※体験版：この環境ではリロードで消えます（セーブ不可）</div>`);
 }
@@ -1690,6 +1732,7 @@ function randMarkings(){
 function initRace(){
   Sfx.stopCrowd(); Sfx.stopRumble(); Sfx.stopWind(); Sfx.hoofPhase=0; Voice.stop();       // サウンドを初期化
   try{ PhotoCine.end(); }catch(e){}          // 写真判定シネマ中のリトライ等でも確実に解除
+  state.replay=null;                          // リプレイ状態もクリア（残留するとカメラが乗っ取られる）
   // 当日距離を確定（コースは共通オーバル。ゴール固定でスタート地点を距離ぶん手前にずらす）
   CFG.DIST = state.selectedDistance || 1600;
   CFG.straightDist = CFG.DIST - 400;                              // 残り400m＝直線
@@ -1715,6 +1758,7 @@ function initRace(){
     started:false,
     going,
     startS,             // コース上のスタート地点（距離で変わる）
+    _rec:[], _recT:0,   // リプレイ記録（全馬のdist/laneを0.1秒間隔でリングバッファ）
     leaderSpeedSmooth:CFG.cruiseBase,
     finishedCount:0,
     resultShown:false,
@@ -2176,6 +2220,15 @@ function stepRace(dt){
 
   // === 被せ・包み込み（プレイヤーへの馬群圧力。横移動のみ＝縦の速度/スタミナ式は不変） ===
   updateSqueeze(dt, r);
+
+  // === リプレイ記録（0.1秒間隔・上限1500点≒150秒＝1レース全部入る） ===
+  if(r._rec && r.raceTime>=r._recT){
+    r._recT = r.raceTime + 0.1;
+    const N=field.length, d=new Float32Array(N), l=new Float32Array(N);
+    for(let i=0;i<N;i++){ d[i]=field[i].dist; l[i]=field[i].lane; }
+    r._rec.push({ t:r.raceTime, d, l });
+    if(r._rec.length>1500) r._rec.shift();
+  }
 
   // === プレイヤーがゴール → 早送りフェーズへ ===
   if(state.player.finished && r.phase==="running"){
@@ -2719,10 +2772,10 @@ function render(){
   }
 
   // --- 直線バナー ---
-  $("straight-banner").classList.toggle("show", p.dist>=CFG.straightDist && !p.finished);
+  $("straight-banner").classList.toggle("show", p.dist>=CFG.straightDist && !p.finished && !state.replay);
 
-  // --- 実況 ---
-  callRace();
+  // --- 実況（リプレイ中はイベント検知を止める＝再発火防止） ---
+  if(!state.replay) callRace();
 
   drawTrack();
 }
@@ -3504,6 +3557,64 @@ window.addEventListener("resize", ()=>{ if(state.screen==="race") resizeCanvas()
 function _lerpV(a,b,rate,dt){ const k=1-Math.exp(-rate*Math.max(0,dt||0.016)); a.x+=(b.x-a.x)*k; a.y+=(b.y-a.y)*k; a.z+=(b.z-a.z)*k; }
 const CAM_MODES=["chase","jockey","overhead"];
 const CAM_LABEL={ chase:"チェイス", jockey:"ジョッキー視点", overhead:"俯瞰" };
+/* ---------- ゴール前リプレイ ----------
+   レース中に記録した全馬の軌跡（0.1s間隔）を、決勝TVカメラ（インフィールド固定・望遠）で再生。
+   「あの差し切りをもう一度」＝Gallop Racer的達成感の増幅（AAAロードマップ Phase4-8 前倒し）。
+   物理は一切動かさない：h.dist/lane を補間で上書きし drawTrack が描くだけ。ゴール前2.2秒はスロー */
+function startReplay(){
+  const r=state.race;
+  if(!r || !r._rec || r._rec.length<12 || !threeReady){ flash("リプレイを記録できていません","#9fb1ad"); return; }
+  const ranked=[...state.field].sort((a,b)=>a.finishTime-b.finishTime);
+  const tWin=ranked[0].finishTime;
+  const buf=r._rec;
+  const t0=Math.max(buf[0].t, tWin-13), t1=Math.min(buf[buf.length-1].t, tWin+1.0);
+  if(t1-t0 < 2){ flash("リプレイ区間が短すぎます","#9fb1ad"); return; }
+  state.replay={ buf, t:t0, t0, t1, tWin, i:0, hold:0 };
+  try{ PhotoCine.end(); }catch(e){}
+  $("controls").style.display="none";
+  const pb=$("btn-pause"); if(pb) pb.style.display="none";
+  const rb=$("replay-banner"); if(rb) rb.classList.add("show");
+  const go=$("gate-overlay"); if(go) go.style.display="none";
+  const cm=$("commentary"); if(cm){ cm.classList.remove("show"); cm.innerHTML=""; }   // 残留実況を消す
+  Sfx.startCrowd(); Sfx.setCrowd(0.22);
+  showScreen("race");
+  resizeCanvas();
+  camInit=false;                       // TVカメラへスナップ
+  cancelAnimationFrame(state.raf);
+  state._repPrev=performance.now()/1000;
+  state.raf=requestAnimationFrame(replayLoop);
+}
+function replayLoop(ts){
+  const R=state.replay;
+  if(!R || state.screen!=="race"){ return; }
+  const now=ts/1000; let dt=now-(state._repPrev||now); state._repPrev=now;
+  dt=clamp(dt,0,0.05);
+  const slow = (R.tWin - R.t) < 2.2 && (R.tWin - R.t) > -0.5;   // ゴール前はスローモーション
+  R.t += dt*CFG.timeScale*(slow?0.38:1.0);
+  if(R.t>=R.t1){ R.t=R.t1; R.hold+=dt; if(R.hold>0.9){ endReplay(); return; } }
+  // バッファ補間で全馬を配置（速度は差分から＝脚アニメの振幅用）
+  const buf=R.buf;
+  while(R.i<buf.length-2 && buf[R.i+1].t<R.t) R.i++;
+  while(R.i>0 && buf[R.i].t>R.t) R.i--;
+  const a=buf[R.i], b=buf[Math.min(R.i+1,buf.length-1)];
+  const f=(b.t>a.t)? clamp((R.t-a.t)/(b.t-a.t),0,1) : 0;
+  state.field.forEach((h,idx)=>{
+    h.dist=a.d[idx]+(b.d[idx]-a.d[idx])*f;
+    h.lane=a.l[idx]+(b.l[idx]-a.l[idx])*f;
+    if(b.t>a.t) h.speed=Math.max(0,(b.d[idx]-a.d[idx])/(b.t-a.t));
+  });
+  render();
+  state.raf=requestAnimationFrame(replayLoop);
+}
+function endReplay(){
+  state.replay=null;
+  const rb=$("replay-banner"); if(rb) rb.classList.remove("show");
+  const pb=$("btn-pause"); if(pb) pb.style.display="";
+  Sfx.stopCrowd();
+  cancelAnimationFrame(state.raf);
+  showScreen("result");
+}
+
 /* ---------- 映画的写真判定（PhotoCine） ----------
    接戦ゴール時：サイドライン（ゴール線の真横）へハードカット→全馬を「1着馬が線を切った瞬間」の
    位置へ巻き戻してフリーズフレーム→鼻先へゆっくり寄りながらシャッター。
@@ -3535,6 +3646,26 @@ const PhotoCine = {
 function updateCamera(dt){
   dt = dt || 0.016;
   const p=state.player; if(!p) return;
+  // リプレイ：決勝TVカメラ（ゴール手前インフィールド固定・望遠で先頭集団を追う＝実際の中継の画）
+  if(state.replay){
+    const gs=(state.race.startS + CFG.DIST)%TRK_P;
+    const w0=trackPose(gs);
+    const hx=Math.cos(w0.heading), hz=Math.sin(w0.heading);
+    const ox=-Math.sin(w0.heading), oz=Math.cos(w0.heading);
+    const camX=w0.x - ox*10 - hx*46, camY=7.2, camZ=w0.z - oz*10 - hz*46;   // 内ラチ内側・ゴール46m手前
+    let lead=state.field[0]; for(const h of state.field) if(h.dist>lead.dist) lead=h;
+    const lw=laneWorld(state.race.startS + Math.min(lead.dist, CFG.DIST+26), lead._rlane!=null?lead._rlane:lead.lane);
+    if(!camInit){ camState.pos.set(camX,camY,camZ); camState.tgt.set(lw.x,1.6,lw.z); camInit=true; }
+    camState.pos.set(camX,camY,camZ);
+    _lerpV(camState.tgt, new THREE.Vector3(lw.x, 1.6, lw.z), 6, dt);   // パンは滑らかに
+    camera.position.copy(camState.pos);
+    camera.lookAt(camState.tgt);
+    const distTo=Math.hypot(lw.x-camX, lw.z-camZ);
+    const fovT=clamp(1900/Math.max(24,distTo), 17, 44);                 // 望遠：遠いほどズーム
+    camera.fov += (fovT-camera.fov)*(1-Math.exp(-6*dt));
+    camera.updateProjectionMatrix();
+    return;
+  }
   // 写真判定シネマ：ゴール線サイドへハードカット→鼻先へ寄る（イージング）。通常カメラは完全停止
   if(PhotoCine.active && PhotoCine.goalS!=null){
     PhotoCine.t = (performance.now()-PhotoCine.t0)/1000;     // 実時間ベース＝シャッター音のタイムラインと同期
@@ -3778,7 +3909,7 @@ function finishRace(){
   C.funds+=prize; C.points+=pts; C.races++; if(p.rank===1) C.wins++; if(p.rank<=2) C.places++;
 
   // キャリア：格別勝利・GⅠタイトル・信頼度（勝てば上がる。本命での凡走は下がる）
-  let g1win=false;
+  let g1win=false, seasonEnd=null;
   if(crc){
     if(p.rank===1){
       C.gradeWins[crc.gradeKey]=(C.gradeWins[crc.gradeKey]|0)+1;
@@ -3788,6 +3919,23 @@ function finishRace(){
                  : (p.popRank<=2 && p.rank>=8)? -6 : p.rank>=6? -2 : 0;
     C.trust=clamp((C.trust==null?20:C.trust)+dTrust, 0, 100);
     C.meets=(C.meets|0)+1;
+
+    // --- シーズン（年間12戦・リーディング争い） ---
+    const S = C.season || (C.season=defaultSeason());
+    S.raceNo++; S.playerPrize=(S.playerPrize|0)+prize; if(p.rank===1) S.playerWins=(S.playerWins|0)+1;
+    const w0=ranked[0];
+    if(!w0.isPlayer && w0.jockey) S.jockeyWins[w0.jockey.name]=(S.jockeyWins[w0.jockey.name]|0)+1;
+    // 他場開催のAI勝ち鞍：毎開催、無作為の3騎手に+1（リーディングが生きて動く。年間で上位≈7〜9勝）
+    for(let k=0;k<3;k++){ const j=choice(JOCKEY_PERSONAS); S.jockeyWins[j.name]=(S.jockeyWins[j.name]|0)+1; }
+    // 年度末（12戦消化）→ 表彰・年度史へ記録・翌年へ
+    if(S.raceNo>=12){
+      const standings=seasonStandings(S);
+      const myRank=standings.findIndex(x=>x.me)+1;
+      seasonEnd={ year:S.year, top:standings[0], meLead:standings[0].me===true, myWins:S.playerWins|0, myRank };
+      C.history.push({ year:S.year, wins:S.playerWins|0, rank:myRank, leading:standings[0].name, leadWins:standings[0].wins });
+      if(seasonEnd.meLead){ C.points+=100; C.trust=clamp(C.trust+10,0,100); }   // リーディング獲得ボーナス
+      C.season={ year:S.year+1, raceNo:0, playerWins:0, playerPrize:0, jockeyWins:{} };
+    }
   }
   // 騎手Pの累計で新しい格が解放されたか（結果画面で告知）
   const newGrade = unlockedGrades().length>unlockedBefore ? GRADES[unlockedGrades()[unlockedGrades().length-1]] : null;
@@ -3855,6 +4003,7 @@ function finishRace(){
     `<span class="pill${upset?' up':''}">騎手P <b>+${pts}</b>${upset?'（人気薄勝ち!）':''}</span>`+
     (newGrade? `<span class="pill up">🔓 <b>${newGrade.name}</b> が解放！</span>`:"")+
     (crc? `<span class="pill">信頼度 <b>${Math.round(C.trust)}</b>/100</span>`:"")+
+    (crc&&C.season? `<span class="pill">第${C.season.year}年 <b>${C.season.raceNo}</b>/12戦・今季<b>${C.season.playerWins}</b>勝</span>`:"")+
     `<span class="pill lv">騎手Lv <b>${grew?grew.level:jLevel()}</b></span>`+
     `<span class="pill">通算 <b>${C.wins}</b>勝 / ${C.points}P / ${C.funds}万</span>`+
     (Save.ok? "" : `<span class="pill" style="color:#ef8a8a;">※体験版（セーブ不可）</span>`);
@@ -3864,6 +4013,17 @@ function finishRace(){
   if(raF) raF.style.display = crc? "none":"grid";
 
   renderJockeyGrowth(grew);
+  // 年度表彰（シーズン12戦消化時のみ表示）
+  const seasonEl=$("result-season");
+  if(seasonEl){
+    if(seasonEnd){
+      seasonEl.style.display="block";
+      seasonEl.innerHTML = `<div class="jg-head">第${seasonEnd.year}年 シーズン終了　―　年度表彰</div>`+
+        (seasonEnd.meLead
+          ? `<div class="jg-up">🏆 リーディングジョッキー獲得！（年間${seasonEnd.myWins}勝）　騎手P+100・信頼度+10</div>`
+          : `<div class="jg-lv">リーディング：<b>${seasonEnd.top.name}</b>（${seasonEnd.top.wins}勝）　あなたは<b>${seasonEnd.myRank}位</b>（${seasonEnd.myWins}勝）。来年こそ頂点へ。</div>`);
+    } else { seasonEl.style.display="none"; seasonEl.innerHTML=""; }
+  }
   $("result-advice").innerHTML = buildAdvice(p);
 
   // 写真判定（1〜2着が際どい）→ 映画的シネマ（サイドカメラ→フリーズフレーム→シャッター）の後に結果
@@ -4033,6 +4193,7 @@ document.addEventListener("pointerdown", ()=>{ Sfx.init(); Sfx.resume(); Voice.i
 $("btn-replay").addEventListener("click", ()=> initRace());           // 同じ馬・同じ作戦（フリーのみ）
 $("btn-rehorse").addEventListener("click", ()=>{ renderHorseList(); showScreen("horse"); });
 $("btn-next-offer").addEventListener("click", ()=>{ state.offerSet=makeOfferSet(); renderOffers(); showScreen("offers"); });
+$("btn-replay-view").addEventListener("click", startReplay);
 $("btn-result-record").addEventListener("click", ()=>{ renderCareerScreen(); showScreen("career"); });
 $("btn-to-title2").addEventListener("click", ()=> showScreen("title"));
 

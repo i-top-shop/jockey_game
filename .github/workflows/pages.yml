@@ -6,7 +6,9 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main, master, feat/aaa-phase1, claude/jockey-app-major-update-lp9zn4 ]
+    # 注意: github-pages環境のデプロイ許可ブランチ（Settings→Environments）に無いブランチを
+    #       ここへ足すと、その実行は環境保護で即失敗し、concurrencyで本命デプロイをキャンセルしてしまう。
+    branches: [ main, master, feat/aaa-phase1 ]
   workflow_dispatch:
 
 permissions:

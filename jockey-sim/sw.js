@@ -1,7 +1,7 @@
 // Service Worker：アプリシェルをキャッシュしオフライン動作＆インストール可能に。
 //   相対パスで記述（GitHub Pages のサブパス /<repo>/ でも壊れない）。
 //   キャッシュを更新したい時は CACHE のバージョンを上げる。
-const CACHE = "hizumeoto-v6";   // 超大幅アップデート（キャリア/被せ/リプレイ/シーズン/κコース）
+const CACHE = "hizumeoto-v7";   // 収録実況（VOICEVOX音声バンク）。voice/*はランタイムキャッシュで随時保存
 const SHELL = [
   "./",
   "./index.html",

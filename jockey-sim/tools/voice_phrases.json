@@ -1,0 +1,58 @@
+{
+  "_readme": [
+    "収録実況のフレーズ台本（正典）。tools/gen_voice.js が VOICEVOX エンジンで voice/*.mp3 を生成する。",
+    "names は本体 CANDIDATES(30頭)+RIVAL_NAMES(20頭) と、raceNames は RACE_NAMES+G1_RACES と一致必須（smoke が照合）。",
+    "tier: calm=道中の落ち着き / high=勝負所の張り / max=ゴール前の絶叫。名前は high と max の2トーン生成。",
+    "音声ライセンス: VOICEVOX:青山龍星（クレジット表記条件）。credit はゲーム内フッターに表示される。"
+  ],
+  "speaker": "青山龍星",
+  "speakerFallbacks": ["玄野武宏", "剣崎雌雄", "波音リツ"],
+  "styles": {
+    "calm": { "styleName": "ノーマル", "speedScale": 1.02, "pitchScale": 0.0,  "intonationScale": 1.0,  "volumeScale": 1.0 },
+    "high": { "styleName": "ノーマル", "speedScale": 1.12, "pitchScale": 0.02, "intonationScale": 1.35, "volumeScale": 1.05 },
+    "max":  { "styleName": "熱血",     "speedScale": 1.15, "pitchScale": 0.03, "intonationScale": 1.5,  "volumeScale": 1.1 }
+  },
+  "phrases": {
+    "gate_soon":      { "text": "まもなく発走です。",                          "tier": "calm" },
+    "gate_open":      { "text": "ゲートが開いた！",                            "tier": "high" },
+    "start_good":     { "text": "は好スタートを切った！",                      "tier": "high" },
+    "start_ok":       { "text": "は五分のスタート。",                          "tier": "calm" },
+    "start_slow":     { "text": "は出遅れた！",                                "tier": "high" },
+    "lead_pace_high": { "text": "が先頭、ハイペースの入りだ！",                "tier": "high" },
+    "lead_pace_slow": { "text": "が先頭。スローペースの入り。",                "tier": "calm" },
+    "lead_pace_even": { "text": "が先頭。平均ペースの入り。",                  "tier": "calm" },
+    "corner_final":   { "text": "最終コーナー！ここから勝負だ！",              "tier": "high" },
+    "straight_in":    { "text": "直線に入った！",                              "tier": "max" },
+    "leads_now":      { "text": "が先頭だ！",                                  "tier": "max" },
+    "duel":           { "text": "ゴール前、大接戦だ！",                        "tier": "max" },
+    "mo_nobiru":      { "text": "も伸びる、伸びる！",                          "tier": "max" },
+    "sashikireru_ka": { "text": "差し切れるか！",                              "tier": "max" },
+    "toraeru":        { "text": "が前をとらえる勢いだ！",                      "tier": "high" },
+    "futa":           { "text": "が外から蓋をした！",                          "tier": "high" },
+    "ikiba_nai":      { "text": "、行き場がない！",                            "tier": "high" },
+    "tsutsumareta":   { "text": "、内で包まれた！我慢のしどころだ！",          "tier": "high" },
+    "whip_in":        { "text": "にムチが入った！最後の脚を引き出す！",        "tier": "max" },
+    "shikaketa":      { "text": "、ここで仕掛けた！",                          "tier": "high" },
+    "zenryoku":       { "text": "、全力だ！最後の力を振り絞る！",              "tier": "max" },
+    "photo":          { "text": "際どい！写真判定だ！",                        "tier": "max" },
+    "win_is":         { "text": "いっちゃくはー！",                            "tier": "max" }
+  },
+  "names": [
+    "テッカコウガ","シラユキレイ","サツキアロー","クロガネオウ","ライカゲイザー","ソフィアノーブル",
+    "ヤミカゼゴウ","テツジンマル","ハヤテシューター","スキマカイザー","アメフリオー","コウソクヒメ",
+    "アマドゥバカヨコ","キングロードサフォ","リツボークン","モモチャン","チャパツユウマ","アラシヤマブキ",
+    "ヒスイノツバサ","コガネマサムネ","ヨイヤミレーヴ","シラベノオト","タカネフブキ","ミナギルダイヤ",
+    "ソウゲンノカゼ","クレナイホシ","ヤグルマシオン","トキワノホコリ","ナギサファング","ライメイオーザ",
+    "ハルカゼロード","ミネノキセキ","アサヒレガロ","ヨゾラノオウジャ","ナナホシボーイ",
+    "セイランダッシュ","コハクノユメ","ライデンフウマ","ホクトシューター","ミナトブリーズ",
+    "ゲンブノタテ","スズカゲンセイ","フブキノオト","タイガクレスト","アオバノヒカリ",
+    "シノノメグロウ","ヤマトホマレ","リンドウクイン","カゲロウマイ","ソラノカケラ"
+  ],
+  "raceNames": [
+    "こもれび特別","北嶺日和特別","若草特別","霜月特別","茜雲特別","初音特別",
+    "北嶺ステークス","黄昏ステークス","蹄音オープン","栄光ステークス","疾風ステークス",
+    "北嶺記念","暁光賞","銀嶺賞","飛燕賞","天空杯",
+    "金鐙賞","鳳雛賞","蒼穹杯","雷鳴ステークス",
+    "鳳凰スプリント","黄金マイル大賞典","天嶺記念"
+  ]
+}

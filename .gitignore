@@ -20,3 +20,5 @@ Desktop.ini
 # 配布ビルド出力（build.js で再生成。コミット不要）
 jockey-sim/dist/
 dist/
+# 収録実況（CIがVOICEVOXで生成・コミットしない）
+jockey-sim/voice/

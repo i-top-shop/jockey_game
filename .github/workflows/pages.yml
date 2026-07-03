@@ -29,6 +29,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      # 収録実況の音声バンク（VOICEVOX）。台本/生成スクリプトが変わらない限りキャッシュで即完了
+      - name: Cache voice bank
+        uses: actions/cache@v4
+        with:
+          path: jockey-sim/voice
+          key: voicebank-${{ hashFiles('jockey-sim/tools/voice_phrases.json', 'jockey-sim/tools/gen_voice.js') }}
+      - name: Generate voice bank (VOICEVOX)
+        working-directory: jockey-sim
+        run: node tools/gen_voice.js --ensure-engine
       - name: Build dist/
         working-directory: jockey-sim
         run: node build.js

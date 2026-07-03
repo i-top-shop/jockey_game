@@ -723,6 +723,7 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
       <div class="title-badge">条件戦からGⅠへ ／ 芝1200・1600・2000m</div>
       <div class="title-career" id="title-career" style="display:none;"></div>
       <div class="foot-note" style="position:relative;">本ゲームの馬名・騎手名・競馬場名はすべて架空です。<br>実在のJRA・団体・人物とは一切関係ありません。</div>
+      <div class="foot-note" id="voice-credit" style="position:relative; display:none; margin-top:4px;"></div>
     </div>
   </section>
 
@@ -1779,6 +1780,9 @@ function initRace(){
   resetPlayerControls();
 
   state.paused=false; $("pause-overlay").style.display="none";   // ポーズ状態をリセット
+  // レース名コール（収録実況があれば「天嶺記念、まもなく発走です」）
+  { const rn=(state.mode==="career" && state.careerRace)? state.careerRace.name : null;
+    jcall(rn? `${rn}、まもなく発走です。` : "まもなく発走です。", true, rn? ["r:"+rn,"p:gate_soon"] : ["p:gate_soon"]); }
   showScreen("race");
   resizeCanvas();          // ※display後に採寸（＋3Dシーン初期化）
   syncHorseMeshes();       // 出走馬に合わせて3Dモデルを生成
@@ -1966,6 +1970,60 @@ const Voice = {
   stop(){ try{ if(this.supported()) window.speechSynthesis.cancel(); }catch(e){} }
 };
 
+/* ---------- 収録実況 VoiceBank（Tier3：生成音声＝TV中継レベル） ----------
+   voice/manifest.json（CIがVOICEVOXで生成）を読み、馬名・実況句クリップを結合再生する。
+   ・部品: "p:句キー" / "n:馬名"(通常) / "N:馬名"(絶叫) / "r:レース名"
+   ・無い部品があれば false を返し、呼び出し側が Web Speech へフォールバック
+   ・cancel-then-speak と同思想：新しい実況が来たら旧再生を止めて優先（_gen世代管理）
+   ・再生中は playing=true → render() が歓声/地鳴り/風を自動ダッキング
+   ・クレジット表記（VOICEVOX規約）はタイトル画面フッターへ自動表示 */
+const VoiceBank = {
+  enabled:false, map:null, credit:"", buffers:{}, _inflight:{}, _nodes:[], _gen:0, playing:false,
+  init(){
+    if(typeof fetch!=="function") return;              // jsdom / file:// 等 → Web Speechのまま
+    fetch("voice/manifest.json").then(r=> r.ok? r.json() : null).then(m=>{
+      if(m && m.map){
+        this.map=m.map; this.credit=m.credit||""; this.enabled=true;
+        const el=$("voice-credit");
+        if(el && this.credit){ el.textContent="音声実況: "+this.credit; el.style.display="block"; }
+      }
+    }).catch(()=>{});
+  },
+  url(key){ return (this.map && this.map[key]) ? "voice/"+this.map[key] : null; },
+  load(key){
+    if(this.buffers[key]) return Promise.resolve(this.buffers[key]);
+    if(this._inflight[key]) return this._inflight[key];
+    const u=this.url(key); if(!u || !Sfx.ctx) return Promise.resolve(null);
+    const p=fetch(u).then(r=> r.ok? r.arrayBuffer() : null)
+      .then(ab=> ab? new Promise(res=>{ try{ Sfx.ctx.decodeAudioData(ab, res, ()=>res(null)); }catch(e){ res(null); } }) : null)
+      .then(b=>{ delete this._inflight[key]; if(b) this.buffers[key]=b; return b; })
+      .catch(()=>{ delete this._inflight[key]; return null; });
+    this._inflight[key]=p; return p;
+  },
+  prefetch(keys){ if(!this.enabled) return; keys.forEach(k=>{ if(this.url(k)) this.load(k); }); },
+  stop(){ this._gen++; this._nodes.forEach(n=>{ try{n.stop();}catch(e){} }); this._nodes=[]; this.playing=false; },
+  play(seq){
+    if(!this.enabled || !Sfx.ctx || !Sfx.on || !Voice.on) return Promise.resolve(false);
+    if(!seq.every(k=>this.url(k))) return Promise.resolve(false);     // 部品不足 → フォールバック
+    const gen = ++this._gen;
+    Voice.stop();                                                      // Web Speech側も止める（混在防止）
+    this._nodes.forEach(n=>{ try{n.stop();}catch(e){} }); this._nodes=[];
+    return Promise.all(seq.map(k=>this.load(k))).then(bufs=>{
+      if(gen!==this._gen) return true;          // より新しい実況に追い越された＝破棄（フォールバック不要）
+      if(bufs.some(b=>!b)) return false;
+      const ctx=Sfx.ctx;
+      const g=ctx.createGain(); g.gain.value=1.15; g.connect(this._bus||Sfx.master);
+      let t=ctx.currentTime+0.03;
+      this._nodes=bufs.map(b=>{ const src=ctx.createBufferSource(); src.buffer=b; src.connect(g);
+        src.start(t); t += Math.max(0.05, b.duration-0.055); return src; });   // 55msクロス詰めで自然に結合
+      this.playing=true;
+      const total=(t-ctx.currentTime)*1000+120;
+      setTimeout(()=>{ if(gen===this._gen) this.playing=false; }, total);
+      return true;
+    });
+  },
+};
+
 // 接戦のゴール前か（スローモーション判定）
 function loop(ts){
   if(state.screen!=="race"){ return; }   // 画面を離れたら停止
@@ -2029,6 +2087,13 @@ function updateGate(dt){
 function beginRun(){
   const r=state.race;
   r.started=true; r.phase="running";
+  // 収録実況の先読み：このレースで使う馬名（全馬・2トーン）＋主要句をキャッシュへ
+  if(VoiceBank.enabled){
+    const keys=["p:gate_open","p:corner_final","p:straight_in","p:leads_now","p:duel","p:win_is","p:photo",
+                "p:sashikireru_ka","p:toraeru","p:whip_in","p:shikaketa","p:zenryoku"];
+    state.field.forEach(h=>{ keys.push("n:"+h.name, "N:"+h.name); });
+    VoiceBank.prefetch(keys);
+  }
   $("gate-overlay").style.display="none";
   $("start-zone").style.display="none";
   $("controls").style.display="block";
@@ -2061,7 +2126,8 @@ function beginRun(){
   });
   // 実況：発走
   const pq2 = pq==="good"?"好スタートを切った":pq==="slow"?"やや出遅れた":"五分のスタート";
-  jcall(`ゲートが開いた！　${state.player.name}は${pq2}。`, true);
+  jcall(`ゲートが開いた！　${state.player.name}は${pq2}。`, true,
+    ["p:gate_open", "n:"+state.player.name, pq==="good"?"p:start_good":pq==="slow"?"p:start_slow":"p:start_ok"]);
   if(typeof openStartGate==="function") openStartGate();   // 発走ゲートを開く
 }
 
@@ -2280,7 +2346,8 @@ function updateSqueeze(dt, r){
           sq.stage="hold"; sq.t=0;
           flash(sq.kind==="cover"?"被された！前が壁！":"包まれた！出口が無い！", "#d23b3b");
           jcall(sq.kind==="cover" ? `${rv.name}が外から蓋をした！　${p.name}、行き場がない！`
-                                  : `${p.name}、内で包まれた！　我慢のしどころ！`, true);
+                                  : `${p.name}、内で包まれた！　我慢のしどころ！`, true,
+                sq.kind==="cover" ? ["n:"+rv.name,"p:futa","n:"+p.name,"p:ikiba_nai"] : ["n:"+p.name,"p:tsutsumareta"]);
         } else {
           // 予兆の間に位置を変えて回避成功＝「先読みのさばき」
           p._sqEscapes++;
@@ -2508,7 +2575,7 @@ function doWhip(){
   h.stamina = Math.max(0, h.stamina - 1.5);                // ひと押しの脚使い
   Sfx.whip(); vib(22);
   if(boost < 0.4){ flash("もう反応が鈍い…","#c9762e"); }
-  else { flash("ムチ！","#e8b84b"); if(uses===0) jcall(`${h.name}にムチが入った！　最後の脚を引き出す！`, true); }
+  else { flash("ムチ！","#e8b84b"); if(uses===0) jcall(`${h.name}にムチが入った！　最後の脚を引き出す！`, true, ["n:"+h.name,"p:whip_in"]); }
 }
 // ギアの上げ下げ。悪天候で上げ下げ（特に反転）を繰り返すと折り合いを欠く
 function shiftGear(delta){
@@ -2524,8 +2591,8 @@ function shiftGear(delta){
   Sfx.blip(dir>0?560:380, 0.05, "square");   // シフト音
   vib(8);
   // 仕掛け地点（初めてギア5以上）
-  if(h.gear>=7 && h._commitAt===null){ h._commitAt=h.dist; jcall(`${h.name}、ここで仕掛けた！　残り${Math.max(0,Math.round(CFG.DIST-h.dist))}m！`, true); }
-  else if(h.gear===10 && prev<10){ jcall(`${h.name}、全力！　最後の力を振り絞る！`, true); }
+  if(h.gear>=7 && h._commitAt===null){ h._commitAt=h.dist; jcall(`${h.name}、ここで仕掛けた！　残り${Math.max(0,Math.round(CFG.DIST-h.dist))}m！`, true, ["n:"+h.name,"p:shikaketa"]); }
+  else if(h.gear===10 && prev<10){ jcall(`${h.name}、全力！　最後の力を振り絞る！`, true, ["n:"+h.name,"p:zenryoku"]); }
   // 悪天候でギアがガチャつくと警告＋折り合い悪化（実処理は computeDesired）
   if((r.going.bad||0)>0 && h._gearChurn>2.2){ flash("ギアの乱れ！折り合いを欠く","#c9762e"); }
   syncGearUI();
@@ -2548,11 +2615,14 @@ function syncGearUI(){
 }
 
 /* ============================ 実況システム ============================ */
-function jcall(text, lead){
+function jcall(text, lead, vo){
   const el=$("commentary"); if(!el) return;
   el.classList.add("show");
   el.innerHTML = lead? `<span class="lead">${text}</span>` : text;
-  if(lead) Voice.say(text);                 // 盛り上がりどころは音声実況
+  if(!lead) return;
+  // 盛り上がりどころは音声実況：収録実況（VoiceBank）を優先し、無ければ Web Speech
+  if(vo && VoiceBank.enabled){ VoiceBank.play(vo).then(ok=>{ if(!ok) Voice.say(text); }); }
+  else Voice.say(text);
 }
 // レース展開を監視して実況を出す（render から毎フレーム呼ぶ。各イベント1回）
 function callRace(){
@@ -2576,17 +2646,17 @@ function callRace(){
   // 勝負所（残り500m手前）
   if(!said.corner && remain<520 && remain>360){
     said.corner=1;
-    jcall(`最終コーナー、ここから勝負！　各馬仕掛けるタイミングを計る。`, true);
+    jcall(`最終コーナー、ここから勝負！　各馬仕掛けるタイミングを計る。`, true, ["p:corner_final"]);
   }
   // 直線
   if(!said.straight && lead.dist>=CFG.straightDist){
     said.straight=1;
-    jcall(`直線に入った！　先頭は${lead.num}番${lead.name}！`, true);
+    jcall(`直線に入った！　先頭は${lead.num}番${lead.name}！`, true, ["p:straight_in","n:"+lead.name,"p:leads_now"]);
   }
   // ゴール前の接戦
   if(!said.duel && remain<140 && !p.finished){
     const near = field.filter(o=>!o.finished && Math.abs(o.dist-p.dist)<2.6 && o!==p).length;
-    if(near>=1){ said.duel=1; jcall(`ゴール前、${p.name}も伸びる！　大接戦だ！`, true); }
+    if(near>=1){ said.duel=1; jcall(`ゴール前、${p.name}も伸びる！　大接戦だ！`, true, ["p:duel","n:"+p.name,"p:mo_nobiru"]); }
   }
 
   // ---- 動的実況：局面の変化を実時間で拾い、重要度順に1つだけ。クールダウンで間引く ----
@@ -2596,12 +2666,12 @@ function callRace(){
     if(now - (r._dynT||0) > 1.5){
       const pr=playerRank(), cand=[];
       // 差し（残り140m以内で順位を上げた）＝最優先
-      if(remain<140 && pr < r._pRankPrev) cand.push({pri:10, text:`差し切れるか、${p.name}！`, lead:true});
+      if(remain<140 && pr < r._pRankPrev) cand.push({pri:10, text:`差し切れるか、${p.name}！`, lead:true, vo:["p:sashikireru_ka","N:"+p.name]});
       // 直線で前をとらえにかかる
       if(p.dist>=CFG.straightDist){
         let aheadGap=Infinity;
         for(const o of field){ if(o===p||o.finished) continue; const g=o.dist-p.dist; if(g>0&&g<aheadGap) aheadGap=g; }
-        if(aheadGap<3.2 && pr>1) cand.push({pri:7, text:`${p.name}、前をとらえる勢いだ！`, lead:true});
+        if(aheadGap<3.2 && pr>1) cand.push({pri:7, text:`${p.name}、前をとらえる勢いだ！`, lead:true, vo:["n:"+p.name,"p:toraeru"]});
       }
       // 前で行った馬の失速（脚が上がる）
       for(const o of field){ if(o.finished) continue;
@@ -2615,7 +2685,7 @@ function callRace(){
       if(cand.length){
         cand.sort((a,b)=>b.pri-a.pri);
         const c=cand[0];
-        if(c.text!==r._lastDyn){ jcall(c.text, c.lead); r._lastDyn=c.text; r._dynT=now; }
+        if(c.text!==r._lastDyn){ jcall(c.text, c.lead, c.vo); r._lastDyn=c.text; r._dynT=now; }
       }
       r._pRankPrev=pr; r._leadNumPrev=lead.num;
     }
@@ -2689,20 +2759,21 @@ function render(){
     arc.setAttribute("stroke", p.gear>=9?"#d23b3b": p.gear>=7?"#e0a23a": p.gear<=3?"#6f86df":"#5fb0b0");
   }
 
-  // --- 観客の盛り上がり（直線で増し、ゴールで歓声） ---
+  // --- 観客の盛り上がり（直線で増し、ゴールで歓声）。収録実況中はダッキング（-9dB相当） ---
+  const duck = VoiceBank.playing ? 0.35 : 1;
   if(Sfx.crowdGain){
     const lvl = p.finished ? 0.30 : (p.dist>=CFG.straightDist ? 0.19 : (p.dist>CFG.DIST*0.5?0.10:0.06));
-    Sfx.setCrowd(lvl);
+    Sfx.setCrowd(lvl*duck);
   }
   // --- 馬群の地鳴り（スピードに連動） ---
   if(Sfx.rumbleGain){
     const lvl = (r.started && !p.finished) ? Math.min(0.16, Math.max(0, p.speed-12)/16*0.16) : 0.0001;
-    Sfx.setRumble(lvl);
+    Sfx.setRumble(lvl*duck);
   }
   // --- 風切り音（速度が上がるほど強く・高く＝体感スピードの裏打ち。ゴール後はスッと引く） ---
   if(Sfx.windGain){
     const wv = (r.started && !p.finished) ? Math.min(0.11, Math.max(0, p.speed-13)/8*0.11) : 0.0001;
-    Sfx.setWind(wv, 480 + Math.max(0,p.speed-12)*55);
+    Sfx.setWind(wv*duck, 480 + Math.max(0,p.speed-12)*55);
   }
   // --- 実況の順位ボード（上位6頭をリアルタイム表示） ---
   const ob=$("order-board");
@@ -4028,9 +4099,12 @@ function finishRace(){
 
   // 写真判定（1〜2着が際どい）→ 映画的シネマ（サイドカメラ→フリーズフレーム→シャッター）の後に結果
   const m12 = ranked.length>1 ? (ranked[1].finishTime - ranked[0].finishTime) : 1;
-  const reveal = ()=>{ Sfx.jingle(p.rank===1); Voice.say(`1着は、${ranked[0].name}！`); setTimeout(()=>{Sfx.stopCrowd(); Sfx.stopRumble(); Sfx.stopWind();},2200); cancelAnimationFrame(state.raf); showScreen("result"); };
+  const sayWin=()=>{ const t=`1着は、${ranked[0].name}！`;
+    if(VoiceBank.enabled){ VoiceBank.play(["p:win_is","N:"+ranked[0].name]).then(ok=>{ if(!ok) Voice.say(t); }); }
+    else Voice.say(t); };
+  const reveal = ()=>{ Sfx.jingle(p.rank===1); sayWin(); setTimeout(()=>{Sfx.stopCrowd(); Sfx.stopRumble(); Sfx.stopWind();},2200); cancelAnimationFrame(state.raf); showScreen("result"); };
   if(m12 < 0.03){
-    jcall("際どい！　写真判定だ！", true);
+    jcall("際どい！　写真判定だ！", true, ["p:photo"]);
     try{ PhotoCine.begin(ranked); }catch(e){}   // WebGL不在（無頭テスト等）でも安全に
     showPhotoFinish(()=>{ PhotoCine.end(); reveal(); });
   } else {
@@ -4196,6 +4270,9 @@ $("btn-next-offer").addEventListener("click", ()=>{ state.offerSet=makeOfferSet(
 $("btn-replay-view").addEventListener("click", startReplay);
 $("btn-result-record").addEventListener("click", ()=>{ renderCareerScreen(); showScreen("career"); });
 $("btn-to-title2").addEventListener("click", ()=> showScreen("title"));
+
+// 収録実況バンクの読み込み（voice/ が配信されていれば有効化。無ければ Web Speech のまま）
+VoiceBank.init();
 
 // 起動時：キャンバスのサイズ取得用に一度だけ参照
 window.addEventListener("load", ()=>{ /* タイトル表示のみ。レース開始時にresizeCanvas */ });

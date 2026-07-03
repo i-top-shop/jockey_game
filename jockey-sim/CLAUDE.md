@@ -134,6 +134,19 @@ docs/jockey_game_design.md  … 初期設計書
   正規化: 括弧除去・全角空白→読点・`\d+m`→メートル・1着→いっちゃく。
   iOS対策で初回ジェスチャー時に`prime()`。ミュート(Sfx.on)に追従。
 
+### 6.5 収録実況 VoiceBank（Tier3・TV中継レベル）
+- **生成はCI**（.github/workflows/pages.yml）：VOICEVOXエンジン(linux-cpu)をランナーで起動し、
+  `tools/voice_phrases.json`（台本の正典）から `tools/gen_voice.js` が voice/*.mp3 ＋ manifest.json を生成。
+  actions/cache で台本ハッシュキー・変更時のみ再生成。**voice/ はgitignore（コミットしない）**。
+- 部品結合再生: "p:句" / "n:馬名"(通常) / "N:馬名"(絶叫) / "r:レース名" を55ms詰めで連結。
+  馬名50頭×2トーン＋レース名23＋実況句23 ≒ 200クリップ・mp3 24kHz mono 64k（Safari対応のためOgg不可）。
+- `jcall(text, lead, vo)`：lead時、voがあれば VoiceBank.play(vo)→部品不足/未ロードなら Web Speech へフォールバック
+  （アーティファクト/オフライン初回/ローカルdevはWeb Speechのまま動く）。世代管理で最新実況優先。
+- **ダッキング**: VoiceBank.playing 中は render() が歓声/地鳴り/風を×0.35。
+- テンション3層: calm(ノーマル)/high(抑揚1.35)/max(熱血スタイル)＝道中→勝負所→ゴール前の絶叫。
+- **ライセンス**: VOICEVOX:青山龍星（クレジット必須）→ manifest.credit をタイトルフッターに自動表示。
+- smoke が台本と本体の同期を照合（馬名50/レース名23/使用句キー）。台本を変えたら両方更新すること。
+
 ## 7. キャリア（永続・騎乗依頼制。v2セーブ）
 - **2モード**: タイトルから「騎乗依頼（キャリア）」/「フリーレース」（従来フロー・ライバル帯66-93不変）。
   `state.mode`("career"/"free")で分岐。`Save`抽象(localStorage/メモリ)へ`{v:2,career}`を永続化（v1後方互換）。

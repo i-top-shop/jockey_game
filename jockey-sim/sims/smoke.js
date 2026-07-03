@@ -65,6 +65,27 @@ check("Course の座標・κ・groundLoss が機能一致（サンプル照合�
   return "周長P="+window.eval("Course.P").toFixed(1);
 });
 
+console.log("\n=== 収録実況（VoiceBank）の整合 ===");
+const vp = require("../tools/voice_phrases.json");
+check("VoiceBankが存在し、jsdomでは安全に無効", () =>
+  window.eval("typeof VoiceBank")==="object" && window.eval("VoiceBank.enabled")===false);
+check("jcallのvo付き呼び出しがフォールバックで例外なし", () => { window.jcall("テスト実況", true, ["p:gate_open"]); return true; });
+check("台本の馬名が全騎乗候補＋ライバル名を網羅", () => {
+  const need = window.eval("CANDIDATES.map(c=>c.name).concat(RIVAL_NAMES)");
+  const miss = need.filter(n=>!vp.names.includes(n));
+  return miss.length===0 ? ("計"+need.length+"頭") : ("不足: "+miss.join(","));
+});
+check("台本のレース名が番組表を網羅", () => {
+  const need = window.eval("Object.values(RACE_NAMES).flat().concat(Object.values(G1_RACES))");
+  const miss = need.filter(n=>!vp.raceNames.includes(n));
+  return miss.length===0 ? ("計"+need.length+"レース") : ("不足: "+miss.join(","));
+});
+check("本体が使う実況句キーが台本に全て存在", () => {
+  const used=[...new Set([...html.matchAll(/"p:([a-z0-9_]+)"/g)].map(m=>m[1]))];
+  const miss=used.filter(k=>!vp.phrases[k]);
+  return miss.length===0 ? ("使用句 "+used.length+"種") : ("台本に無い句: "+miss.join(","));
+});
+
 console.log("\n=== 画面遷移フロー ===");
 check("タイトル→馬選択→30枚", () => { click("btn-to-select"); return $("horse-list").children.length===30; });
 check("馬選択→作戦", () => { $("horse-list").children[2].dispatchEvent(new window.Event("click",{bubbles:true})); click("btn-to-tactic"); return $("screen-tactic").classList.contains("active"); });

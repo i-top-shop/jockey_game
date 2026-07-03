@@ -112,6 +112,24 @@ check("セーブv2（格別勝利/信頼度/開催数）", () => {
   return s.v===2 && c.gradeWins && typeof c.trust==="number" && c.meets>=1
     ? ("trust="+c.trust+" meets="+c.meets+" gradeWins="+JSON.stringify(c.gradeWins)) : false;
 });
+console.log("\n=== 被せ・包み込み／映画的写真判定 ===");
+check("updateSqueeze/PhotoCineが存在", () =>
+  typeof window.updateSqueeze==="function" && window.eval("typeof PhotoCine")==="object" && window.eval("typeof PhotoCine.begin")==="function");
+check("被せ/包みの計測フィールドが初期化されている", () => {
+  const v=window.eval("({c:state.race._sqCount||0, e:state.player._sqEscapes, b:state.player._sqBoxedT})");
+  return (typeof v.e==="number" && typeof v.b==="number") ? ("仕掛け回数="+v.c+" 回避="+v.e+" 被弾秒="+v.b.toFixed(2)) : false;
+});
+check("PhotoCine.begin/end（フリーズ位置の設定と解除）", () => {
+  const ok=window.eval(`(()=>{
+    const rk=[...state.field].sort((a,b)=>a.finishTime-b.finishTime);
+    PhotoCine.begin(rk);
+    const set = PhotoCine.active===true && state.field.every(h=>h._photoDist!=null) && Math.abs(rk[0]._photoDist-CFG.DIST)<0.01;
+    PhotoCine.end();
+    const cleared = PhotoCine.active===false && state.field.every(h=>h._photoDist==null);
+    return set && cleared; })()`);
+  return ok===true;
+});
+
 check("次の騎乗依頼へ→依頼画面", () => { click("btn-next-offer"); return $("screen-offers").classList.contains("active") && $("offer-list").children.length===3; });
 check("騎手手帳が描画される", () => {
   click("btn-offers-title"); click("btn-career-view");

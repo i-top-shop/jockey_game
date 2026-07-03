@@ -525,6 +525,10 @@ h1,h2,h3{ margin:0; font-family:"Dela Gothic One", sans-serif; font-weight:400; 
 .lane-ind .li-cell .li-s{ font-size:9px; display:block; margin-top:1px; }
 .lane-ind .li-cell.open{ background:rgba(63,191,111,.18); color:#7fe0a3; border-color:rgba(63,191,111,.5); }
 .lane-ind .li-cell.wall{ background:rgba(210,59,59,.20); color:#ef8a8a; border-color:rgba(210,59,59,.55); }
+/* 被せ/包みの予兆警告（琥珀の点滅＝1.3秒の回避猶予がある印） */
+.lane-ind .li-cell.warn{ background:rgba(232,162,58,.26); color:#ffd48a; border-color:rgba(232,162,58,.8);
+  animation:sqWarn .5s ease-in-out infinite alternate; }
+@keyframes sqWarn{ from{ box-shadow:0 0 0 0 rgba(232,162,58,.0); } to{ box-shadow:0 0 10px 2px rgba(232,162,58,.45); } }
 /* シネマ用ビネット */
 .vignette{ position:absolute; inset:0; z-index:4; pointer-events:none;
   box-shadow:inset 0 0 120px 24px rgba(0,0,0,.55); }
@@ -1046,6 +1050,7 @@ function awardJockeyXP(p, upset){
   if(p._compMin>=70) add("settle",2.4); else if(p._compMin>=45) add("settle",1.2);
   if(p.stats.temper<60 && p._compMin>=45) add("settle",1.2);        // 難気性をまとめた腕
   if((p._blockStraight||0)<0.4) add("handle",2.2); else if((p._blockStraight||0)<1.2) add("handle",1.0);
+  if((p._sqEscapes||0)>0) add("handle", Math.min(3, 1.4*p._sqEscapes));   // 被せ/包みの予兆を読んで回避＝さばきの腕
   const gained=(p._rankAtStraight!=null)? (p._rankAtStraight - p.rank):0;
   if(gained>=3) add("drive",2.8); else if(gained>=1) add("drive",1.4);
   if(upset) JSKILLS.forEach(k=> add(k,2.5));                        // 人気薄勝ち＝腕で覆した
@@ -1652,6 +1657,8 @@ function makeHorse(o){
     // 計測（主にプレイヤーの講評用）
     _commitAt:null, _compMin:100, _staAtStraight:null, _blockStraight:0, _whipUses:0,
     _startQ:null, _rankAtStraight:null, _cornerLossM:0,
+    // 被せ/包み込み（Phase2馬群相互作用）：AI側=_squeeze（進路上書き）、プレイヤー側=回避/被弾の計測
+    _squeeze:null, _sqEscapes:0, _sqBoxedT:0,
   };
 }
 // ランダムな顔・脚の白徴（流星/ソックス等）を生成
@@ -1665,6 +1672,7 @@ function randMarkings(){
 /* ============================ レース初期化（ゲート） ============================ */
 function initRace(){
   Sfx.stopCrowd(); Sfx.stopRumble(); Sfx.hoofPhase=0; Voice.stop();       // サウンドを初期化
+  try{ PhotoCine.end(); }catch(e){}          // 写真判定シネマ中のリトライ等でも確実に解除
   // 当日距離を確定（コースは共通オーバル。ゴール固定でスタート地点を距離ぶん手前にずらす）
   CFG.DIST = state.selectedDistance || 1600;
   CFG.straightDist = CFG.DIST - 400;                              // 残り400m＝直線
@@ -2070,7 +2078,10 @@ function stepRace(dt){
       const onBend = pose.curve!==0;
       if(h.blocked) h.blockTimer+=dt; else h.blockTimer=Math.max(0,h.blockTimer-dt*0.5);
       const st=STYLES[h.style];
-      if((CFG.DIST - h.dist) > 480){
+      if(h._squeeze){
+        // 被せ/包み実行中：updateSqueeze が毎フレーム更新する進路へ寄せる（通常の置き所ロジックを一時停止）
+        h.targetLane = h._squeeze.tl;
+      } else if((CFG.DIST - h.dist) > 480){
         // 道中：脚質4段の勾配で内の置き所をキープ（逃=最内ラチ→先行=好位の内→差し=中目→追込=後方中目）。
         //   詰まっても外へは流さない＝馬群は内ラチに固まる。先頭ほど密集・後方ほど横に散る。
         const HB={nige:0.5,senko:0.72,sashi:2.35,oikomi:2.55}, BS={nige:0.6,senko:0.9,sashi:1.15,oikomi:1.3};
@@ -2125,6 +2136,9 @@ function stepRace(dt){
     }
   }
 
+  // === 被せ・包み込み（プレイヤーへの馬群圧力。横移動のみ＝縦の速度/スタミナ式は不変） ===
+  updateSqueeze(dt, r);
+
   // === プレイヤーがゴール → 早送りフェーズへ ===
   if(state.player.finished && r.phase==="running"){
     r.phase="finishing";
@@ -2135,6 +2149,102 @@ function stepRace(dt){
     r.resultShown=true;
     r.phase="done";
     setTimeout(finishRace, 900);
+  }
+}
+
+/* ---------- 被せ・包み込み（Gallop Racer体験の核・Phase2馬群相互作用） ----------
+   ライバルがプレイヤーへ仕掛ける攻撃的な位置取り。2種：
+     被せ(cover)＝前外の馬がこちらの進路上へ斜めに降りてきて蓋をする（前ブロック化）
+     包み(box) ＝内ラチ沿いで前が壁のとき、外の馬が真横に張り付いて出口を塞ぐ（ポケット）
+   設計原則（AAAロードマップ査読の是正を遵守）：
+   ・必ず予兆（windup 約1.3秒・HUDと3Dの寄せで提示）→ 内/外/ギアの「状態設定」で事前回避できる窓を保証＝反射ゲーにしない
+   ・変更はライバルの targetLane（横移動）のみ。速度・スタミナの縦には一切触れない＝balance不変
+   ・発生ゲート：確率・回数上限・クールダウン・脚質/固有の攻撃性。運ゲー化を防ぐ
+   ・engine.js非同期でOK（プレイヤー対象の相互作用のみ。AI同士の挙動は不変） */
+const SQUEEZE = {
+  WINDUP:1.3,        // 予兆時間(秒)。騎手スキル「さばき」で最大+0.4s＝読む時間が延びる（操作有効性軸）
+  HOLD:2.6,          // 実行の継続時間(秒)
+  COOLDOWN:5,        // 次の仕掛けまでの最短間隔(秒)
+  MAX_PER_RACE:3,    // 1レースの発生上限
+  P_COVER:0.45, P_BOX:0.50,   // 0.6秒ごとの判定確率（攻撃性で増幅）※無頭30レースで約1.3回/レースへ調整
+};
+function updateSqueeze(dt, r){
+  const p=state.player;
+  if(!p || p.finished || r.phase!=="running") return;
+  const remain = CFG.DIST - p.dist;
+
+  // --- 進行中の被せ/包みを更新 ---
+  if(r._sq){
+    const sq=r._sq, rv=sq.rival;
+    sq.t += dt;
+    const dd=rv.dist-p.dist, dl=(rv.lane-p.lane)*sq.side;   // side=+1:外から / -1:内から（被せは両側あり）
+    if(sq.stage==="windup"){
+      // 予兆中：じわっと寄せてくる（3Dでも見える）。完了時にまだ射程内なら実行
+      rv._squeeze = { tl: clamp(p.lane + sq.side*1.0, 0, 7) };
+      if(sq.t>=sq.windup){
+        const inReach = !rv.finished && (sq.kind==="cover"
+          ? (dd>0.6 && dd<8.5 && dl>0.25 && dl<2.8)
+          : (dd>-2.5 && dd<3.5 && dl>0.25 && dl<2.0));
+        if(inReach){
+          sq.stage="hold"; sq.t=0;
+          flash(sq.kind==="cover"?"被された！前が壁！":"包まれた！出口が無い！", "#d23b3b");
+          jcall(sq.kind==="cover" ? `${rv.name}が外から蓋をした！　${p.name}、行き場がない！`
+                                  : `${p.name}、内で包まれた！　我慢のしどころ！`, true);
+        } else {
+          // 予兆の間に位置を変えて回避成功＝「先読みのさばき」
+          p._sqEscapes++;
+          flash("予兆を読んで回避！", "#3fbf6f");
+          rv._squeeze=null; r._sq=null; r._sqCooldown=SQUEEZE.COOLDOWN*0.6;
+        }
+      }
+    } else { // hold：進路上へピタリと張り付く（cover=前で蓋／box=真横で壁）
+      rv._squeeze = { tl: clamp(p.lane + sq.side*(sq.kind==="cover"?0.25:0.42), 0, 7) };
+      if(p.blocked || sq.kind==="box") p._sqBoxedT += dt;
+      const holdMax = sq.hold * (p.ability==="breaker"?0.6:1);   // 馬群突破：怯まず早く捌ける
+      const lost = rv.finished || Math.abs(dd)>9 || remain<90;   // 引き離した/落とした/ゴール前は解除
+      if(sq.t>=holdMax || lost){
+        if(p.ability==="breaker" && sq.t>=holdMax && !lost && !p._ab.breakerSq){ p._ab.breakerSq=1; procAbility("馬群突破！こじ開けた！"); }
+        rv._squeeze=null; r._sq=null; r._sqCooldown=SQUEEZE.COOLDOWN;
+      }
+    }
+    return;
+  }
+
+  // --- 新規の仕掛け判定（0.6秒ごと・回数/クールダウン/区間ゲート） ---
+  r._sqCooldown = Math.max(0, (r._sqCooldown||0)-dt);
+  r._sqCheck = (r._sqCheck||0)-dt;
+  if(r._sqCheck>0 || r._sqCooldown>0) return;
+  r._sqCheck = 0.6;
+  if((r._sqCount||0)>=SQUEEZE.MAX_PER_RACE) return;
+  if(p.dist < CFG.DIST*0.22 || remain < 140) return;   // 序盤とゴール直前は仕掛けてこない
+
+  // 包みの前提：内が壁（最内ラチ or 内に並走馬）＋前にも馬がいる（理不尽な単独ポケットは作らない）
+  const insideWall = p.lane<1.2 || state.field.some(o=>!o.isPlayer && !o.finished &&
+    Math.abs(o.dist-p.dist)<2.8 && (o.lane-p.lane)>-1.2 && (o.lane-p.lane)<-0.2);
+  const frontExists = state.field.some(o=>!o.isPlayer && !o.finished &&
+    (o.dist-p.dist)>0 && (o.dist-p.dist)<CFG.blockGap+2 && Math.abs(o.lane-p.lane)<1.0);
+
+  for(const rv of state.field){
+    if(rv.isPlayer || rv.finished || rv._squeeze) continue;
+    const dd=rv.dist-p.dist, dlRaw=rv.lane-p.lane, adl=Math.abs(dlRaw);
+    // 攻撃性：闘争心の強い固有・前めの脚質ほど仕掛けてくる（行動傾向のみ・能力数値は不変）
+    let aggr=1;
+    if(rv.ability==="fighter"||rv.ability==="frontsoul"||rv.ability==="hotblood") aggr*=1.5;
+    if(rv.style==="senko"||rv.style==="sashi") aggr*=1.2;
+    let kind=null;
+    if(dd>1.0 && dd<8 && adl>0.35 && adl<2.6) kind="cover";            // 斜め前にいる→内外どちらからでも被せ
+    else if(insideWall && frontExists && dlRaw>0.35 && dlRaw<2.0 && dd>-2.5 && dd<3.5) kind="box";  // 内が壁＋外に並走→包み
+    if(!kind) continue;
+    if(Math.random() < (kind==="cover"?SQUEEZE.P_COVER:SQUEEZE.P_BOX)*aggr){
+      // 予兆開始。騎手スキル「さばき」で予兆が最大+0.4秒長く見える（回避の窓が広がる）
+      const side = kind==="box" ? 1 : (dlRaw>=0?1:-1);   // 被せは相手のいる側から降りてくる
+      r._sq = { rival:rv, kind, side, stage:"windup", t:0,
+                windup:SQUEEZE.WINDUP + jSkill("handle")*0.4, hold:SQUEEZE.HOLD };
+      r._sqCount = (r._sqCount||0)+1;
+      flash(kind==="cover" ? (side>0?"外から被せてくる！":"内から被せてくる！") : "外から包みにくる！", "#e8a23a");
+      vib(14);
+      break;
+    }
   }
 }
 
@@ -2519,6 +2629,13 @@ function render(){
       setCell("li-in",   sit.inner, "壁");
       setCell("li-front",sit.front, "詰");
       setCell("li-out",  sit.outer, "壁");
+      // 被せ/包みの予兆・実行を警告表示（予兆＝琥珀点滅「被せ!/包み!」→ 位置を変えれば回避できる）
+      const sq=r._sq;
+      if(sq){
+        const cell = sq.kind==="cover" ? $("li-front") : $("li-out");
+        const warnTxt = sq.stage==="windup" ? (sq.kind==="cover"?"被せ!":"包み!") : (sq.kind==="cover"?"蓋!":"壁!");
+        if(cell){ cell.classList.add("warn"); const sp2=cell.querySelector(".li-s"); if(sp2) sp2.textContent=warnTxt; }
+      }
     }
   }
   // --- スタミナの手応え（残脚の脚色） ---
@@ -3178,9 +3295,60 @@ window.addEventListener("resize", ()=>{ if(state.screen==="race") resizeCanvas()
 function _lerpV(a,b,rate,dt){ const k=1-Math.exp(-rate*Math.max(0,dt||0.016)); a.x+=(b.x-a.x)*k; a.y+=(b.y-a.y)*k; a.z+=(b.z-a.z)*k; }
 const CAM_MODES=["chase","jockey","overhead"];
 const CAM_LABEL={ chase:"チェイス", jockey:"ジョッキー視点", overhead:"俯瞰" };
+/* ---------- 映画的写真判定（PhotoCine） ----------
+   接戦ゴール時：サイドライン（ゴール線の真横）へハードカット→全馬を「1着馬が線を切った瞬間」の
+   位置へ巻き戻してフリーズフレーム→鼻先へゆっくり寄りながらシャッター。
+   物理は一切動かさない（描画位置 _photoDist を使うだけ）。既存の2Dフラッシュ演出はシャッターとして流用 */
+const PhotoCine = {
+  active:false, t:0, t0:0, goalS:null, midLane:2,
+  begin(ranked){
+    const r=state.race; if(!r || !ranked || !ranked[0]) return;
+    this.active=true; this.t=0; this.t0=performance.now();
+    // 全馬を「1着馬のゴール瞬間」の位置へ巻き戻す（着差×通過速度から逆算＝写真そのもの）
+    const t0=ranked[0].finishTime;
+    state.field.forEach(h=>{
+      const v=(h._vfin && h._vfin>4)? h._vfin : 16;
+      const back=Math.max(0,(h.finishTime||t0+1.5)-t0)*v;
+      h._photoDist = Math.min(h.dist, CFG.DIST - back);
+    });
+    this.goalS = (r.startS + CFG.DIST) % TRK_P;
+    const l1=ranked[0]._rlane!=null?ranked[0]._rlane:ranked[0].lane;
+    const l2=ranked[1]? (ranked[1]._rlane!=null?ranked[1]._rlane:ranked[1].lane) : l1;
+    this.midLane=(l1+l2)/2;
+  },
+  end(){
+    this.active=false;
+    state.field.forEach(h=>{ h._photoDist=null; });
+    camInit=false;   // 次のレースはカメラを演出位置から引きずらずスナップで開始
+  },
+};
+
 function updateCamera(dt){
   dt = dt || 0.016;
   const p=state.player; if(!p) return;
+  // 写真判定シネマ：ゴール線サイドへハードカット→鼻先へ寄る（イージング）。通常カメラは完全停止
+  if(PhotoCine.active && PhotoCine.goalS!=null){
+    PhotoCine.t = (performance.now()-PhotoCine.t0)/1000;     // 実時間ベース＝シャッター音のタイムラインと同期
+    const w0=trackPose(PhotoCine.goalS);                     // ゴール線（レーン0基準）
+    const hx=Math.cos(w0.heading), hz=Math.sin(w0.heading);  // 進行方向
+    const ox=-Math.sin(w0.heading), oz=Math.cos(w0.heading); // コース外向き
+    const k=1-Math.exp(-1.1*PhotoCine.t);                    // 寄りのイージング
+    // インフィールドの決勝写真タワー（内ラチ約2mより上）からゴール線上の鼻先へ寄る。
+    // 低い位置だと内ラチ・ゴール柱・ゲートが被るため、見下ろしの俯瞰→ズームで構成する
+    const inn  = 11.0 - 3.5*k;                               // 内側への距離（寄るほど近く）
+    const back = -(10.0 - 8.2*k);                            // 引きは斜め後ろ→寄りはほぼ真横（決勝写真の角度）
+    const y    = 6.4 - 2.1*k;                                // 内ラチ(約2m)の上を常に維持
+    camState.pos.set(w0.x - ox*inn + hx*back, y, w0.z - oz*inn + hz*back);
+    const tgtOut = clamp(PhotoCine.midLane,0,7)*LANE_W;      // 1-2着の間のレーンへ照準
+    camState.tgt.set(w0.x + ox*tgtOut + hx*0.9, 1.3, w0.z + oz*tgtOut + hz*0.9);
+    camera.position.copy(camState.pos);
+    camera.lookAt(camState.tgt);
+    const fovT=40-9*k;
+    camera.fov += (fovT-camera.fov)*(1-Math.exp(-8*dt));
+    camera.updateProjectionMatrix();
+    camInit=true;
+    return;
+  }
   const sS=(state.race&&state.race.startS)||0;
   const w=laneWorld(sS + p.dist, p._rlane!=null?p._rlane:p.lane);   // 枠入り整列に追従（描画レーン）
   const hx=Math.cos(w.heading), hz=Math.sin(w.heading);
@@ -3244,9 +3412,11 @@ function drawTrack(){
     const gl=gateLaneOf(h.num, nField);
     h._gateBlend = inGate ? 0 : Math.min(1,(h._gateBlend||0)+dt/1.0);
     h._rlane = gl + (h.lane - gl)*h._gateBlend;
-    const w=laneWorld(sS + h.dist, h._rlane);
+    // 写真判定シネマ中は「1着馬がゴール線を切った瞬間」の位置でフリーズフレーム（描画のみ・物理不変）
+    const dEff = (PhotoCine.active && h._photoDist!=null) ? h._photoDist : h.dist;
+    const w=laneWorld(sS + dEff, h._rlane);
     const sp=clamp(h.speed/17, 0, 1.35);
-    const ph=h.dist*1.55;                                 // 走行位相（距離ベースで安定）
+    const ph=dEff*1.55;                                   // 走行位相（距離ベースで安定＝フリーズ時は静止）
     const bob=Math.max(0,Math.sin(ph+0.3))*0.085*sp;      // バウンド（一完歩に一度の浮き）
     m.group.position.set(w.x, m.group.userData.gltf?0:bob, w.z);   // GLTFは接地済み(y=0)／箱馬はbob
     m.group.rotation.y = -w.heading;
@@ -3257,7 +3427,8 @@ function drawTrack(){
     const ud=m.group.userData, lg=ud.legs;
     if(ud.gltf){
       // GLTF：脚の回転を地上速度に同期してギャロップ再生（足滑り防止）。うねり/脚/首/尾はモーフが担う
-      if(ud.mixer){ ud.mixer.timeScale = (h.speed/HORSE_STRIDE)*ud.clipDur; ud.mixer.update(dt); }
+      // 写真判定シネマ中はミキサーを進めない＝疾走姿勢のままフリーズ
+      if(ud.mixer && !PhotoCine.active){ ud.mixer.timeScale = (h.speed/HORSE_STRIDE)*ud.clipDur; ud.mixer.update(dt); }
     } else {
       m.group.rotation.z = Math.sin(ph)*0.055*sp;           // 馬体のうねり（前後のロック）
       if(lg && lg[0] && lg[0].hip){
@@ -3281,6 +3452,7 @@ function drawTrack(){
       if(ud.arms){ ud.arms.rotation.x = Math.sin(ph)*amp*0.8; ud.arms.position.y = (ud.armsY!=null?ud.armsY:1.40) - driving*0.05; }
     }
     const numY = m.group.userData.gltf ? 4.0 : 2.45;        // GLTF(2倍)・少し低めに
+    m.sprite.visible = !PhotoCine.active;                   // 写真判定シネマ中は馬番を消してクリーンな画に
     m.sprite.position.set(w.x, numY+bob, w.z);
     m.sprite.material.opacity = h.finished? 0.2 : 0.38;     // さらに半透明
     m.sprite.material.depthTest = false;                    // 馬体に隠れず常に見える
@@ -3309,6 +3481,7 @@ function drawTrack(){
   }
   Dust.update(dt);
   if(playerRing && p){
+    playerRing.visible = !PhotoCine.active;                 // 写真判定シネマ中はリングも消す
     const w=laneWorld(sS + p.dist, p._rlane!=null?p._rlane:p.lane); playerRing.position.set(w.x, 0.07, w.z);
     playerRing.material.opacity = p.finished? 0.35 : (0.8 + 0.2*Math.sin(performance.now()*0.006));
     updateSunShadow(w.x, w.z);                   // 影の視錐台を主役へ追従
@@ -3475,24 +3648,26 @@ function finishRace(){
   renderJockeyGrowth(grew);
   $("result-advice").innerHTML = buildAdvice(p);
 
-  // 写真判定（1〜2着が際どい）→ スロー演出の後に結果
+  // 写真判定（1〜2着が際どい）→ 映画的シネマ（サイドカメラ→フリーズフレーム→シャッター）の後に結果
   const m12 = ranked.length>1 ? (ranked[1].finishTime - ranked[0].finishTime) : 1;
   const reveal = ()=>{ Sfx.jingle(p.rank===1); Voice.say(`1着は、${ranked[0].name}！`); setTimeout(()=>{Sfx.stopCrowd(); Sfx.stopRumble();},2200); cancelAnimationFrame(state.raf); showScreen("result"); };
   if(m12 < 0.03){
     jcall("際どい！　写真判定だ！", true);
-    showPhotoFinish(reveal);
+    try{ PhotoCine.begin(ranked); }catch(e){}   // WebGL不在（無頭テスト等）でも安全に
+    showPhotoFinish(()=>{ PhotoCine.end(); reveal(); });
   } else {
     reveal();
   }
 }
-// 写真判定の演出（3Dを映したままフラッシュ→数秒後にコールバック）
+// 写真判定の演出：PhotoCine（サイドカメラ＋フリーズフレーム）の上でシャッターを3回切る
 function showPhotoFinish(cb){
   const ov=$("photo-finish"), fl=$("pf-flash"); if(!ov){ cb(); return; }
   ov.classList.add("show");
-  if(fl){ fl.classList.remove("go"); void fl.offsetWidth; fl.classList.add("go"); }
-  Sfx.thud(); Sfx.blip(1500,0.04,"square");   // シャッター音
-  setTimeout(()=>{ if(fl){ fl.classList.remove("go"); void fl.offsetWidth; fl.classList.add("go"); } Sfx.blip(1500,0.04,"square"); }, 700);
-  setTimeout(()=>{ ov.classList.remove("show"); cb(); }, 2300);
+  const shutter=()=>{ if(fl){ fl.classList.remove("go"); void fl.offsetWidth; fl.classList.add("go"); } Sfx.blip(1500,0.04,"square"); };
+  Sfx.thud(); shutter();                         // カット切替と同時に1枚目
+  setTimeout(shutter, 1000);                     // 寄りながら2枚目
+  setTimeout(shutter, 2200);                     // 鼻先クローズで決めの3枚目
+  setTimeout(()=>{ ov.classList.remove("show"); cb(); }, 3400);
 }
 
 /* ---------- 騎手成長の可視化（結果画面） ---------- */
@@ -3571,6 +3746,12 @@ function buildAdvice(p){
   // 馬群さばき
   if(blockS>1.2){
     tips.push(`<b>進路：</b>直線で前が壁になり${blockS.toFixed(1)}秒ロス。早めに［内/外］で進路を確保したい。`);
+  }
+  // 被せ・包み込みへの対応（予兆→事前回避が「さばき」の見せ場）
+  if((p._sqEscapes||0)>0){
+    tips.push(`<b>さばき◎：</b>被せ・包みの予兆を${p._sqEscapes}回読み切って事前に回避。位置取りの先読みができている。`);
+  } else if((p._sqBoxedT||0)>1.4){
+    tips.push(`<b>包まれた：</b>馬群に閉じ込められて${p._sqBoxedT.toFixed(1)}秒ロス。琥珀色の警告（予兆）が出たら、実行される前に［内/外］やギアで位置を変えると避けられる。`);
   }
   // コース取り（コーナーで外を回った距離ロス）
   if((p._cornerLossM||0) > 9){

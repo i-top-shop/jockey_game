@@ -89,6 +89,15 @@ docs/jockey_game_design.md  … 初期設計書
 - **発走**: 自動（反射要素なし）。出=gatePow+調子+乱数。rocketは出遅れ帳消し。
 
 ## 5. 3D・演出の注意（gotchas）
+- **GLTF馬の滑らか馬体**: Horse.glb は素の状態だと**material.flatShading=true**（カクカクの正体）。
+  `smoothGeoNormals()` がロード時に一度だけ、位置共有頂点で法線を平均化＋**15個のモーフターゲットの
+  法線も各ポーズで再計算**（アニメ中も滑らか）→ `makeGltfHorse` が flatShading=false に。
+  ※法線だけ直しても flatShading が true だとシェーダーが法線を無視するので両方必須。
+- **騎手多関節リグ（GLTF馬用）**: `makeGltfHorse` が骨盤(torso)/首(head)/肩(shoL,R)/肘(elbL,R)の
+  ピボット＋右手ムチを構築、`animateJockey()` が毎フレーム駆動（userData.jockey が契約）。
+  道中クラウチング→直線追い出し（完歩ph同期のプッシュ＋手綱しごき）→**ムチ=whipTimer(1.6s)から
+  振り上げ→打ち下ろし→戻しの1アーク**（連打無効思想の視覚化）。AIも直線で追い出し姿勢(0.7)。
+  箱馬（フォールバック）は旧 userData.rider 契約のまま。
 - **トーンマップ**: ACES exposure1.16。`MeshBasicMaterial`は一括で`toneMapped=false`
   （authored色維持）。**新規のMeshBasic/Sprite/数字スプライトにも必ず`toneMapped:false`**。
 - **脚は2関節**: `legs=[{hip,knee,front}]`。位相 `LEGPH=[2.6,3.05,0,0.45]`(FL,FR,BL,BR)。

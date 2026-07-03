@@ -65,8 +65,11 @@ async function ensureEngine(){
   console.log("VOICEVOX エンジンのリリース情報を取得…");
   const rel = await (await jfetch("https://api.github.com/repos/VOICEVOX/voicevox_engine/releases/latest",
     { headers:{ "User-Agent":"hizumeoto-voicegen", "Accept":"application/vnd.github+json" } })).json();
-  const assets = (rel.assets||[]).filter(a => /linux-cpu(-x64)?.*\.7z\.\d+$/.test(a.name)).sort((a,b)=>a.name.localeCompare(b.name));
-  if(!assets.length) throw new Error("linux-cpu の 7z 資産が見つかりません（release: "+rel.tag_name+"）");
+  // x64 を厳格に選ぶ（arm64 が混ざると x64 ランナーで起動不能。過去命名 linux-cpu-<ver> にもフォールバック）
+  let assets = (rel.assets||[]).filter(a => /linux-cpu-x64.*\.7z\.\d+$/.test(a.name));
+  if(!assets.length) assets = (rel.assets||[]).filter(a => /linux-cpu-(?!arm)[\d.]/.test(a.name) && /\.7z\.\d+$/.test(a.name));
+  assets.sort((a,b)=>a.name.localeCompare(b.name));
+  if(!assets.length) throw new Error("linux-cpu-x64 の 7z 資産が見つかりません（release: "+rel.tag_name+"）: "+ (rel.assets||[]).map(a=>a.name).join(", "));
   console.log("取得対象:", rel.tag_name, assets.map(a=>a.name+" ("+Math.round(a.size/1e6)+"MB)").join(", "));
   for(const a of assets){
     const dest = path.join(dl, a.name);
@@ -89,8 +92,10 @@ async function ensureEngine(){
       if(runBin) return; } })(ex, 0);
   if(!runBin) throw new Error("エンジン実行体 run が見つかりません");
   console.log("エンジン起動:", runBin);
-  const proc = spawn(runBin, ["--host","127.0.0.1","--port","50021"], { cwd:path.dirname(runBin), stdio:"ignore", detached:false });
+  const proc = spawn(runBin, ["--host","127.0.0.1","--port","50021"], { cwd:path.dirname(runBin), stdio:"inherit", detached:false });
+  let died=false; proc.on("exit", code=>{ died=true; console.error("エンジンプロセスが終了 code="+code); });
   for(let i=0;i<180;i++){
+    if(died) throw new Error("エンジンが即終了しました（アーキテクチャ/依存ライブラリを確認）");
     await new Promise(r=>setTimeout(r,2000));
     try{ await jfetch(ENGINE_URL+"/version"); console.log("エンジン準備完了"); return proc; }catch(e){}
   }

@@ -6,8 +6,11 @@
  * 使い方: const {runMany} = require("./engine");
  *   runMany(1600, 1500, {BASE:0.34}) → 集計オブジェクト
  */
-const TRK_R=140, TRK_SL=360, TRK_LB=Math.PI*TRK_R, TRK_P=2*TRK_LB+2*TRK_SL;
-function curveAt(s){ s=((s%TRK_P)+TRK_P)%TRK_P; return (s<TRK_LB || (s>=TRK_LB+TRK_SL && s<2*TRK_LB+TRK_SL)) ? -1 : 0; }
+// コース＝共有正典 sims/course_def.js（κ(s)連続・groundLoss=f(κ)・データ駆動）。
+// 旧 curveAt 二値＋gl定数の二重定義は Phase2 コース一元化で根治済み。
+const { COURSE_DEF, JOCKEY_PERSONAS, buildCourse } = require("./course_def");
+const Course = buildCourse(COURSE_DEF);
+const TRK_P = Course.P;
 
 const cruiseBase=18.8, staFatigue=24;
 // 創発ペース／ハナ争い（Stage1）：先頭争いからペースを発生させ、スタミナ・縦長・失速へ波及させる
@@ -56,8 +59,11 @@ function race(DIST, P){
     const cr=Math.random(), cond=cr<0.22?1.04:cr<0.74?1.0:cr<0.90?0.985:0.965;
     const pref=STYLES[style].pref;
     const h={id:i,style,ab,stats:s,p:derive(s,ab,DIST,cond),dist:0,lane:rnd(pref[0],pref[1]),target:(pref[0]+pref[1])/2,
-             speed:0,stamina:100,minSta:100,committed:false,finished:false,ft:0,laneBias:rnd(-0.9,0.9)};
-    h.commitDist=DIST-STYLES[style].cr+rnd(-55,55);
+             speed:0,stamina:100,minSta:100,committed:false,finished:false,ft:0};
+    // ライバル騎手の個性（本体と同一の共有定義。行動傾向のみ＝能力数値は不変）
+    h.jockey=ch(JOCKEY_PERSONAS);
+    h.laneBias=clamp(rnd(-0.9,0.9)+h.jockey.lane, -1.6, 1.6);
+    h.commitDist=DIST-STYLES[style].cr+rnd(-55,55)-h.jockey.commit;
     let q=Math.random()<0.18?"good":Math.random()>0.85?"slow":"ok"; if(ab==="rocket"&&q==="slow")q="ok";
     let off=q==="good"?rnd(1.5,3):q==="slow"?-rnd(2,4):rnd(-0.5,1); off+=h.p.gatePow*1.2;
     h.dist=Math.max(0,0.5+off); h.speed=(q==="slow"?12.5:14.5)+h.p.gatePow*0.8; F.push(h);
@@ -131,13 +137,13 @@ function race(DIST, P){
       if((lead-h.dist)<30) for(const o of F){ if(o===h||o.finished)continue; const gap=o.dist-h.dist;   // 後方に離れた馬は開けた所＝ブロック対象外（デッドロック回避）
         if(gap>0&&gap<bg&&Math.abs(o.lane-h.lane)<0.7){ cap=Math.min(cap,o.speed); blk=true; } }   // blockLane 0.95→0.7
       let v=h._v; if(blk)v=Math.min(v,cap); h.speed=v;
-      const sW=startS+h.dist, onBend=curveAt(sW)!==0, cg=STYLES[h.style].cg;
+      const sW=startS+h.dist, kappa=Math.abs(Course.kappaAt(sW)), onBend=kappa!==0, cg=STYLES[h.style].cg;
       if((DIST-h.dist)>480){ const HB={nige:0.5,senko:0.72,sashi:2.35,oikomi:2.55}, BS={nige:0.6,senko:0.9,sashi:1.15,oikomi:1.3}; const home=clamp((HB[h.style]??1.4)+h.laneBias*(BS[h.style]??1.1),0,6); h.target+=clamp(home-h.target,-0.5,0.5)*dt*0.5; }
       else{ if((h.style==="sashi"||h.style==="oikomi")&&h.target<3.4)h.target+=dt*0.9;
             if(cg>0&&h.target>1.4)h.target-=dt*0.5; }
       if(blk){ const d=(h.id%2? -0.7 : 1.0); h.target=clamp(h.target + d*(onBend?0.7:1.2)*dt, 0, onBend?4.5:6.5); }  // 詰まったら左右に開いて抜ける（IDで散らしデッドロック回避）
       h.lane=clamp(h.lane+clamp(h.target-h.lane,-1.9*dt,1.9*dt),0,7);
-      let gl=onBend?0.0026:0.0005;
+      let gl=Course.glOf(kappa);   // 横ロス＝曲率連続 f(κ)（現行コースでは旧二値と同値）
       if(onBend){ let red=h.p.cornerSkill; if(h.ab==="corner")red+=0.5; gl*=clamp(1-red,0.35,1); }
       h.dist+=h.speed*(1-h.lane*gl)*dt;
       if(!h.finished&&h.dist>=DIST){ const over=h.dist-DIST, ve=Math.max(0.1,h.speed*(1-h.lane*gl)); h.ft=t-over/ve; h.finished=true; }

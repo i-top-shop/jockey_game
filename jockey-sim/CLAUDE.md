@@ -13,6 +13,7 @@
 jockey_game.html        … ゲーム本体（全コード内包・約2,500行・単一<script>）
 CLAUDE.md               … 本ファイル（開発憲法）
 sims/engine.js          … AI12頭のヘッドレスレースエンジン（本体物理の写し）
+sims/course_def.js      … 共有正典：コースκ(s)定義＋騎手個性（engine.jsがrequire・本体埋め込みはsmokeが機械照合）
 sims/balance_check.js   … 回帰チェック（物理を触ったら必ず実行）
 sims/stamina_tune.js    … スタミナ調整実験（BASEスイープ）
 docs/jockey_sim_redesign.md … Gallop Racer再設計ブループリント（フェーズ2計画）
@@ -36,6 +37,10 @@ docs/jockey_game_design.md  … 初期設計書
 ```
 コース: 右回りオーバル 周長1599.6m（TRK_R140/TRK_SL360/LANE_W2.4/8レーン）。ゴール固定、
         距離変更は startS=((P-(DIST%P))%P) で開始点を後退。残り400mから直線。
+        ★定義はデータ駆動：COURSE_DEF(セグメント列)→buildCourse→Course.poseAt/kappaAt/glOf。
+        横ロスは二値→曲率連続 f(κ)（κ=0で0.0005/κ=1/140で0.0026の線形＝旧値と同値再現・A/B検証済み）。
+        正典は sims/course_def.js。本体埋め込みと同一であること（smokeが座標/κ/glを機械照合）。
+        東京府中移行＝COURSE_DEFテーブル差し替え（clothoidセグメント追加実装＋TRK_*舞台定数見直し）。
 速度  : cruiseBase 18.8 ★ / topSpeed=19.4+(speed-78)*0.072+aptF*0.30（×調子×局面補正）
 適性  : aptF=clamp(0.45-|DIST-aptDist|/650, -0.7, 0.45) → top+0.30aptF・drainResist×(1+0.12aptF)
 脚質  : cruiseGain 逃+0.55/先+0.22/差-0.22/追-0.46、staBurn 1.08/1.00/0.92/0.84、
@@ -76,6 +81,12 @@ docs/jockey_game_design.md  … 初期設計書
   （`_photoDist`＝描画のみ・物理不変）、**インフィールドの決勝写真タワー**（内ラチ2mより上・y6.4→4.3）から
   ハードカット→鼻先へ寄る（実時間ベース・3.4秒・シャッター3回）。ゲート/外ラチ/ゴール柱が被るため
   **カメラは内側上空限定**（外側・低所はNG＝実写で確認済み）。GLTFミキサーは停止・馬番/リングは非表示。
+
+### ライバル騎手個性（JOCKEY_PERSONAS・共有正典）
+- 8名の架空騎手（早瀬迅=早仕掛け+65m/深井慎=脚ため-55m/内村=イン-0.7/大曽根=大外+0.8/鬼頭=被せ積極1.5等）。
+- 効果は**AIの行動傾向のみ**：commitDist前倒し/後ろ倒し・laneBias加算・被せaggr倍率。能力数値は不変。
+- engine.js と完全同一データ（course_def.js が正典・smoke照合）。A/B 1500レースで脚質シェア/時計に系統差なしを確認済み。
+- 出走前カードに「注目騎手」最大2名を表示＝展開を読む材料（例：早仕掛けがいる→前が締まる）。
 
 ## 4. プレイヤー操作仕様
 - **7段ギア**: target = idle + (maxv-idle)×(g-1)/6。idle=巡航-3、maxv=max(top+0.8, 巡航+2.6)。

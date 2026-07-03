@@ -45,6 +45,26 @@ check("新規関数が存在", () => ["jLevel","awardJockeyXP","playerLaneSituat
 check("Save.ok=true（localStorage有効）", () => window.Save && window.Save.ok===true);
 check("新規DOM要素が存在", () => ["lane-ind","li-in","li-front","li-out","result-jockey","sta-lab","comp-lab"].every(id=>!!$(id)));
 
+console.log("\n=== 共有定義の同期照合（コースκ(s)／騎手個性＝sims/course_def.js が正典） ===");
+const defs = require("./course_def");
+check("COURSE_DEF が本体と完全一致", () => {
+  const emb = window.eval("COURSE_DEF");
+  return JSON.stringify(emb)===JSON.stringify(defs.COURSE_DEF) ? true : "データ不一致（両方を同時に更新すること）";
+});
+check("JOCKEY_PERSONAS が本体と完全一致", () => {
+  const emb = window.eval("JOCKEY_PERSONAS");
+  return JSON.stringify(emb)===JSON.stringify(defs.JOCKEY_PERSONAS) ? true : "データ不一致（両方を同時に更新すること）";
+});
+check("Course の座標・κ・groundLoss が機能一致（サンプル照合）", () => {
+  const nodeCourse = defs.buildCourse(defs.COURSE_DEF);
+  for(const s of [0, 1, 219.9, 439.82, 700, 799.82, 1100, 1239.5, 1500, 1599.5]){
+    const a = window.eval(`(()=>{ const p=Course.poseAt(${s}); return [p.x,p.z,p.curve,Course.glOf(Math.abs(p.curve))]; })()`);
+    const p = nodeCourse.poseAt(s), b=[p.x,p.z,p.curve,nodeCourse.glOf(Math.abs(p.curve))];
+    for(let i=0;i<4;i++) if(Math.abs(a[i]-b[i])>1e-9) return `s=${s} で不一致 [${a}] vs [${b}]`;
+  }
+  return "周長P="+window.eval("Course.P").toFixed(1);
+});
+
 console.log("\n=== 画面遷移フロー ===");
 check("タイトル→馬選択→30枚", () => { click("btn-to-select"); return $("horse-list").children.length===30; });
 check("馬選択→作戦", () => { $("horse-list").children[2].dispatchEvent(new window.Event("click",{bubbles:true})); click("btn-to-tactic"); return $("screen-tactic").classList.contains("active"); });
@@ -66,6 +86,11 @@ check("playerLaneSituation()正常", () => { const s=window.playerLaneSituation(
 check("finishRace 実行（例外なし）", () => { window.finishRace(); return true; });
 check("着順表が12行生成", () => $("result-body").children.length===12);
 check("講評に騎乗貢献度スコア", () => /騎乗貢献度/.test($("result-advice").innerHTML));
+check("結果に走破タイム・上がり3F", () => /タイム/.test($("result-reward").innerHTML) && /上がり3F/.test($("result-reward").innerHTML));
+check("ライバル全騎手に個性が付与", () => {
+  const n=window.eval("state.field.filter(h=>!h.isPlayer && h.jockey && h.jockey.name).length");
+  return n===11 ? true : ("jockey付与="+n+"/11");
+});
 check("騎手成長枠に騎手レベル", () => /騎手レベル/.test($("result-jockey").textContent));
 check("キャリアが保存された(localStorageにraces>0)", () => {
   const raw = window.localStorage.getItem("hizumeoto_save_v1");

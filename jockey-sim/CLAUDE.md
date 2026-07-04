@@ -104,8 +104,23 @@ docs/jockey_game_design.md  … 初期設計書
   `smoothGeoNormals()` がロード時に一度だけ、位置共有頂点で法線を平均化＋**15個のモーフターゲットの
   法線も各ポーズで再計算**（アニメ中も滑らか）→ `makeGltfHorse` が flatShading=false に。
   ※法線だけ直しても flatShading が true だとシェーダーが法線を無視するので両方必須。
+- **Box3.setFromObject はGLTF馬に使用禁止**: computeBoundingBox がモーフ可動域込みで膨張する
+  （実測: 全長322が721相当＝約2.2倍）。スケール・接地・鞍位置に使うと「馬が半分サイズ・馬装だけ
+  実寸で宙に浮く」。**必ず基準ポーズの素頂点（morphTargetInfluences持ちメッシュのposition属性）から
+  実測**する。生座標系の正典: 頭=+Z、全長322(z -187..135)、幅61(x -29..33)、鞍領域の背の稜線
+  y≈137（**z範囲は -45..5**。z>5はたてがみ根本y149+が混ざる）、最低y0.8。
+- **HORSE_LEN_M=2.68 は描画上の体長の正典**（旧Box3バグ時代の実効値 6.0×322/722 を正典化）。
+  ゲート(高さ2.4)/レーン/カメラ/騎手比はこの寸法に調整済み。変えるなら世界全体を追随させること。
+- **馬の個体ペイント**: `paintHorseGeometry(geo,coat,markings,silk)` が**頂点カラー**で
+  毛色/たてがみ・尾・脚元の差し毛(元頂点色の輝度L<0.075が焼き込みの黒mane)/流星(blaze 1-3)/
+  ソックス/メンコ(markings.menko、鼻先z>128は開ける)を塗る。色属性のみ複製・position/normal/
+  index/モーフは全馬共有。material.color=白+vertexColors（tint方式は廃止）。
+  モーフ追従なので走行中も破綻しない。ゼッケンは `makeZekkenTex(num,capCol)` 白布Box+両面Plane。
 - **騎手多関節リグ（GLTF馬用）**: `makeGltfHorse` が骨盤(torso)/首(head)/肩(shoL,R)/肘(elbL,R)の
   ピボット＋右手ムチを構築、`animateJockey()` が毎フレーム駆動（userData.jockey が契約）。
+  騎手の寸法単位 J=HORSE_LEN_M*0.122（0.098だと子供に見える）。**腕の基準角は肩+1.35/肘+0.70**
+  ＝前傾胴から前下へ（負値だと腕が後上へ跳ね上がる）。ムチ振り上げは肩1.35-2.30*up。
+  脚・鐙のzは legZ=W/2+J*0.24（ゼッケン布(W+0.06)より外＝布に埋もれない）。
   道中クラウチング→直線追い出し（完歩ph同期のプッシュ＋手綱しごき）→**ムチ=whipTimer(1.6s)から
   振り上げ→打ち下ろし→戻しの1アーク**（連打無効思想の視覚化）。AIも直線で追い出し姿勢(0.7)。
   箱馬（フォールバック）は旧 userData.rider 契約のまま。

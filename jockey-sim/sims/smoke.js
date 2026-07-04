@@ -55,14 +55,26 @@ check("JOCKEY_PERSONAS が本体と完全一致", () => {
   const emb = window.eval("JOCKEY_PERSONAS");
   return JSON.stringify(emb)===JSON.stringify(defs.JOCKEY_PERSONAS) ? true : "データ不一致（両方を同時に更新すること）";
 });
-check("Course の座標・κ・groundLoss が機能一致（サンプル照合）", () => {
+check("Course の座標・κ・gl・標高・勾配が機能一致（サンプル照合）", () => {
   const nodeCourse = defs.buildCourse(defs.COURSE_DEF);
-  for(const s of [0, 1, 219.9, 439.82, 700, 799.82, 1100, 1239.5, 1500, 1599.5]){
-    const a = window.eval(`(()=>{ const p=Course.poseAt(${s}); return [p.x,p.z,p.curve,Course.glOf(Math.abs(p.curve))]; })()`);
-    const p = nodeCourse.poseAt(s), b=[p.x,p.z,p.curve,nodeCourse.glOf(Math.abs(p.curve))];
-    for(let i=0;i<4;i++) if(Math.abs(a[i]-b[i])>1e-9) return `s=${s} で不一致 [${a}] vs [${b}]`;
+  // 全セグメント種（直線/クロソイド/円弧）＋坂の谷/山を跨ぐサンプル
+  for(const s of [0, 60, 145, 300, 440, 800, 1150, 1350, 1500, 1650, 1823, 2000]){
+    const a = window.eval(`(()=>{ const p=Course.poseAt(${s}); return [p.x,p.z,p.curve,Course.glOf(Math.abs(p.curve)),Course.elevAt(${s}),Course.gradeAt(${s})]; })()`);
+    const p = nodeCourse.poseAt(s), b=[p.x,p.z,p.curve,nodeCourse.glOf(Math.abs(p.curve)),nodeCourse.elevAt(s),nodeCourse.gradeAt(s)];
+    for(let i=0;i<6;i++) if(Math.abs(a[i]-b[i])>1e-9) return `s=${s} で不一致 [${a}] vs [${b}]`;
   }
   return "周長P="+window.eval("Course.P").toFixed(1);
+});
+check("府中モデルの骨格（左回り・直線525.9・閉路・高低差2.7）", () => {
+  const C = defs.buildCourse(defs.COURSE_DEF);
+  if(C.outSign!==-1) return "左回りでない（outSign="+C.outSign+"）";
+  if(Math.abs(C.P-2083.1)>0.01) return "周長が2083.1でない: "+C.P;
+  if(Math.abs(C.homeStraight-525.9)>0.01) return "直線が525.9でない";
+  if(C.closure>0.05) return "閉路誤差が大きい: "+C.closure;
+  let mn=1/0,mx=-1/0; for(let s=0;s<C.P;s+=5){ const e=C.elevAt(s); if(e<mn)mn=e; if(e>mx)mx=e; }
+  if(Math.abs((mx-mn)-2.7)>0.1) return "高低差が2.7でない: "+(mx-mn).toFixed(2);
+  const emb = window.eval("Course.outSign===OUT_SGN && Course.homeStraight===525.9 && Course.closure<0.05");
+  return emb===true ? ("閉路誤差="+C.closure.toExponential(1)) : "本体側Course派生値が不一致";
 });
 
 console.log("\n=== 収録実況（VoiceBank）の整合 ===");
@@ -155,7 +167,7 @@ check("セーブv2（格別勝利/信頼度/開催数）", () => {
   const raw = window.localStorage.getItem("hizumeoto_save_v1");
   if(!raw) return false; const s=JSON.parse(raw);
   const c=s.career;
-  return s.v===2 && c.gradeWins && typeof c.trust==="number" && c.meets>=1
+  return s.v>=2 && c.gradeWins && typeof c.trust==="number" && c.meets>=1
     ? ("trust="+c.trust+" meets="+c.meets+" gradeWins="+JSON.stringify(c.gradeWins)) : false;
 });
 console.log("\n=== 被せ・包み込み／映画的写真判定 ===");

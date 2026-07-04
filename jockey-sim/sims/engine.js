@@ -6,22 +6,24 @@
  * 使い方: const {runMany} = require("./engine");
  *   runMany(1600, 1500, {BASE:0.34}) → 集計オブジェクト
  */
-// コース＝共有正典 sims/course_def.js（κ(s)連続・groundLoss=f(κ)・データ駆動）。
-// 旧 curveAt 二値＋gl定数の二重定義は Phase2 コース一元化で根治済み。
+// コース＝共有正典 sims/course_def.js（府中モデル：左回り2083.1m・直線525.9m・クロソイド複合カーブ・
+// 標高2.7m）。κ(s)連続・groundLoss=f(κ)・坂=slope{upDrain,upSlow,downFast}をデータ駆動で参照。
 const { COURSE_DEF, JOCKEY_PERSONAS, buildCourse } = require("./course_def");
 const Course = buildCourse(COURSE_DEF);
 const TRK_P = Course.P;
 
-const cruiseBase=18.8, staFatigue=24;
+// Phase3a 物理再バランス：実時計帯（東京1600≈94s級）へ速度系を再回帰（旧: cruise18.8/top19.4/FREE16.3/COEF0.052）
+const cruiseBase=17.1, staFatigue=24;
 // 創発ペース／ハナ争い（Stage1）：先頭争いからペースを発生させ、スタミナ・縦長・失速へ波及させる
 const LEAD_ZONE=9, HANA_ESC=0.9, LONE_EASE=1.5, PACE_DRAIN=0.25, FOLLOW_MAX=2.0;
 // 後続の役割ギャップ（馬身。先頭からの距離）。ペースで伸縮し、馬群を約8〜20馬身に束ねる
 const ROLEGAP={nige:1, senko:3.5, sashi:8, oikomi:13};
+// cr=仕掛け残りm。直線525.9m化に合わせ+40〜50m（4角進入〜直線入口で動く実際の呼吸へ）
 const STYLES={
-  nige:  {cg:0.55, sb:1.08, kg:0.62, cr:520, pref:[0,1.6]},
-  senko: {cg:0.22, sb:1.00, kg:0.88, cr:450, pref:[0.6,2.6]},
-  sashi: {cg:-0.22,sb:0.92, kg:1.08, cr:370, pref:[1.4,4.0]},
-  oikomi:{cg:-0.46,sb:0.84, kg:1.22, cr:310, pref:[2.2,5.2]},
+  nige:  {cg:0.55, sb:1.08, kg:0.62, cr:560, pref:[0,1.6]},
+  senko: {cg:0.22, sb:1.00, kg:0.88, cr:500, pref:[0.6,2.6]},
+  sashi: {cg:-0.22,sb:0.92, kg:1.08, cr:420, pref:[1.4,4.0]},
+  oikomi:{cg:-0.46,sb:0.84, kg:1.22, cr:355, pref:[2.2,5.2]},
 };
 const SK=Object.keys(STYLES);
 const ABK=["rocket","settle","burst","breaker","corner","stayer","fighter","widerush","frontsoul","hotblood","mud","fast"];
@@ -32,8 +34,8 @@ function derive(s,ab,DIST,cond){
   const mm=Math.abs(DIST-s.aptDist), aptF=clamp(0.45-mm/650,-0.7,0.45);
   let keen=clamp((76-s.temper)/20,0,1.5); if(ab==="hotblood") keen=clamp(keen+0.45,0,1.9);
   return {
-    baseTop:(19.4+(s.speed-78)*0.072+aptF*0.30)*cond,
-    kickInst:(s.instant-72)*0.052,
+    baseTop:(17.7+(s.speed-78)*0.0655+aptF*0.27)*cond,
+    kickInst:(s.instant-72)*0.047,
     accelUp:1.5+(s.instant-70)*0.030+(s.power-72)*0.006,
     drainResist:clamp((0.74+(s.stamina-72)*0.014)*(1+aptF*0.12),0.52,1.55)*cond,
     keen, gatePow:clamp(((s.gate!=null?s.gate:s.power)-70)/30,-0.4,1),
@@ -43,10 +45,13 @@ function derive(s,ab,DIST,cond){
 }
 const topBase=h=>h.p.baseTop+STYLES[h.style].kg*h.p.kickInst;
 
-/** 1レース実行。P でドレイン系を上書き可能（既定＝ゲーム現行値） */
+/** 1レース実行。P でドレイン/坂/横ロス系を上書き可能（既定＝ゲーム現行値。グリッドサーチが使う） */
 function race(DIST, P){
-  P=Object.assign({BASE:0.34, COEF:0.052, FREE:16.3, DM:1.0}, P||{});
-  const startS=((TRK_P-(DIST%TRK_P))%TRK_P), straightDist=DIST-400;
+  P=Object.assign({BASE:0.28, COEF:0.055, FREE:16.1, DM:1.0,
+                   SLU:COURSE_DEF.slope.upDrain, BEND:COURSE_DEF.groundLoss.bendRef}, P||{});
+  const glX=k=>{ const g=COURSE_DEF.groundLoss, t=clamp(k/g.kappaRef,0,1); return g.straight+(P.BEND-g.straight)*t; };
+  const SLOPE=COURSE_DEF.slope;
+  const startS=((TRK_P-(DIST%TRK_P))%TRK_P), straightDist=DIST-Course.homeStraight;
   const g=Math.random();
   const going=g<0.62?{drain:1.0,fast:true,bad:0}:g<0.85?{drain:1.045,bad:0.6}:{drain:1.09,heavy:true,bad:1};
   const F=[];
@@ -66,7 +71,7 @@ function race(DIST, P){
     h.commitDist=DIST-STYLES[style].cr+rnd(-55,55)-h.jockey.commit;
     let q=Math.random()<0.18?"good":Math.random()>0.85?"slow":"ok"; if(ab==="rocket"&&q==="slow")q="ok";
     let off=q==="good"?rnd(1.5,3):q==="slow"?-rnd(2,4):rnd(-0.5,1); off+=h.p.gatePow*1.2;
-    h.dist=Math.max(0,0.5+off); h.speed=(q==="slow"?12.5:14.5)+h.p.gatePow*0.8; F.push(h);
+    h.dist=Math.max(0,0.5+off); h.speed=(q==="slow"?11.4:13.2)+h.p.gatePow*0.8; F.push(h);
   }
   const dt=1/30; let t=0;
   let pace=cruiseBase, fhPaceSum=0, fhPaceN=0, peakLen=0, peakContest=0;   // 創発ペース・前半ペース・ピーク縦長・最大競り強度
@@ -90,8 +95,9 @@ function race(DIST, P){
     for(const h of F){ if(h.finished)continue;
       if(h._rankAtStr==null && h.dist>=straightDist) h._rankAtStr=h._rankNow;        // 直線入口の順位
       let leader=true; for(const o of F){ if(o===h||o.finished)continue; if(o.dist>h.dist){leader=false;break;} }
-      const inStr=h.dist>=straightDist; let tm=1;
-      if(h.ab==="burst"&&inStr)tm+=0.10; if(h.ab==="widerush"&&inStr&&h.lane>=4)tm+=0.09;
+      const inStr=h.dist>=straightDist, last400=(DIST-h.dist)<400; let tm=1;
+      // 末脚系は「残り400m」に紐付け（旧仕様の直線=残り400mと等価＝直線525.9m化でも総獲得が距離非依存で不変）
+      if(h.ab==="burst"&&last400)tm+=0.045; if(h.ab==="widerush"&&last400&&h.lane>=4)tm+=0.041;
       if(h.ab==="frontsoul"&&leader)tm+=0.05; if(h.ab==="mud"&&going.heavy)tm+=0.06; if(h.ab==="fast"&&going.fast)tm+=0.05;
       const tTop=topBase(h)*tm; let target;
       if(h.dist>=h.commitDist){ target=tTop; h.committed=true; }
@@ -116,10 +122,16 @@ function race(DIST, P){
         for(const o of F){ if(o===h||o.finished)continue; if(Math.abs(o.dist-h.dist)<3.2){battle=true;break;} }
         if(battle){ let gb=0.4+h.p.gutsF*0.7; if(h.ab==="fighter")gb*=1.8; target+=gb; }
       }
+      // ---- 坂（勾配1%あたり）：上り=消費追加＋目標減速 / 下り=目標微増。drainResistが効く＝
+      //      スタミナ自慢は坂に強い。「坂で止まる馬を坂下で脚を残して差す」判断の物理根拠 ----
+      const gPct = Course.gradeAt(startS+h.dist)*100;
+      const slopeV = gPct>0 ? -SLOPE.upSlow*gPct : SLOPE.downFast*(-gPct);
+      target += slopeV;
       // ---- スタミナ消費（ゲーム本体と同一構造。Pで調整実験可） ----
       let drain=P.BASE + Math.pow(Math.max(0,h.speed-P.FREE),1.8)*P.COEF*STYLES[h.style].sb;
       if(h.committed) drain+=1.0;
       if(h._contesting) drain+=PACE_DRAIN*contest;   // ハナ争いは脚を使う＝後半に失速の伏線
+      if(gPct>0) drain+=P.SLU*gPct;                  // 上り坂の追加消費（回帰対象）
       let gm=going.drain; if(h.ab==="mud"&&going.heavy)gm=1.0; drain*=gm;
       if(h.ab==="stayer"&&h.dist>DIST*0.66)drain*=0.9;
       if(h.ab==="frontsoul"&&leader)drain*=0.95;
@@ -127,6 +139,7 @@ function race(DIST, P){
       h.stamina=clamp(h.stamina-drain*dt,0,100); if(h.stamina<h.minSta)h.minSta=h.stamina;
       let floor=h.ab==="stayer"?0.76:0.66, vCeil=tTop+0.6;
       if(h.stamina<staFatigue){ const f=floor+(1-floor)*(h.stamina/staFatigue); vCeil=tTop*f; }
+      vCeil += slopeV;                                                   // 坂は上限にも効く（上りで頭打ち＝坂で止まる）
       if(!h.committed && (lead-h.dist)>30 && h.stamina>20) vCeil+=1.8;   // 後方に離れた馬は馬群へ取り付くため一時的に上限up（脱落防止＝馬群を束ねる）
       target=clamp(target,6,vCeil);
       const rate=target>h.speed?h.p.accelUp:2.4;
@@ -143,7 +156,7 @@ function race(DIST, P){
             if(cg>0&&h.target>1.4)h.target-=dt*0.5; }
       if(blk){ const d=(h.id%2? -0.7 : 1.0); h.target=clamp(h.target + d*(onBend?0.7:1.2)*dt, 0, onBend?4.5:6.5); }  // 詰まったら左右に開いて抜ける（IDで散らしデッドロック回避）
       h.lane=clamp(h.lane+clamp(h.target-h.lane,-1.9*dt,1.9*dt),0,7);
-      let gl=Course.glOf(kappa);   // 横ロス＝曲率連続 f(κ)（現行コースでは旧二値と同値）
+      let gl=glX(kappa);   // 横ロス＝曲率連続 f(κ)（bendRefはP.BENDで回帰実験可）
       if(onBend){ let red=h.p.cornerSkill; if(h.ab==="corner")red+=0.5; gl*=clamp(1-red,0.35,1); }
       h.dist+=h.speed*(1-h.lane*gl)*dt;
       if(!h.finished&&h.dist>=DIST){ const over=h.dist-DIST, ve=Math.max(0.1,h.speed*(1-h.lane*gl)); h.ft=t-over/ve; h.finished=true; }

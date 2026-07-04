@@ -30,17 +30,17 @@
     lanes: 8,
     homeStraight: 525.9,                     // 最終直線長（直線判定・実況・HUDの正典）
     // 始点（s=0=ゴール線）。コース重心がワールド原点に来る平行移動量（ソルバのbboxから算出）
-    start: { x: 221.37, z: -114.34, heading: 0 },
+    start: { x: 221.37, z: 114.34, heading: 0 },
     // 閉路ソルバの解（旋回和=2π・閉路誤差1.2e-10）。数値は調整値（出典: 周長/直線/高低差はJRA公開値）
     segments: [
       { type:"straight", len: 120 },                                              // ゴール→1角 立ち上がり
-      { type:"clothoid", len: 50,  k0: 0,                 k1: 1/95 },              // 1角 進入緩和
-      { type:"arc",      len: 243.426335230765, R: 95,    dir: +1 },               // 1-2角 本体（タイト）
-      { type:"clothoid", len: 50,  k0: 1/95,              k1: 0 },                 // 2角 脱出緩和
+      { type:"clothoid", len: 50,  k0: 0,                 k1: -1/95 },             // 1角 進入緩和
+      { type:"arc",      len: 243.426335230765, R: 95,    dir: -1 },               // 1-2角 本体（タイト）
+      { type:"clothoid", len: 50,  k0: -1/95,             k1: 0 },                 // 2角 脱出緩和
       { type:"straight", len: 645.9 },                                             // 向正面（長い）
-      { type:"clothoid", len: 90,  k0: 0,                 k1: 1/112.02852292395615 }, // 3角 進入緩和
-      { type:"arc",      len: 267.87366476933585, R: 112.02852292395615, dir: +1 }, // 3-4角 本体（大回り）
-      { type:"clothoid", len: 90,  k0: 1/112.02852292395615, k1: 0 },              // 4角 脱出緩和
+      { type:"clothoid", len: 90,  k0: 0,                 k1: -1/112.02852292395615 }, // 3角 進入緩和
+      { type:"arc",      len: 267.87366476933585, R: 112.02852292395615, dir: -1 }, // 3-4角 本体（大回り）
+      { type:"clothoid", len: 90,  k0: -1/112.02852292395615, k1: 0 },             // 4角 脱出緩和
       { type:"straight", len: 525.9 },                                             // ホームストレッチ → ゴール(s=0)
     ],
     // 横ロス係数 f(κ)：gl(κ) = straight + (bendRef - straight) × clamp(κ/kappaRef, 0, 1)
@@ -125,7 +125,7 @@
     return {
       P, laneW:def.laneW, lanes:def.lanes,
       homeStraight: def.homeStraight || 400,
-      outSign: turn<0 ? +1 : -1,             // 右回り=+1（現行互換）/ 左回り=-1
+      outSign: turn<0 ? +1 : -1,             // heading減少の回り=+1（three.js y-up の画面では左回り＝府中）
       closure,
       kappaAt(s){
         const [sg,d]=segOf(s);

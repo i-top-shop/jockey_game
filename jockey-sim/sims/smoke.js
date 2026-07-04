@@ -65,9 +65,10 @@ check("Course の座標・κ・gl・標高・勾配が機能一致（サンプ�
   }
   return "周長P="+window.eval("Course.P").toFixed(1);
 });
-check("府中モデルの骨格（左回り・直線525.9・閉路・高低差2.7）", () => {
+check("府中モデルの骨格（実視左回り・直線525.9・閉路・高低差2.7）", () => {
   const C = defs.buildCourse(defs.COURSE_DEF);
-  if(C.outSign!==-1) return "左回りでない（outSign="+C.outSign+"）";
+  // three.js y-up の画面では heading減少の回り（outSign=+1）が左回りに見える（凡例逆転の罠。CLAUDE.md §5）
+  if(C.outSign!==+1) return "実視左回りでない（outSign="+C.outSign+"）";
   if(Math.abs(C.P-2083.1)>0.01) return "周長が2083.1でない: "+C.P;
   if(Math.abs(C.homeStraight-525.9)>0.01) return "直線が525.9でない";
   if(C.closure>0.05) return "閉路誤差が大きい: "+C.closure;

@@ -260,7 +260,8 @@
   if(DATA.generatedAt){
     const g = new Date(DATA.generatedAt);
     document.getElementById("ft").textContent =
-      "データ更新: " + fmtDateLabel.format(g) + " " + fmtTime.format(g) + "（JST） ／ 全" + matches.length + "試合収録";
+      "データ更新: " + fmtDateLabel.format(g) + " " + fmtTime.format(g) + "（JST） ／ 全" + matches.length + "試合収録 ／ " +
+      "「時刻未定」の試合は暫定の日付表示です（放送編成等で変更の可能性あり）";
   }
 
   renderChips();

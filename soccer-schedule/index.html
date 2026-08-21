@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>５リーグ日程帳</title>
+<style>
+  :root{
+    --bg:#f4f5f7; --card:#ffffff; --ink:#1a1d24; --sub:#6b7280; --line:#e5e7eb;
+    --chip:#ffffff; --chip-line:#d1d5db; --accent:#0e6e4b; --today:#0e6e4b;
+    --score:#111827; --badge-ink:#ffffff; --head:#f4f5f7ee;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#101216; --card:#1a1e26; --ink:#e8eaf0; --sub:#9aa2b1; --line:#2a2f3a;
+      --chip:#1a1e26; --chip-line:#3a4150; --accent:#3ecf8e; --today:#3ecf8e;
+      --score:#f3f4f6; --head:#101216ee;
+    }
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP","Yu Gothic UI",system-ui,sans-serif;
+    line-height:1.5; padding-bottom:48px;
+  }
+  header{
+    position:sticky; top:0; z-index:20; background:var(--head);
+    backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
+    padding:10px 14px 8px;
+  }
+  h1{font-size:17px; letter-spacing:.04em; display:flex; align-items:baseline; gap:8px;}
+  h1 small{font-size:11px; font-weight:normal; color:var(--sub);}
+  .sample-note{
+    margin-top:6px; font-size:11.5px; padding:6px 9px; border-radius:8px;
+    background:color-mix(in srgb, var(--accent) 12%, transparent);
+    color:var(--ink); border:1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+  .controls{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; align-items:center;}
+  .chip{
+    border:1px solid var(--chip-line); background:var(--chip); color:var(--ink);
+    border-radius:999px; padding:4px 12px; font-size:12.5px; cursor:pointer;
+    display:inline-flex; align-items:center; gap:6px; user-select:none;
+    transition:background .12s, border-color .12s;
+  }
+  .chip .dot{width:8px; height:8px; border-radius:50%; background:var(--dot,#888);}
+  .chip.on{background:var(--dot,#555); border-color:var(--dot,#555); color:#fff;}
+  .chip.on .dot{background:#fff;}
+  .row2{display:flex; gap:6px; margin-top:7px; align-items:center;}
+  input[type=search]{
+    flex:1; min-width:120px; border:1px solid var(--chip-line); background:var(--card); color:var(--ink);
+    border-radius:8px; padding:6px 10px; font-size:13px; outline:none;
+  }
+  input[type=search]:focus{border-color:var(--accent);}
+  .toggle{font-size:12px; color:var(--sub); display:inline-flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap;}
+  main{max-width:720px; margin:0 auto; padding:4px 10px;}
+  .datehead{
+    position:sticky; top:var(--headH,118px); z-index:10;
+    background:var(--head); backdrop-filter:blur(8px);
+    font-size:13.5px; font-weight:bold; padding:10px 6px 6px;
+    display:flex; align-items:center; gap:8px; border-bottom:1px solid var(--line);
+  }
+  .datehead .cnt{font-weight:normal; font-size:11px; color:var(--sub);}
+  .badge-today{
+    font-size:10.5px; color:#fff; background:var(--today); border-radius:5px; padding:1px 7px;
+  }
+  .match{
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    margin:7px 0; padding:8px 11px;
+    display:grid; grid-template-columns:52px 1fr auto; gap:4px 10px; align-items:center;
+  }
+  .match .time{font-size:15px; font-weight:bold; font-variant-numeric:tabular-nums;}
+  .match .time.tbd{font-size:11px; color:var(--sub); font-weight:normal;}
+  .match .lg{
+    grid-column:1; font-size:10px; color:var(--badge-ink); background:var(--dot,#666);
+    border-radius:4px; text-align:center; padding:1px 2px; letter-spacing:.03em;
+  }
+  .match .teams{grid-column:2; grid-row:1; font-size:14px;}
+  .match .teams .vs{color:var(--sub); font-size:11px; margin:0 5px;}
+  .match .meta{grid-column:2; grid-row:2; font-size:11px; color:var(--sub);}
+  .match .right{grid-column:3; grid-row:1/3; text-align:right;}
+  .match .score{font-size:16px; font-weight:bold; color:var(--score); font-variant-numeric:tabular-nums;}
+  .match .st{font-size:10.5px; color:var(--sub);}
+  .match .st.live{color:#e02020; font-weight:bold;}
+  .match.done{opacity:.72;}
+  .empty{text-align:center; color:var(--sub); font-size:13px; padding:48px 0;}
+  footer{max-width:720px; margin:24px auto 0; padding:0 14px; font-size:11px; color:var(--sub);}
+  .totop{
+    position:fixed; right:14px; bottom:14px; z-index:30;
+    border:1px solid var(--chip-line); background:var(--card); color:var(--ink);
+    border-radius:999px; padding:8px 14px; font-size:12px; cursor:pointer;
+    box-shadow:0 2px 8px rgba(0,0,0,.15); display:none;
+  }
+</style>
+</head>
+<body>
+<header id="hd">
+  <h1>５リーグ日程帳 <small>すべて日本時間（JST）表示</small></h1>
+  <div class="sample-note" id="sampleNote" hidden>
+    ⚠ サンプルデータを表示中です。実際の日程・結果ではありません。<code>scripts/update.mjs</code> で実データに更新できます。
+  </div>
+  <div class="controls" id="chips"></div>
+  <div class="row2">
+    <input type="search" id="q" placeholder="チーム・スタジアム名で絞り込み" autocomplete="off">
+    <label class="toggle"><input type="checkbox" id="futureOnly" checked>今後のみ</label>
+  </div>
+</header>
+
+<main id="list"></main>
+<footer id="ft"></footer>
+<button class="totop" id="totop">▲ 今日へ</button>
+
+<script src="data/matches.js"></script>
+<script>
+(function(){
+  "use strict";
+  const DATA = window.SCHEDULE_DATA || { leagues:[], matches:[], sample:false };
+  const leagues = DATA.leagues;
+  const byId = Object.fromEntries(leagues.map(l => [l.id, l]));
+
+  // ---- 状態（localStorage は使えない環境でも動くよう try/catch） ----
+  const store = {
+    get(k, d){ try{ const v = localStorage.getItem("sched5:"+k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+    set(k, v){ try{ localStorage.setItem("sched5:"+k, JSON.stringify(v)); }catch(e){} }
+  };
+  let selected = new Set(store.get("leagues", []));   // 空 = 全リーグ
+  let query = "";
+  let futureOnly = store.get("futureOnly", true);
+
+  // ---- JST 変換ユーティリティ ----
+  const TZ = "Asia/Tokyo";
+  const fmtTime = new Intl.DateTimeFormat("ja-JP", { timeZone:TZ, hour:"2-digit", minute:"2-digit", hour12:false });
+  const fmtDateKey = new Intl.DateTimeFormat("en-CA", { timeZone:TZ, year:"numeric", month:"2-digit", day:"2-digit" }); // YYYY-MM-DD
+  const fmtDateLabel = new Intl.DateTimeFormat("ja-JP", { timeZone:TZ, month:"long", day:"numeric", weekday:"short" });
+  const jstKey = d => fmtDateKey.format(d);
+  const todayKey = () => jstKey(new Date());
+
+  // ---- 前処理：JSTの日付キーを付与してソート ----
+  const matches = DATA.matches.map(m => {
+    const d = new Date(m.utc);
+    return { ...m, _d:d, _key:jstKey(d), _time:fmtTime.format(d), _label:fmtDateLabel.format(d) };
+  }).sort((a,b) => a._d - b._d || a.league.localeCompare(b.league));
+
+  // ---- リーグ選択チップ ----
+  const chipsEl = document.getElementById("chips");
+  function renderChips(){
+    chipsEl.innerHTML = "";
+    const all = document.createElement("button");
+    all.className = "chip" + (selected.size === 0 ? " on" : "");
+    all.style.setProperty("--dot", "var(--accent)");
+    all.textContent = "すべて";
+    all.onclick = () => { selected.clear(); persist(); renderChips(); render(); };
+    chipsEl.appendChild(all);
+    for(const l of leagues){
+      const b = document.createElement("button");
+      b.className = "chip" + (selected.has(l.id) ? " on" : "");
+      b.style.setProperty("--dot", l.color);
+      b.innerHTML = '<span class="dot"></span>' + l.short;
+      b.title = l.name + "（" + l.country + "）";
+      b.onclick = () => {
+        selected.has(l.id) ? selected.delete(l.id) : selected.add(l.id);
+        if(selected.size === leagues.length) selected.clear();
+        persist(); renderChips(); render();
+      };
+      chipsEl.appendChild(b);
+    }
+  }
+  function persist(){
+    store.set("leagues", [...selected]);
+    store.set("futureOnly", futureOnly);
+  }
+
+  // ---- 一覧描画 ----
+  const listEl = document.getElementById("list");
+  function statusLabel(m){
+    if(m.status === "FINISHED") return "終了";
+    if(m.status === "IN_PLAY" || m.status === "LIVE" || m.status === "PAUSED") return "試合中";
+    if(m.status === "POSTPONED") return "延期";
+    if(m.status === "CANCELLED") return "中止";
+    return "";
+  }
+  function render(){
+    const q = query.trim().toLowerCase();
+    const tk = todayKey();
+    const rows = matches.filter(m => {
+      if(selected.size && !selected.has(m.league)) return false;
+      if(futureOnly && m._key < tk) return false;
+      if(q && !((m.home + m.away + (m.venue||"") + (byId[m.league]?.name||"")).toLowerCase().includes(q))) return false;
+      return true;
+    });
+
+    listEl.innerHTML = "";
+    if(rows.length === 0){
+      listEl.innerHTML = '<div class="empty">該当する試合がありません</div>';
+      return;
+    }
+
+    let curKey = null, dayWrap = null;
+    const tomorrow = jstKey(new Date(Date.now() + 864e5));
+    for(const m of rows){
+      if(m._key !== curKey){
+        curKey = m._key;
+        const h = document.createElement("div");
+        h.className = "datehead";
+        h.dataset.key = m._key;
+        const cnt = rows.filter(x => x._key === m._key).length;
+        let badge = "";
+        if(m._key === tk) badge = '<span class="badge-today">今日</span>';
+        else if(m._key === tomorrow) badge = '<span class="badge-today" style="opacity:.65">明日</span>';
+        h.innerHTML = m._label + " " + badge + ' <span class="cnt">' + cnt + "試合</span>";
+        listEl.appendChild(h);
+      }
+      const lg = byId[m.league] || { short:m.league, color:"#666" };
+      const el = document.createElement("div");
+      el.className = "match" + (m.status === "FINISHED" ? " done" : "");
+      el.style.setProperty("--dot", lg.color);
+      const st = statusLabel(m);
+      const live = /IN_PLAY|LIVE|PAUSED/.test(m.status || "");
+      el.innerHTML =
+        (m.tbd ? '<div class="time tbd">時刻未定</div>' : '<div class="time">' + m._time + "</div>") +
+        '<div class="lg">' + lg.short + "</div>" +
+        '<div class="teams">' + esc(m.home) + '<span class="vs">vs</span>' + esc(m.away) + "</div>" +
+        '<div class="meta">' + (m.matchday ? "第" + m.matchday + "節　" : "") + esc(m.venue || "") + "</div>" +
+        '<div class="right">' +
+          (m.score ? '<div class="score">' + esc(m.score) + "</div>" : "") +
+          (st ? '<div class="st' + (live ? " live" : "") + '">' + st + "</div>" : "") +
+        "</div>";
+      listEl.appendChild(el);
+    }
+  }
+  function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+  // ---- ヘッダ高さ → 日付見出しの sticky 位置 ----
+  function syncHeadH(){
+    document.documentElement.style.setProperty("--headH", document.getElementById("hd").offsetHeight + "px");
+  }
+
+  // ---- 今日へスクロール ----
+  function scrollToToday(){
+    const tk = todayKey();
+    const heads = [...document.querySelectorAll(".datehead")];
+    const target = heads.find(h => h.dataset.key >= tk);
+    if(target && target !== heads[0]){
+      const headH = document.getElementById("hd").offsetHeight;
+      window.scrollTo(0, Math.max(0, target.offsetTop - headH));
+    }
+  }
+  document.getElementById("totop").onclick = () => { window.scrollTo({ top:0, behavior:"smooth" }); };
+  addEventListener("scroll", () => {
+    document.getElementById("totop").style.display = scrollY > 600 ? "block" : "none";
+  }, { passive:true });
+
+  // ---- 入力 ----
+  document.getElementById("q").addEventListener("input", e => { query = e.target.value; render(); });
+  const fo = document.getElementById("futureOnly");
+  fo.checked = futureOnly;
+  fo.addEventListener("change", e => { futureOnly = e.target.checked; persist(); render(); });
+
+  // ---- フッタ・サンプル表示 ----
+  if(DATA.sample) document.getElementById("sampleNote").hidden = false;
+  if(DATA.generatedAt){
+    const g = new Date(DATA.generatedAt);
+    document.getElementById("ft").textContent =
+      "データ更新: " + fmtDateLabel.format(g) + " " + fmtTime.format(g) + "（JST） ／ 全" + matches.length + "試合収録";
+  }
+
+  renderChips();
+  render();
+  syncHeadH();
+  addEventListener("resize", syncHeadH);
+  if(futureOnly) requestAnimationFrame(scrollToToday);
+})();
+</script>
+</body>
+</html>

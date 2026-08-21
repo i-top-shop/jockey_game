@@ -216,7 +216,8 @@
       const st = statusLabel(m);
       const live = /IN_PLAY|LIVE|PAUSED/.test(m.status || "");
       el.innerHTML =
-        (m.tbd ? '<div class="time tbd">時刻未定</div>' : '<div class="time">' + m._time + "</div>") +
+        (m.dateTBD ? '<div class="time tbd">日程未定</div>'
+          : m.tbd ? '<div class="time tbd">時刻未定</div>' : '<div class="time">' + m._time + "</div>") +
         '<div class="lg">' + lg.short + "</div>" +
         '<div class="teams">' + esc(m.home) + '<span class="vs">vs</span>' + esc(m.away) + "</div>" +
         '<div class="meta">' + (m.matchday ? "第" + m.matchday + "節　" : "") + esc(m.venue || "") + "</div>" +

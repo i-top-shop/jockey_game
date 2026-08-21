@@ -15,43 +15,46 @@
   日本のカレンダー上の日付に正しく振り分けられる
 - 選択状態は端末に保存される（localStorage）
 
-## データについて
+## データについて（2026-27シーズン・実データ収録済み）
 
-初期状態では `data/matches.js` に **サンプルデータ**（デモ用のダミー日程）が入っており、
-画面上部にその旨のバナーが出ます。実データへの更新は次のとおり。
+`data/matches.js` には **2026-27シーズンの実際の日程 全1,864試合** を収録済み
+（Ｊ１ 380・Ｊ２札幌 38・プレミア 380・ラリーガ 380・セリエＡ 380・ブンデス 306）。
 
-### 実データに更新する（要ネット接続の環境で実行）
+### 収録内容と精度
+
+- **Ｊ１・Ｊ２**: Ｊリーグ公式サイトの日程から自動生成されている
+  [j-schedule-ics-maker](https://github.com/takahashimasaki4biz/j-schedule-ics-maker)
+  のクラブ別ICSを全クラブぶん突合して復元（ホーム側・アウェイ側の二重記録が全試合一致することを検証済み）。
+  開幕〜直近節の結果スコアは報道各社の検索結果から反映。
+  第20節 京都×岡山はＪリーグ公式でも「日程未定」のため、その旨表示している
+- **欧州4リーグ**: 全節の対戦カードと開催日は [openfootball](https://github.com/openfootball) の公式日程データ、
+  放送編成で確定済みの節（プレミア第1-6節・ラリーガ第1-3節・セリエＡ第1-5節・ブンデス第1-4節、2026-08-21時点）は
+  日本語メディアの確報で個別キックオフ日時・結果に補正済み
+- **未確定の節は「時刻未定」表示**（日付は暫定。放送編成の発表で確定していく）
+- Ｗ杯影響によるラリーガ開幕節の延期4試合、セリエＡ第4節のEL日程待ち2試合なども反映済み
+
+### データを最新化する（要ネット接続、Node 18+）
 
 ```bash
-# 1) football-data.org の無料APIキーを取得（欧州4リーグ用）
-#    https://www.football-data.org/client/register
+# Ｊリーグの日程更新（時刻未定→確定の反映など。git cloneできれば動く）
+node scripts/update-jleague-ics.mjs
 
-# 2) 実行（Node 18 以上）
-FOOTBALL_DATA_API_KEY=あなたのキー node scripts/update.mjs
+# 欧州4リーグ・結果スコアの更新（football-data.org の無料APIキーが必要）
+FOOTBALL_DATA_API_KEY=あなたのキー node scripts/update.mjs --no-j
 ```
 
-主なオプション:
-
-| オプション | 意味 |
-|---|---|
-| `--no-eu` | Ｊリーグのみ更新（APIキー不要） |
-| `--no-j` | 欧州4リーグのみ更新 |
-| `--season=2026` | 欧州のシーズン開始年を指定（省略時は今季） |
-| `--jyears=2026,2027` | Ｊリーグの取得年度。秋春制で年をまたぐ場合は両年指定 |
-
-- 欧州4リーグ: [football-data.org](https://www.football-data.org/) v4 API（無料枠 10リクエスト/分）
-- Ｊ１・Ｊ２: [Ｊリーグ公式データサイト](https://data.j-league.or.jp/) の日程検索結果を解析。
-  Ｊ２はコンサドーレ札幌が絡む試合だけを残す（`update.mjs` の `DIVS` で変更可）。
-  サイトの構成変更で0件になった場合は `scripts/update.mjs` の `parseJleagueHtml` を修正する
-- 片側だけ更新した場合、もう片側の既存データは維持される
+- `update-jleague-ics.mjs` は日程の更新のみ（消化済み試合と結果は既存データを維持）
+- `update.mjs` は football-data.org（欧州）とＪリーグ公式データサイトのHTML解析（`--no-eu`でＪのみ）。
+  結果スコアの取り込みにも使える
 - 日次更新したい場合は cron 等で上記コマンドを回し、`data/matches.js` を配信すればよい
 
 ## ファイル構成
 
 ```
-index.html          表示アプリ本体（ゼロ依存）
-data/matches.js     日程データ（update.mjs が生成。window.SCHEDULE_DATA を定義）
-scripts/update.mjs  データ更新スクリプト（Node 18+、依存パッケージなし）
+index.html                      表示アプリ本体（ゼロ依存）
+data/matches.js                 日程データ（window.SCHEDULE_DATA を定義）
+scripts/update-jleague-ics.mjs  Ｊリーグ日程更新（ICS方式・キー不要）
+scripts/update.mjs              欧州リーグ・結果更新（football-data.org / Ｊリーグ公式サイト）
 ```
 
 ## データ形式
@@ -68,7 +71,8 @@ window.SCHEDULE_DATA = {
     home, away, venue,
     status: "SCHEDULED|FINISHED|IN_PLAY|POSTPONED|CANCELLED",
     score: "1-0",            // 終了時のみ
-    tbd: true                // キックオフ時刻未定なら
+    tbd: true,               // キックオフ時刻未定なら（日付は暫定表示）
+    dateTBD: true            // 開催日そのものが未定なら（例: J1第20節 京都×岡山）
   }]
 };
 ```

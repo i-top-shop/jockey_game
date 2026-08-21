@@ -2,6 +2,7 @@
 
 Ｊ１リーグ・プレミアリーグ・ラ・リーガ・セリエＡ・ブンデスリーガの日程を
 **すべて日本時間（JST）** で一覧できる、ゼロ依存の単一HTMLアプリ。
+Ｊ２は**北海道コンサドーレ札幌の試合のみ**特別収録（リーグ色はＪ１＝緑、Ｊ２＝深緑）。
 
 ## 使い方
 
@@ -39,7 +40,8 @@ FOOTBALL_DATA_API_KEY=あなたのキー node scripts/update.mjs
 | `--jyears=2026,2027` | Ｊリーグの取得年度。秋春制で年をまたぐ場合は両年指定 |
 
 - 欧州4リーグ: [football-data.org](https://www.football-data.org/) v4 API（無料枠 10リクエスト/分）
-- Ｊ１: [Ｊリーグ公式データサイト](https://data.j-league.or.jp/) の日程検索結果を解析。
+- Ｊ１・Ｊ２: [Ｊリーグ公式データサイト](https://data.j-league.or.jp/) の日程検索結果を解析。
+  Ｊ２はコンサドーレ札幌が絡む試合だけを残す（`update.mjs` の `DIVS` で変更可）。
   サイトの構成変更で0件になった場合は `scripts/update.mjs` の `parseJleagueHtml` を修正する
 - 片側だけ更新した場合、もう片側の既存データは維持される
 - 日次更新したい場合は cron 等で上記コマンドを回し、`data/matches.js` を配信すればよい
@@ -60,7 +62,7 @@ window.SCHEDULE_DATA = {
   sample: true/false,       // サンプルデータかどうか（trueで警告バナー表示）
   leagues: [{ id, name, short, country, color }],
   matches: [{
-    league: "J1|PL|PD|SA|BL1",
+    league: "J1|J2|PL|PD|SA|BL1",
     matchday: 2,             // 節
     utc: "ISO8601",          // キックオフ（UTC）。表示側で JST に変換
     home, away, venue,

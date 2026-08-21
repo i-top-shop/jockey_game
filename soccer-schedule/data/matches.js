@@ -5,7 +5,8 @@ window.SCHEDULE_DATA = {
   generatedAt: "2026-08-21T03:00:00Z",
   sample: true,
   leagues: [
-    { id: "J1", name: "明治安田Ｊ１リーグ", short: "Ｊ１", country: "日本", color: "#d5001d" },
+    { id: "J1", name: "明治安田Ｊ１リーグ", short: "Ｊ１", country: "日本", color: "#0e7d38" },
+    { id: "J2", name: "明治安田Ｊ２リーグ（コンサドーレのみ）", short: "Ｊ２札幌", country: "日本", color: "#145c30" },
     { id: "PL", name: "プレミアリーグ", short: "プレミア", country: "イングランド", color: "#38003c" },
     { id: "PD", name: "ラ・リーガ", short: "ラリーガ", country: "スペイン", color: "#e07a00" },
     { id: "SA", name: "セリエＡ", short: "セリエＡ", country: "イタリア", color: "#0066a7" },
@@ -22,6 +23,7 @@ window.SCHEDULE_DATA = {
     { league: "J1",  matchday: 1, utc: "2026-08-15T10:00:00Z", home: "鹿島アントラーズ", away: "浦和レッズ", venue: "県立カシマサッカースタジアム", status: "FINISHED", score: "1-0" },
     { league: "J1",  matchday: 1, utc: "2026-08-15T10:00:00Z", home: "ヴィッセル神戸", away: "サンフレッチェ広島", venue: "ノエビアスタジアム神戸", status: "FINISHED", score: "2-2" },
     { league: "J1",  matchday: 1, utc: "2026-08-16T09:00:00Z", home: "川崎フロンターレ", away: "ＦＣ東京", venue: "Ｕｖａｎｃｅとどろきスタジアム", status: "FINISHED", score: "3-1" },
+    { league: "J2",  matchday: 1, utc: "2026-08-16T04:00:00Z", home: "北海道コンサドーレ札幌", away: "ベガルタ仙台", venue: "大和ハウス プレミストドーム", status: "FINISHED", score: "2-1" },
 
     // ---- 今週末（予定） ----
     { league: "BL1", matchday: 1, utc: "2026-08-21T18:30:00Z", home: "バイエルン", away: "ライプツィヒ", venue: "アリアンツ・アレーナ", status: "SCHEDULED" },
@@ -31,6 +33,7 @@ window.SCHEDULE_DATA = {
     { league: "J1",  matchday: 2, utc: "2026-08-22T10:00:00Z", home: "名古屋グランパス", away: "ガンバ大阪", venue: "豊田スタジアム", status: "SCHEDULED" },
     { league: "J1",  matchday: 2, utc: "2026-08-23T09:00:00Z", home: "セレッソ大阪", away: "京都サンガF.C.", venue: "ヨドコウ桜スタジアム", status: "SCHEDULED" },
     { league: "J1",  matchday: 2, utc: "2026-08-23T10:00:00Z", home: "アビスパ福岡", away: "湘南ベルマーレ", venue: "ベスト電器スタジアム", status: "SCHEDULED" },
+    { league: "J2",  matchday: 2, utc: "2026-08-23T05:00:00Z", home: "ジェフユナイテッド千葉", away: "北海道コンサドーレ札幌", venue: "フクダ電子アリーナ", status: "SCHEDULED" },
     { league: "PL",  matchday: 2, utc: "2026-08-22T11:30:00Z", home: "マンチェスター・シティ", away: "トッテナム", venue: "エティハド・スタジアム", status: "SCHEDULED" },
     { league: "PL",  matchday: 2, utc: "2026-08-22T14:00:00Z", home: "ブライトン", away: "エヴァートン", venue: "アメックス・スタジアム", status: "SCHEDULED" },
     { league: "PL",  matchday: 2, utc: "2026-08-22T14:00:00Z", home: "ニューカッスル", away: "ブレントフォード", venue: "セント・ジェームズ・パーク", status: "SCHEDULED" },
@@ -54,6 +57,7 @@ window.SCHEDULE_DATA = {
     { league: "J1",  matchday: 3, utc: "2026-08-29T10:00:00Z", home: "横浜Ｆ・マリノス", away: "川崎フロンターレ", venue: "日産スタジアム", status: "SCHEDULED" },
     { league: "J1",  matchday: 3, utc: "2026-08-29T10:00:00Z", home: "サンフレッチェ広島", away: "ファジアーノ岡山", venue: "エディオンピースウイング広島", status: "SCHEDULED" },
     { league: "J1",  matchday: 3, utc: "2026-08-30T10:00:00Z", home: "ＦＣ東京", away: "ヴィッセル神戸", venue: "味の素スタジアム", status: "SCHEDULED" },
+    { league: "J2",  matchday: 3, utc: "2026-08-29T04:00:00Z", home: "北海道コンサドーレ札幌", away: "Ｖ・ファーレン長崎", venue: "大和ハウス プレミストドーム", status: "SCHEDULED" },
     { league: "PL",  matchday: 3, utc: "2026-08-29T14:00:00Z", home: "トッテナム", away: "ウェストハム", venue: "トッテナム・ホットスパー・スタジアム", status: "SCHEDULED" },
     { league: "PL",  matchday: 3, utc: "2026-08-29T14:00:00Z", home: "エヴァートン", away: "リヴァプール", venue: "ヒル・ディキンソン・スタジアム", status: "SCHEDULED" },
     { league: "PL",  matchday: 3, utc: "2026-08-29T16:30:00Z", home: "アーセナル", away: "マンチェスター・シティ", venue: "エミレーツ・スタジアム", status: "SCHEDULED" },
@@ -71,6 +75,7 @@ window.SCHEDULE_DATA = {
 
     // ---- 時刻未定の例 ----
     { league: "J1",  matchday: 4, utc: "2026-09-05T15:00:00Z", home: "京都サンガF.C.", away: "ＦＣ町田ゼルビア", venue: "サンガスタジアム by KYOCERA", status: "SCHEDULED", tbd: true },
-    { league: "J1",  matchday: 4, utc: "2026-09-05T15:00:00Z", home: "湘南ベルマーレ", away: "アルビレックス新潟", venue: "レモンガススタジアム平塚", status: "SCHEDULED", tbd: true }
+    { league: "J1",  matchday: 4, utc: "2026-09-05T15:00:00Z", home: "湘南ベルマーレ", away: "アルビレックス新潟", venue: "レモンガススタジアム平塚", status: "SCHEDULED", tbd: true },
+    { league: "J2",  matchday: 4, utc: "2026-09-06T15:00:00Z", home: "モンテディオ山形", away: "北海道コンサドーレ札幌", venue: "ＮＤソフトスタジアム山形", status: "SCHEDULED", tbd: true }
   ]
 };

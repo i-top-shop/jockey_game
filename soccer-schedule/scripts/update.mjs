@@ -30,7 +30,8 @@ const args = Object.fromEntries(
 const OUT = args.out ? String(args.out) : join(ROOT, "data", "matches.js");
 
 const LEAGUES = [
-  { id: "J1",  name: "明治安田Ｊ１リーグ", short: "Ｊ１",     country: "日本",       color: "#d5001d" },
+  { id: "J1",  name: "明治安田Ｊ１リーグ", short: "Ｊ１",     country: "日本",       color: "#0e7d38" },
+  { id: "J2",  name: "明治安田Ｊ２リーグ（コンサドーレのみ）", short: "Ｊ２札幌", country: "日本", color: "#145c30" },
   { id: "PL",  name: "プレミアリーグ",     short: "プレミア", country: "イングランド", color: "#38003c" },
   { id: "PD",  name: "ラ・リーガ",         short: "ラリーガ", country: "スペイン",   color: "#e07a00" },
   { id: "SA",  name: "セリエＡ",           short: "セリエＡ", country: "イタリア",   color: "#0066a7" },
@@ -125,7 +126,7 @@ async function fetchEurope() {
 function stripTags(html) {
   return html.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
 }
-function parseJleagueHtml(html, seasonYear) {
+function parseJleagueHtml(html, seasonYear, leagueId = "J1") {
   const rows = [];
   const trRe = /<tr[\s\S]*?<\/tr>/gi;
   for (const trm of html.match(trRe) || []) {
@@ -151,7 +152,7 @@ function parseJleagueHtml(html, seasonYear) {
     const utc = new Date(Date.UTC(year, Number(MM) - 1, Number(DD), hh - 9, mm)); // JST→UTC
     const sc = scoreCell.match(/^(\d+)\s*-\s*(\d+)$/);
     rows.push({
-      league: "J1",
+      league: leagueId,
       matchday: md ? Number(md[1]) : undefined,
       utc: utc.toISOString(),
       home, away,
@@ -165,20 +166,28 @@ function parseJleagueHtml(html, seasonYear) {
 }
 async function fetchJleague() {
   const years = String(args.jyears || new Date().getFullYear()).split(",").map(s => Number(s.trim()));
+  // Ｊ２は北海道コンサドーレ札幌の試合のみ収録する
+  const DIVS = [
+    { frame: 1, league: "J1", label: "Ｊ１" },
+    { frame: 2, league: "J2", label: "Ｊ２(コンサドーレ)", only: /コンサドーレ/ }
+  ];
   const out = [];
-  for (const y of years) {
-    const url = `https://data.j-league.or.jp/SFMS01/search?competition_years=${y}&competition_frame_ids=1`;
-    process.stdout.write(`  Ｊ１ ${y}年度 を取得中 ... `);
-    try {
-      const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (schedule-app personal use)" } });
-      if (!res.ok) { console.warn(`失敗 (HTTP ${res.status})`); continue; }
-      const rows = parseJleagueHtml(await res.text(), y);
-      console.log(`${rows.length}試合`);
-      if (rows.length === 0) console.warn("  ⚠ 0件でした。サイト構成が変わった可能性があります（parseJleagueHtml を確認）。");
-      out.push(...rows);
-      await sleep(2000);
-    } catch (e) {
-      console.warn(`失敗: ${e.message}`);
+  for (const div of DIVS) {
+    for (const y of years) {
+      const url = `https://data.j-league.or.jp/SFMS01/search?competition_years=${y}&competition_frame_ids=${div.frame}`;
+      process.stdout.write(`  ${div.label} ${y}年度 を取得中 ... `);
+      try {
+        const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (schedule-app personal use)" } });
+        if (!res.ok) { console.warn(`失敗 (HTTP ${res.status})`); continue; }
+        let rows = parseJleagueHtml(await res.text(), y, div.league);
+        if (rows.length === 0) console.warn("  ⚠ 0件でした。サイト構成が変わった可能性があります（parseJleagueHtml を確認）。");
+        if (div.only) rows = rows.filter(m => div.only.test(m.home + m.away));
+        console.log(`${rows.length}試合`);
+        out.push(...rows);
+        await sleep(2000);
+      } catch (e) {
+        console.warn(`失敗: ${e.message}`);
+      }
     }
   }
   // 年をまたいで重複した試合を除去

@@ -35,7 +35,8 @@ const LEAGUES = [
   { id: "PL",  name: "プレミアリーグ",     short: "プレミア", country: "イングランド", color: "#38003c" },
   { id: "PD",  name: "ラ・リーガ",         short: "ラリーガ", country: "スペイン",   color: "#e07a00" },
   { id: "SA",  name: "セリエＡ",           short: "セリエＡ", country: "イタリア",   color: "#0066a7" },
-  { id: "BL1", name: "ブンデスリーガ",     short: "ブンデス", country: "ドイツ",     color: "#d20515" }
+  { id: "BL1", name: "ブンデスリーガ",     short: "ブンデス", country: "ドイツ",     color: "#d20515" },
+  { id: "FL1", name: "リーグ・アン",       short: "リーグアン", country: "フランス", color: "#1b2a6b" }
 ];
 
 // football-data.org の英語名 → 日本語表記（未収載はAPIの shortName をそのまま使う）
@@ -73,7 +74,12 @@ const JA = {
   "Union Berlin": "ウニオン・ベルリン", "Mainz": "マインツ", "Augsburg": "アウクスブルク",
   "Werder": "ヴェルダー・ブレーメン", "Hoffenheim": "ホッフェンハイム", "Bochum": "ボーフム",
   "Heidenheim": "ハイデンハイム", "St. Pauli": "ザンクト・パウリ", "Holstein Kiel": "ホルシュタイン・キール",
-  "Hamburg": "ハンブルガーＳＶ", "Köln": "ケルン"
+  "Hamburg": "ハンブルガーＳＶ", "Köln": "ケルン",
+  // リーグ・アン
+  "PSG": "パリ・サンジェルマン", "Paris Saint-Germain": "パリ・サンジェルマン", "Marseille": "マルセイユ", "Lyon": "リヨン",
+  "Monaco": "モナコ", "Lille": "リール", "Nice": "ニース", "Lens": "ランス", "Rennes": "レンヌ", "Strasbourg": "ストラスブール",
+  "Toulouse": "トゥールーズ", "Brest": "ブレスト", "Auxerre": "オセール", "Angers": "アンジェ", "Le Havre": "ル・アーヴル",
+  "Lorient": "ロリアン", "Paris FC": "パリＦＣ", "Troyes": "トロワ", "Le Mans": "ル・マン", "Nantes": "ナント", "Metz": "メス"
 };
 const ja = t => JA[t?.shortName] || JA[t?.name] || t?.shortName || t?.name || "不明";
 
@@ -87,7 +93,7 @@ async function fetchEurope() {
     console.warn("  無料キー: https://www.football-data.org/client/register");
     return [];
   }
-  const codes = ["PL", "PD", "SA", "BL1"];
+  const codes = ["PL", "PD", "SA", "BL1", "FL1"];
   const out = [];
   for (const code of codes) {
     const url = new URL(`https://api.football-data.org/v4/competitions/${code}/matches`);

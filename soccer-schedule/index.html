@@ -3,273 +3,408 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>５リーグ日程帳</title>
+<title>６リーグ日程帳</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
 <style>
   :root{
-    --bg:#f4f5f7; --card:#ffffff; --ink:#1a1d24; --sub:#6b7280; --line:#e5e7eb;
-    --chip:#ffffff; --chip-line:#d1d5db; --accent:#0e6e4b; --today:#0e6e4b;
-    --score:#111827; --badge-ink:#ffffff; --head:#f4f5f7ee;
+    --bg:#f3f2ed; --card:#ffffff; --ink:#17201b; --sub:#66716b; --faint:#9aa39e; --line:#e2e4de;
+    --hover:#eef1ec; --accent:#157a45; --accent-ink:#ffffff; --accent-soft:#e3f1e8;
+    --shadow:0 1px 2px rgba(20,30,24,.06);
+    --num:"Barlow Condensed","Roboto Condensed","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+    --jp:"Noto Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI",system-ui,sans-serif;
   }
   @media (prefers-color-scheme: dark){
-    :root{
-      --bg:#101216; --card:#1a1e26; --ink:#e8eaf0; --sub:#9aa2b1; --line:#2a2f3a;
-      --chip:#1a1e26; --chip-line:#3a4150; --accent:#3ecf8e; --today:#3ecf8e;
-      --score:#f3f4f6; --head:#101216ee;
+    :root:not([data-theme="light"]){
+      --bg:#0e1310; --card:#171d19; --ink:#e8ece8; --sub:#97a29b; --faint:#6d7873; --line:#263029;
+      --hover:#1f2721; --accent:#45c982; --accent-ink:#0b140f; --accent-soft:#183324;
+      --shadow:0 1px 2px rgba(0,0,0,.35);
     }
   }
+  :root[data-theme="dark"]{
+    --bg:#0e1310; --card:#171d19; --ink:#e8ece8; --sub:#97a29b; --faint:#6d7873; --line:#263029;
+    --hover:#1f2721; --accent:#45c982; --accent-ink:#0b140f; --accent-soft:#183324;
+    --shadow:0 1px 2px rgba(0,0,0,.35);
+  }
   *{box-sizing:border-box; margin:0; padding:0;}
-  body{
-    background:var(--bg); color:var(--ink);
-    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP","Yu Gothic UI",system-ui,sans-serif;
-    line-height:1.5; padding-bottom:48px;
-  }
-  header{
-    position:sticky; top:0; z-index:20; background:var(--head);
-    backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
-    padding:10px 14px 8px;
-  }
-  h1{font-size:17px; letter-spacing:.04em; display:flex; align-items:baseline; gap:8px;}
-  h1 small{font-size:11px; font-weight:normal; color:var(--sub);}
-  .sample-note{
-    margin-top:6px; font-size:11.5px; padding:6px 9px; border-radius:8px;
-    background:color-mix(in srgb, var(--accent) 12%, transparent);
-    color:var(--ink); border:1px solid color-mix(in srgb, var(--accent) 35%, transparent);
-  }
-  .controls{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; align-items:center;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{transition:none !important;} }
+  body{background:var(--bg); color:var(--ink); font-family:var(--jp); line-height:1.45; padding-bottom:64px; -webkit-text-size-adjust:100%;}
+  button{font:inherit; color:inherit; background:none; border:0; cursor:pointer;}
+  button:focus-visible, input:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  /* ---------- アプリバー ---------- */
+  .bar{position:sticky; top:0; z-index:30; background:var(--bg); border-bottom:1px solid var(--line);}
+  .bar-in{max-width:760px; margin:0 auto; padding:10px 12px 8px; display:grid; gap:8px;}
+  .bar-in > *{min-width:0;}
+  .bar.compact .search:not(.active){display:none;}
+  .title-row{display:flex; align-items:baseline; gap:10px;}
+  .title{font-family:var(--num); font-weight:700; font-size:22px; letter-spacing:.02em; line-height:1;}
+  .title small{font-family:var(--jp); font-weight:500; font-size:11px; color:var(--sub); letter-spacing:.06em; margin-left:6px;}
+  .spacer{flex:1;}
+  .btn{border:1px solid var(--line); background:var(--card); border-radius:8px; padding:6px 11px; font-size:12.5px; font-weight:500; white-space:nowrap;}
+  .btn:hover{background:var(--hover);}
+  .btn.primary{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);}
+
+  .scroller{display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; padding:1px;}
+  .scroller::-webkit-scrollbar{display:none;}
   .chip{
-    border:1px solid var(--chip-line); background:var(--chip); color:var(--ink);
-    border-radius:999px; padding:4px 12px; font-size:12.5px; cursor:pointer;
-    display:inline-flex; align-items:center; gap:6px; user-select:none;
-    transition:background .12s, border-color .12s;
+    flex:0 0 auto; display:inline-flex; align-items:center; gap:6px; border:1px solid var(--line);
+    background:var(--card); border-radius:999px; padding:5px 12px; font-size:12.5px; font-weight:500; white-space:nowrap;
+    transition:background .12s, border-color .12s, color .12s;
   }
-  .chip .dot{width:8px; height:8px; border-radius:50%; background:var(--dot,#888);}
-  .chip.on{background:var(--dot,#555); border-color:var(--dot,#555); color:#fff;}
-  .chip.on .dot{background:#fff;}
-  .row2{display:flex; gap:6px; margin-top:7px; align-items:center;}
-  input[type=search]{
-    flex:1; min-width:120px; border:1px solid var(--chip-line); background:var(--card); color:var(--ink);
-    border-radius:8px; padding:6px 10px; font-size:13px; outline:none;
+  .chip .dot{width:8px; height:8px; border-radius:50%; background:var(--lg,var(--sub));}
+  .chip .n{font-family:var(--num); font-weight:600; font-size:12px; color:var(--faint); font-variant-numeric:tabular-nums;}
+  .chip.on{background:var(--ink); color:var(--bg); border-color:var(--ink);}
+  .chip.on .dot{box-shadow:0 0 0 2px var(--bg);}
+  .chip.on .n{color:var(--bg); opacity:.7;}
+  .chip.star{padding-left:10px;}
+
+  .tools{display:grid; grid-template-columns:auto 1fr auto; gap:6px; align-items:center;}
+  @media (max-width:560px){
+    .tools{grid-template-columns:auto 1fr;}
+    .tools #mode{grid-row:1; grid-column:1;}
+    .tools #view{grid-row:1; grid-column:2; justify-self:end;}
+    .tools .search{grid-row:2; grid-column:1 / -1;}
   }
-  input[type=search]:focus{border-color:var(--accent);}
-  .toggle{font-size:12px; color:var(--sub); display:inline-flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap;}
-  main{max-width:720px; margin:0 auto; padding:4px 10px;}
-  .datehead{
-    position:sticky; top:var(--headH,118px); z-index:10;
-    background:var(--head); backdrop-filter:blur(8px);
-    font-size:13.5px; font-weight:bold; padding:10px 6px 6px;
-    display:flex; align-items:center; gap:8px; border-bottom:1px solid var(--line);
+  .seg{display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--card);}
+  .seg button{padding:6px 10px; font-size:12.5px; font-weight:500; color:var(--sub); border-right:1px solid var(--line);}
+  .seg button:last-child{border-right:0;}
+  .seg button.on{background:var(--accent-soft); color:var(--ink); font-weight:700;}
+  .search{display:flex; align-items:center; gap:4px; border:1px solid var(--line); background:var(--card); border-radius:8px; padding:0 6px 0 10px; min-width:0;}
+  .search input{flex:1; min-width:0; border:0; background:none; color:var(--ink); font-size:13px; padding:6px 0; outline:none;}
+  .search input::placeholder{color:var(--faint);}
+  .search .clear{color:var(--faint); font-size:16px; padding:0 4px; line-height:1;}
+  .search .clear[hidden]{display:none;}
+
+  /* ---------- 日付ストリップ ---------- */
+  .days{margin:0 -12px; padding:0 12px;}
+  .bar.compact .title-row{display:none;}
+  .day{
+    flex:0 0 auto; width:44px; border:1px solid var(--line); background:var(--card); border-radius:10px;
+    padding:4px 0 3px; text-align:center; line-height:1.1;
   }
-  .datehead .cnt{font-weight:normal; font-size:11px; color:var(--sub);}
-  .badge-today{
-    font-size:10.5px; color:#fff; background:var(--today); border-radius:5px; padding:1px 7px;
+  .day .wd{font-size:10px; color:var(--sub); letter-spacing:.05em;}
+  .day .dn{font-family:var(--num); font-weight:700; font-size:18px; margin-top:1px;}
+  .day .cnt{font-family:var(--num); font-size:11px; color:var(--faint); margin-top:2px; min-height:12px;}
+  .day.today{border-color:var(--accent); background:var(--accent-soft);}
+  .day.sat .wd{color:#2f6fd6;} .day.sun .wd{color:#d1443e;}
+  .day.none{opacity:.45;}
+
+  /* ---------- リスト ---------- */
+  main{max-width:760px; margin:0 auto; padding:6px 12px 0;}
+  .dh{
+    position:sticky; top:var(--barH,132px); z-index:10; background:var(--bg);
+    display:flex; align-items:baseline; gap:8px; padding:14px 2px 6px; border-bottom:1px solid var(--line); margin-bottom:6px;
   }
-  .match{
-    background:var(--card); border:1px solid var(--line); border-radius:10px;
-    margin:7px 0; padding:8px 11px;
-    display:grid; grid-template-columns:52px 1fr auto; gap:4px 10px; align-items:center;
+  .dh .d{font-family:var(--num); font-weight:700; font-size:20px; letter-spacing:.01em;}
+  .dh .d .wd{font-family:var(--jp); font-weight:700; font-size:13px; margin-left:3px;}
+  .dh .wd.sat{color:#2f6fd6;} .dh .wd.sun{color:#d1443e;}
+  .dh .tag{font-size:10.5px; font-weight:700; color:var(--accent-ink); background:var(--accent); border-radius:5px; padding:1px 7px; letter-spacing:.06em;}
+  .dh .tag.soft{background:var(--accent-soft); color:var(--ink);}
+  .dh .c{font-family:var(--num); font-size:13px; color:var(--faint); margin-left:auto; font-variant-numeric:tabular-nums;}
+  .dh .sub{font-family:var(--jp); font-size:11.5px; color:var(--sub); font-weight:500;}
+
+  .m{
+    background:var(--card); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow);
+    margin:0 0 6px; padding:9px 10px 9px 8px;
+    display:grid; grid-template-columns:68px 1fr auto; gap:0 8px; align-items:center;
   }
-  .match .time{font-size:15px; font-weight:bold; font-variant-numeric:tabular-nums;}
-  .match .time.tbd{font-size:11px; color:var(--sub); font-weight:normal;}
-  .match .lg{
-    grid-column:1; font-size:10px; color:var(--badge-ink); background:var(--dot,#666);
-    border-radius:4px; text-align:center; padding:1px 2px; letter-spacing:.03em;
+  .m .t{font-family:var(--num); font-weight:700; font-size:22px; line-height:1; text-align:center; font-variant-numeric:tabular-nums; letter-spacing:0; overflow:hidden;}
+  .m .t small{display:block; font-family:var(--jp); font-weight:500; font-size:10px; color:var(--sub); margin-top:3px; letter-spacing:.04em;}
+  .m .t.tbd{font-family:var(--jp); font-weight:500; font-size:11px; color:var(--sub); line-height:1.25;}
+  .m .lg{display:inline-block; font-size:9.5px; font-weight:700; color:#fff; background:var(--lg,#666); border-radius:4px; padding:1px 5px; letter-spacing:.02em; margin-top:5px; white-space:nowrap;}
+  .m .body{min-width:0;}
+  .m .team{display:flex; align-items:center; gap:6px; font-size:14.5px; font-weight:500; line-height:1.35; text-align:left; width:100%; padding:1px 0; border-radius:4px;}
+  .m .team:hover{background:var(--hover);}
+  .m .team .nm{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .m .team .ha{font-size:9.5px; color:var(--faint); letter-spacing:.06em; flex:0 0 auto;}
+  .m .team.fav .nm{color:var(--accent); font-weight:700;}
+  .m .team .st{flex:0 0 auto; font-size:12px; color:var(--faint);}
+  .m .team.fav .st{color:var(--accent);}
+  .m .team.win .nm{font-weight:700;}
+  .m .team.lose .nm{color:var(--sub);}
+  .m .meta{font-size:11px; color:var(--sub); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .m .sc{display:grid; grid-template-rows:1fr 1fr; align-items:center; justify-items:end; min-width:26px;}
+  .m .sc b{font-family:var(--num); font-weight:700; font-size:22px; line-height:1.35; font-variant-numeric:tabular-nums;}
+  .m .sc b.lose{color:var(--sub); font-weight:600;}
+  .m .status{grid-column:3; grid-row:2; font-size:10px; color:var(--sub); text-align:right; letter-spacing:.04em; margin-top:2px;}
+  .m .status.live{color:#d1443e; font-weight:700;}
+  .m .status.done{color:var(--faint);}
+  .m.done{background:color-mix(in srgb, var(--card) 70%, var(--bg));}
+  .m.done .t{color:var(--sub);}
+
+  .mdh{font-size:13px; font-weight:700; padding:16px 2px 6px; display:flex; gap:8px; align-items:baseline; border-bottom:1px solid var(--line); margin-bottom:6px;}
+  .mdh .lgname{color:var(--lg,var(--ink));}
+  .mdh .range{font-family:var(--num); font-weight:600; font-size:13px; color:var(--sub); margin-left:auto;}
+
+  .empty{text-align:center; color:var(--sub); font-size:13px; padding:56px 12px; line-height:1.8;}
+  .toast{
+    position:fixed; left:50%; bottom:20px; transform:translateX(-50%); z-index:40;
+    background:var(--ink); color:var(--bg); font-size:12.5px; padding:8px 14px; border-radius:999px;
+    opacity:0; transition:opacity .2s; pointer-events:none; white-space:nowrap;
   }
-  .match .teams{grid-column:2; grid-row:1; font-size:14px;}
-  .match .teams .vs{color:var(--sub); font-size:11px; margin:0 5px;}
-  .match .meta{grid-column:2; grid-row:2; font-size:11px; color:var(--sub);}
-  .match .right{grid-column:3; grid-row:1/3; text-align:right;}
-  .match .score{font-size:16px; font-weight:bold; color:var(--score); font-variant-numeric:tabular-nums;}
-  .match .st{font-size:10.5px; color:var(--sub);}
-  .match .st.live{color:#e02020; font-weight:bold;}
-  .match.done{opacity:.72;}
-  .empty{text-align:center; color:var(--sub); font-size:13px; padding:48px 0;}
-  footer{max-width:720px; margin:24px auto 0; padding:0 14px; font-size:11px; color:var(--sub);}
-  .totop{
-    position:fixed; right:14px; bottom:14px; z-index:30;
-    border:1px solid var(--chip-line); background:var(--card); color:var(--ink);
-    border-radius:999px; padding:8px 14px; font-size:12px; cursor:pointer;
-    box-shadow:0 2px 8px rgba(0,0,0,.15); display:none;
+  .toast.show{opacity:1;}
+  .fabs{position:fixed; right:14px; bottom:16px; z-index:35; display:flex; gap:8px;}
+  .fab{border:1px solid var(--line); background:var(--card); color:var(--ink);
+    border-radius:999px; padding:9px 14px; font-size:12.5px; font-weight:500; box-shadow:0 3px 10px rgba(0,0,0,.18);}
+  .fab.primary{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);}
+  #fab{display:none;}
+  footer{max-width:760px; margin:28px auto 0; padding:0 14px; font-size:11px; color:var(--sub); line-height:1.7;}
+  @media (min-width:640px){
+    .m{grid-template-columns:78px 1fr auto;}
+    .m .t{font-size:26px;}
   }
 </style>
 </head>
 <body>
-<header id="hd">
-  <h1>５リーグ日程帳 <small>すべて日本時間（JST）表示</small></h1>
-  <div class="sample-note" id="sampleNote" hidden>
-    ⚠ サンプルデータを表示中です。実際の日程・結果ではありません。<code>scripts/update.mjs</code> で実データに更新できます。
+<div class="bar" id="bar">
+  <div class="bar-in">
+    <div class="title-row">
+      <div class="title">６リーグ日程帳<small>すべて日本時間</small></div>
+    </div>
+    <div class="scroller" id="chips"></div>
+    <div class="tools">
+      <div class="seg" id="mode">
+        <button data-v="upcoming">今後</button><button data-v="results">結果</button><button data-v="all">すべて</button>
+      </div>
+      <label class="search"><input type="search" id="q" placeholder="クラブ・スタジアムで絞り込み" autocomplete="off" aria-label="絞り込み"><button class="clear" id="qClear" aria-label="クリア" hidden>×</button></label>
+      <div class="seg" id="view">
+        <button data-v="date">日付</button><button data-v="md">節</button>
+      </div>
+    </div>
+    <div class="days"><div class="scroller" id="days"></div></div>
   </div>
-  <div class="controls" id="chips"></div>
-  <div class="row2">
-    <input type="search" id="q" placeholder="チーム・スタジアム名で絞り込み" autocomplete="off">
-    <label class="toggle"><input type="checkbox" id="futureOnly" checked>今後のみ</label>
-  </div>
-</header>
-
+</div>
 <main id="list"></main>
 <footer id="ft"></footer>
-<button class="totop" id="totop">▲ 今日へ</button>
+<div class="fabs"><button class="fab" id="fab">↑ 上へ</button><button class="fab primary" id="today">今日へ</button></div>
+<div class="toast" id="toast"></div>
 
 <script src="data/matches.js"></script>
 <script>
 (function(){
   "use strict";
-  const DATA = window.SCHEDULE_DATA || { leagues:[], matches:[], sample:false };
+  const DATA = window.SCHEDULE_DATA || { leagues:[], matches:[] };
   const leagues = DATA.leagues;
   const byId = Object.fromEntries(leagues.map(l => [l.id, l]));
 
-  // ---- 状態（localStorage は使えない環境でも動くよう try/catch） ----
+  // ---- 永続化（使えない環境でも動く） ----
   const store = {
-    get(k, d){ try{ const v = localStorage.getItem("sched5:"+k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
-    set(k, v){ try{ localStorage.setItem("sched5:"+k, JSON.stringify(v)); }catch(e){} }
+    get(k, d){ try{ const v = localStorage.getItem("sched6:"+k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+    set(k, v){ try{ localStorage.setItem("sched6:"+k, JSON.stringify(v)); }catch(e){} }
   };
-  let selected = new Set(store.get("leagues", []));   // 空 = 全リーグ
-  let query = "";
-  let futureOnly = store.get("futureOnly", true);
+  const S = {
+    leagues: new Set(store.get("leagues", [])),  // 空 = 全リーグ
+    mode: store.get("mode", "upcoming"),           // upcoming | results | all
+    view: store.get("view", "date"),               // date | md
+    favs: new Set(store.get("favs", [])),
+    favOnly: store.get("favOnly", false),
+    q: ""
+  };
+  const persist = () => { store.set("leagues", [...S.leagues]); store.set("mode", S.mode); store.set("view", S.view); store.set("favs", [...S.favs]); store.set("favOnly", S.favOnly); };
 
-  // ---- JST 変換ユーティリティ ----
+  // ---- JST ----
   const TZ = "Asia/Tokyo";
-  const fmtTime = new Intl.DateTimeFormat("ja-JP", { timeZone:TZ, hour:"2-digit", minute:"2-digit", hour12:false });
-  const fmtDateKey = new Intl.DateTimeFormat("en-CA", { timeZone:TZ, year:"numeric", month:"2-digit", day:"2-digit" }); // YYYY-MM-DD
-  const fmtDateLabel = new Intl.DateTimeFormat("ja-JP", { timeZone:TZ, month:"long", day:"numeric", weekday:"short" });
-  const jstKey = d => fmtDateKey.format(d);
-  const todayKey = () => jstKey(new Date());
+  const fTime = new Intl.DateTimeFormat("ja-JP", { timeZone:TZ, hour:"2-digit", minute:"2-digit", hour12:false });
+  const fKey  = new Intl.DateTimeFormat("en-CA", { timeZone:TZ, year:"numeric", month:"2-digit", day:"2-digit" });
+  const fMD   = new Intl.DateTimeFormat("ja-JP", { timeZone:TZ, month:"numeric", day:"numeric" });
+  const fWd   = new Intl.DateTimeFormat("ja-JP", { timeZone:TZ, weekday:"short" });
+  const key = d => fKey.format(d);
+  const nowKey = () => key(new Date());
+  const addDays = (d, n) => new Date(d.getTime() + n * 864e5);
+  const wdClass = d => { const w = fWd.format(d); return w === "土" ? "sat" : w === "日" ? "sun" : ""; };
 
-  // ---- 前処理：JSTの日付キーを付与してソート ----
-  const matches = DATA.matches.map(m => {
+  const M = DATA.matches.map(m => {
     const d = new Date(m.utc);
-    return { ...m, _d:d, _key:jstKey(d), _time:fmtTime.format(d), _label:fmtDateLabel.format(d) };
+    return { ...m, _d:d, _key:key(d), _time:fTime.format(d), _md:fMD.format(d), _wd:fWd.format(d), _wdc:wdClass(d) };
   }).sort((a,b) => a._d - b._d || a.league.localeCompare(b.league));
 
-  // ---- リーグ選択チップ ----
-  const chipsEl = document.getElementById("chips");
-  function renderChips(){
-    chipsEl.innerHTML = "";
-    const all = document.createElement("button");
-    all.className = "chip" + (selected.size === 0 ? " on" : "");
-    all.style.setProperty("--dot", "var(--accent)");
-    all.textContent = "すべて";
-    all.onclick = () => { selected.clear(); persist(); renderChips(); render(); };
-    chipsEl.appendChild(all);
-    for(const l of leagues){
-      const b = document.createElement("button");
-      b.className = "chip" + (selected.has(l.id) ? " on" : "");
-      b.style.setProperty("--dot", l.color);
-      b.innerHTML = '<span class="dot"></span>' + l.short;
-      b.title = l.name + "（" + l.country + "）";
-      b.onclick = () => {
-        selected.has(l.id) ? selected.delete(l.id) : selected.add(l.id);
-        if(selected.size === leagues.length) selected.clear();
-        persist(); renderChips(); render();
-      };
-      chipsEl.appendChild(b);
-    }
-  }
-  function persist(){
-    store.set("leagues", [...selected]);
-    store.set("futureOnly", futureOnly);
+  // ---- ユーティリティ ----
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const $ = id => document.getElementById(id);
+  let toastT; function toast(msg){ const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 1600); }
+  function scoreParts(m){ if(!m.score) return null; const p = m.score.split("-").map(Number); return p.length === 2 && p.every(n => !isNaN(n)) ? p : null; }
+  function isLive(m){ const t = Date.now() - m._d.getTime(); return m.status !== "FINISHED" && !m.tbd && t > 0 && t < 135 * 60e3; }
+  function statusOf(m){
+    if(m.status === "FINISHED") return ["終了", "done"];
+    if(isLive(m)) return ["キックオフ済", "live"];
+    if(m.status === "POSTPONED") return ["延期", ""];
+    if(m.status === "CANCELLED") return ["中止", ""];
+    return ["", ""];
   }
 
-  // ---- 一覧描画 ----
-  const listEl = document.getElementById("list");
-  function statusLabel(m){
-    if(m.status === "FINISHED") return "終了";
-    if(m.status === "IN_PLAY" || m.status === "LIVE" || m.status === "PAUSED") return "試合中";
-    if(m.status === "POSTPONED") return "延期";
-    if(m.status === "CANCELLED") return "中止";
-    return "";
-  }
-  function render(){
-    const q = query.trim().toLowerCase();
-    const tk = todayKey();
-    const rows = matches.filter(m => {
-      if(selected.size && !selected.has(m.league)) return false;
-      if(futureOnly && m._key < tk) return false;
-      if(q && !((m.home + m.away + (m.venue||"") + (byId[m.league]?.name||"")).toLowerCase().includes(q))) return false;
+  // ---- フィルタ ----
+  function filtered(){
+    const q = S.q.trim().toLowerCase();
+    const tk = nowKey();
+    let rows = M.filter(m => {
+      if(S.leagues.size && !S.leagues.has(m.league)) return false;
+      if(S.favOnly && !(S.favs.has(m.home) || S.favs.has(m.away))) return false;
+      if(S.mode === "upcoming" && m._key < tk) return false;
+      if(S.mode === "results" && m.status !== "FINISHED") return false;
+      if(q && !((m.home + m.away + (m.venue||"") + byId[m.league]?.name + byId[m.league]?.short).toLowerCase().includes(q))) return false;
       return true;
     });
+    if(S.mode === "results") rows = rows.slice().reverse();
+    return rows;
+  }
 
-    listEl.innerHTML = "";
-    if(rows.length === 0){
-      listEl.innerHTML = '<div class="empty">該当する試合がありません</div>';
+  // ---- ヘッダ部品 ----
+  function renderChips(){
+    const upcoming = {}; const tk = nowKey();
+    for(const m of M) if(m._key >= tk) upcoming[m.league] = (upcoming[m.league] || 0) + 1;
+    const el = $("chips"); el.innerHTML = "";
+    const mk = (label, on, color, n, onclick) => {
+      const b = document.createElement("button");
+      b.className = "chip" + (on ? " on" : "");
+      if(color) b.style.setProperty("--lg", color);
+      b.innerHTML = (color ? '<span class="dot"></span>' : "") + esc(label) + (n != null ? ' <span class="n">' + n + "</span>" : "");
+      b.onclick = onclick; el.appendChild(b);
+    };
+    const fav = document.createElement("button");
+    fav.className = "chip star" + (S.favOnly ? " on" : "");
+    fav.id = "favHint"; fav.title = "クラブ名をタップすると推しクラブに登録できます";
+    fav.innerHTML = "★ 推し <span class=\"n\">" + S.favs.size + "</span>";
+    fav.onclick = () => { if(!S.favs.size){ toast("クラブ名をタップすると推しに登録できます"); return; } S.favOnly = !S.favOnly; persist(); renderAll(); };
+    el.appendChild(fav);
+    mk("すべて", S.leagues.size === 0 && !S.favOnly, null, null, () => { S.leagues.clear(); S.favOnly = false; persist(); renderAll(); });
+    for(const l of leagues) mk(l.short, S.leagues.has(l.id), l.color, upcoming[l.id] || 0, () => {
+      S.leagues.has(l.id) ? S.leagues.delete(l.id) : S.leagues.add(l.id);
+      if(S.leagues.size === leagues.length) S.leagues.clear();
+      persist(); renderAll();
+    });
+    [...$("mode").children].forEach(b => b.classList.toggle("on", b.dataset.v === S.mode));
+    [...$("view").children].forEach(b => b.classList.toggle("on", b.dataset.v === S.view));
+  }
+  function renderDays(rows){
+    const el = $("days"); el.innerHTML = "";
+    const wrap = el.parentElement; wrap.style.display = S.view === "date" && S.mode !== "results" ? "" : "none";
+    if(wrap.style.display === "none") return;
+    const cnt = {}; for(const m of rows) cnt[m._key] = (cnt[m._key] || 0) + 1;
+    const base = new Date();
+    for(let i = 0; i < 14; i++){
+      const d = addDays(base, i), k = key(d), n = cnt[k] || 0;
+      const b = document.createElement("button");
+      b.className = "day " + wdClass(d) + (i === 0 ? " today" : "") + (n ? "" : " none");
+      b.innerHTML = '<div class="wd">' + fWd.format(d) + '</div><div class="dn">' + Number(k.slice(8, 10)) + '</div><div class="cnt">' + (n || "") + "</div>";
+      b.title = fMD.format(d) + "（" + fWd.format(d) + "）" + n + "試合";
+      b.onclick = () => jumpTo(k);
+      el.appendChild(b);
+    }
+  }
+
+  // ---- 試合行 ----
+  function teamBtn(name, side, m, parts, idx){
+    const fav = S.favs.has(name);
+    let wl = "";
+    if(parts){ const me = parts[idx], op = parts[1 - idx]; wl = me > op ? " win" : me < op ? " lose" : ""; }
+    return '<button class="team' + (fav ? " fav" : "") + wl + '" data-team="' + esc(name) + '" title="タップで推しクラブに登録/解除">' +
+      (fav ? '<span class="st">★</span>' : "") + '<span class="nm">' + esc(name) + '</span><span class="ha">' + side + "</span></button>";
+  }
+  function matchRow(m, showDate){
+    const lg = byId[m.league] || { short:m.league, color:"#666" };
+    const parts = scoreParts(m);
+    const [stLabel, stClass] = statusOf(m);
+    const timeCell = m.dateTBD ? '<div class="t tbd">日程<br>未定</div>'
+      : m.tbd ? '<div class="t tbd">' + (showDate ? m._md + "<br>" : "") + "時刻未定</div>"
+      : '<div class="t">' + m._time + (showDate ? "<small>" + m._md + "（" + m._wd + "）</small>" : "") + "</div>";
+    const meta = [m.matchday ? "第" + m.matchday + "節" : "", m.venue || ""].filter(Boolean).join("　");
+    return '<div class="m' + (m.status === "FINISHED" ? " done" : "") + '" style="--lg:' + lg.color + '">' +
+      '<div>' + timeCell + '<div style="text-align:center"><span class="lg">' + esc(lg.short) + "</span></div></div>" +
+      '<div class="body">' + teamBtn(m.home, "HOME", m, parts, 0) + teamBtn(m.away, "AWAY", m, parts, 1) +
+        (meta ? '<div class="meta">' + esc(meta) + "</div>" : "") + "</div>" +
+      (parts ? '<div class="sc"><b class="' + (parts[0] < parts[1] ? "lose" : "") + '">' + parts[0] + '</b><b class="' + (parts[1] < parts[0] ? "lose" : "") + '">' + parts[1] + "</b></div>" : "<div></div>") +
+      (stLabel ? '<div class="status ' + stClass + '">' + stLabel + "</div>" : "") +
+      "</div>";
+  }
+
+  // ---- 一覧 ----
+  function renderList(rows){
+    const el = $("list");
+    if(!rows.length){
+      el.innerHTML = '<div class="empty">該当する試合がありません' + (S.favOnly ? "<br>クラブ名をタップして推しクラブを登録してください" : "") + "</div>";
       return;
     }
-
-    let curKey = null, dayWrap = null;
-    const tomorrow = jstKey(new Date(Date.now() + 864e5));
-    for(const m of rows){
-      if(m._key !== curKey){
-        curKey = m._key;
-        const h = document.createElement("div");
-        h.className = "datehead";
-        h.dataset.key = m._key;
-        const cnt = rows.filter(x => x._key === m._key).length;
-        let badge = "";
-        if(m._key === tk) badge = '<span class="badge-today">今日</span>';
-        else if(m._key === tomorrow) badge = '<span class="badge-today" style="opacity:.65">明日</span>';
-        h.innerHTML = m._label + " " + badge + ' <span class="cnt">' + cnt + "試合</span>";
-        listEl.appendChild(h);
+    const tk = nowKey(), tmk = key(addDays(new Date(), 1));
+    let html = "";
+    if(S.view === "date"){
+      let cur = null, buf = [];
+      const flush = () => {
+        if(!buf.length) return;
+        const m = buf[0];
+        const tag = m._key === tk ? '<span class="tag">今日</span>' : m._key === tmk ? '<span class="tag soft">明日</span>' : "";
+        html += '<div class="dh" data-key="' + m._key + '"><span class="d">' + m._md + '<span class="wd ' + m._wdc + '">' + m._wd + "</span></span>" + tag +
+          '<span class="c">' + buf.length + "試合</span></div>";
+        for(const x of buf) html += matchRow(x, false);
+        buf = [];
+      };
+      for(const m of rows){ if(m._key !== cur){ flush(); cur = m._key; } buf.push(m); }
+      flush();
+    } else {
+      // 節順: リーグ×節でまとめ、最初のキックオフ順（結果モードは新しい順）
+      const groups = new Map();
+      for(const m of rows){ const k = m.league + "|" + (m.matchday || 0); (groups.get(k) || groups.set(k, []).get(k)).push(m); }
+      const list = [...groups.values()];
+      list.sort((a,b) => (a[0]._d - b[0]._d) * (S.mode === "results" ? -1 : 1));
+      for(const g of list){
+        const gs = g.slice().sort((a,b) => a._d - b._d);
+        const lg = byId[gs[0].league] || { name:gs[0].league, color:"#666" };
+        const range = gs[0]._md + (gs.length > 1 && gs[gs.length-1]._key !== gs[0]._key ? "–" + gs[gs.length-1]._md : "");
+        html += '<div class="mdh" style="--lg:' + lg.color + '"><span class="lgname">' + esc(lg.name) + "</span> 第" + gs[0].matchday + "節" +
+          '<span class="range">' + range + "</span></div>";
+        for(const x of gs) html += matchRow(x, true);
       }
-      const lg = byId[m.league] || { short:m.league, color:"#666" };
-      const el = document.createElement("div");
-      el.className = "match" + (m.status === "FINISHED" ? " done" : "");
-      el.style.setProperty("--dot", lg.color);
-      const st = statusLabel(m);
-      const live = /IN_PLAY|LIVE|PAUSED/.test(m.status || "");
-      el.innerHTML =
-        (m.dateTBD ? '<div class="time tbd">日程未定</div>'
-          : m.tbd ? '<div class="time tbd">時刻未定</div>' : '<div class="time">' + m._time + "</div>") +
-        '<div class="lg">' + lg.short + "</div>" +
-        '<div class="teams">' + esc(m.home) + '<span class="vs">vs</span>' + esc(m.away) + "</div>" +
-        '<div class="meta">' + (m.matchday ? "第" + m.matchday + "節　" : "") + esc(m.venue || "") + "</div>" +
-        '<div class="right">' +
-          (m.score ? '<div class="score">' + esc(m.score) + "</div>" : "") +
-          (st ? '<div class="st' + (live ? " live" : "") + '">' + st + "</div>" : "") +
-        "</div>";
-      listEl.appendChild(el);
     }
-  }
-  function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
-
-  // ---- ヘッダ高さ → 日付見出しの sticky 位置 ----
-  function syncHeadH(){
-    document.documentElement.style.setProperty("--headH", document.getElementById("hd").offsetHeight + "px");
+    el.innerHTML = html;
   }
 
-  // ---- 今日へスクロール ----
-  function scrollToToday(){
-    const tk = todayKey();
-    const heads = [...document.querySelectorAll(".datehead")];
-    const target = heads.find(h => h.dataset.key >= tk);
-    if(target && target !== heads[0]){
-      const headH = document.getElementById("hd").offsetHeight;
-      window.scrollTo(0, Math.max(0, target.offsetTop - headH));
-    }
+  function renderAll(){
+    renderChips();
+    const rows = filtered();
+    renderDays(rows);
+    renderList(rows);
+    syncBarH();
   }
-  document.getElementById("totop").onclick = () => { window.scrollTo({ top:0, behavior:"smooth" }); };
+  function syncBarH(){ document.documentElement.style.setProperty("--barH", $("bar").offsetHeight + "px"); }
+  function jumpTo(k){
+    const heads = [...document.querySelectorAll(".dh")];
+    const t = heads.find(h => h.dataset.key >= k);
+    if(!t){ toast("その日以降の試合はありません"); return; }
+    window.scrollTo({ top: t.offsetTop - $("bar").offsetHeight, behavior: "instant" });
+  }
+
+  // ---- イベント ----
+  $("list").addEventListener("click", e => {
+    const b = e.target.closest(".team"); if(!b) return;
+    const name = b.dataset.team;
+    if(S.favs.has(name)){ S.favs.delete(name); toast("★ " + name + " を推しから外しました"); }
+    else { S.favs.add(name); toast("★ " + name + " を推しに登録"); }
+    persist(); renderAll();
+  });
+  $("mode").onclick = e => { const b = e.target.closest("button"); if(!b) return; S.mode = b.dataset.v; persist(); renderAll(); if(S.mode !== "results") jumpTo(nowKey()); };
+  $("view").onclick = e => { const b = e.target.closest("button"); if(!b) return; S.view = b.dataset.v; persist(); renderAll(); };
+  $("today").onclick = () => { if(S.mode === "results"){ S.mode = "upcoming"; persist(); renderAll(); } jumpTo(nowKey()); };
+  const syncQ = () => { $("qClear").hidden = !S.q; $("q").parentElement.classList.toggle("active", !!S.q); };
+  $("q").addEventListener("input", e => { S.q = e.target.value; syncQ(); renderAll(); });
+  $("qClear").onclick = () => { S.q = ""; $("q").value = ""; syncQ(); renderAll(); };
+  $("fab").onclick = () => window.scrollTo({ top:0 });
+  let compact = false;
   addEventListener("scroll", () => {
-    document.getElementById("totop").style.display = scrollY > 600 ? "block" : "none";
+    $("fab").style.display = scrollY > 800 ? "block" : "none";
+    const c = scrollY > 160; if(c !== compact){ compact = c; $("bar").classList.toggle("compact", c); syncBarH(); }
   }, { passive:true });
+  addEventListener("resize", syncBarH);
 
-  // ---- 入力 ----
-  document.getElementById("q").addEventListener("input", e => { query = e.target.value; render(); });
-  const fo = document.getElementById("futureOnly");
-  fo.checked = futureOnly;
-  fo.addEventListener("change", e => { futureOnly = e.target.checked; persist(); render(); });
-
-  // ---- フッタ・サンプル表示 ----
-  if(DATA.sample) document.getElementById("sampleNote").hidden = false;
+  // ---- フッタ ----
   if(DATA.generatedAt){
     const g = new Date(DATA.generatedAt);
-    document.getElementById("ft").textContent =
-      "データ更新: " + fmtDateLabel.format(g) + " " + fmtTime.format(g) + "（JST） ／ 全" + matches.length + "試合収録 ／ " +
-      "「時刻未定」の試合は暫定の日付表示です（放送編成等で変更の可能性あり）";
+    $("ft").innerHTML = "データ更新: " + fMD.format(g) + " " + fTime.format(g) + "（JST）／ 全" + M.length + "試合収録<br>" +
+      "「時刻未定」は暫定の日付表示（放送編成等で確定次第変わります）。クラブ名タップで推しクラブを登録すると「★ 推し」で絞り込めます。";
   }
 
-  renderChips();
-  render();
-  syncHeadH();
-  addEventListener("resize", syncHeadH);
-  if(futureOnly) requestAnimationFrame(scrollToToday);
+  renderAll();
+  requestAnimationFrame(() => { syncBarH(); if(S.mode !== "results") jumpTo(nowKey()); });
 })();
 </script>
 </body>

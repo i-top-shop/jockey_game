@@ -10,7 +10,7 @@ on:
   push:
     # 注意: github-pages環境のデプロイ許可ブランチ（Settings→Environments）に無いブランチを
     #       ここへ足すと、その実行は環境保護で即失敗し、concurrencyで本命デプロイをキャンセルしてしまう。
-    branches: [ main, master, feat/aaa-phase1, claude/five-leagues-jp-schedule-app-750s5w ]
+    branches: [ main, master, feat/aaa-phase1 ]
   workflow_dispatch:
 
 permissions:

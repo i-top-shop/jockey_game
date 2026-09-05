@@ -10,7 +10,7 @@
 //   node scripts/update-jleague-ics.mjs --dir=path # クローン済みディレクトリを使う
 //
 // 注意: ICSは「これからの試合」だけを含むため、消化済みの試合は既存データを
-// そのまま残す（結果スコアの取り込みは scripts/update.mjs か手動で行う）。
+// そのまま残す（スコアはネタバレ防止のため一切保存しない）。
 
 import { readFileSync, writeFileSync, existsSync, rmSync } from "node:fs";
 import { execSync } from "node:child_process";
@@ -88,6 +88,7 @@ for (const n of seen.values()) // 新規に発表された試合
     home: n.home, away: n.away, venue: n.venue, status: "SCHEDULED", tbd: n.jst_time ? undefined : true });
 
 data.matches = out
+  .map(m => ({ ...m, score: undefined })) // ネタバレ防止: スコアは保存しない
   .map(m => Object.fromEntries(Object.entries(m).filter(([, v]) => v !== undefined)))
   .sort((a, b) => a.utc.localeCompare(b.utc) || a.league.localeCompare(b.league));
 data.generatedAt = new Date().toISOString();

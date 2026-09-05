@@ -1,6 +1,6 @@
 // scripts/update.mjs / merge_build.mjs により自動生成。手で編集しないこと。
 window.SCHEDULE_DATA = {
- "generatedAt": "2026-09-05T00:18:10.221Z",
+ "generatedAt": "2026-09-05T00:28:33.324Z",
  "sample": false,
  "leagues": [
   {
@@ -61,8 +61,7 @@ window.SCHEDULE_DATA = {
    "home": "横浜Ｆ・マリノス",
    "away": "鹿島アントラーズ",
    "venue": "ＭＵＦＧスタジアム",
-   "status": "FINISHED",
-   "score": "3-4"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -71,8 +70,7 @@ window.SCHEDULE_DATA = {
    "home": "ガンバ大阪",
    "away": "浦和レッズ",
    "venue": "パナソニック スタジアム 吹田",
-   "status": "FINISHED",
-   "score": "4-3"
+   "status": "FINISHED"
   },
   {
    "league": "J2",
@@ -81,8 +79,7 @@ window.SCHEDULE_DATA = {
    "home": "北海道コンサドーレ札幌",
    "away": "徳島ヴォルティス",
    "venue": "大和ハウス プレミストドーム",
-   "status": "FINISHED",
-   "score": "2-0"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -91,8 +88,7 @@ window.SCHEDULE_DATA = {
    "home": "柏レイソル",
    "away": "水戸ホーリーホック",
    "venue": "三協フロンテア柏スタジアム",
-   "status": "FINISHED",
-   "score": "2-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -101,8 +97,7 @@ window.SCHEDULE_DATA = {
    "home": "ＦＣ東京",
    "away": "ＦＣ町田ゼルビア",
    "venue": "味の素スタジアム",
-   "status": "FINISHED",
-   "score": "1-5"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -111,8 +106,7 @@ window.SCHEDULE_DATA = {
    "home": "名古屋グランパス",
    "away": "清水エスパルス",
    "venue": "豊田スタジアム",
-   "status": "FINISHED",
-   "score": "0-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -121,8 +115,7 @@ window.SCHEDULE_DATA = {
    "home": "セレッソ大阪",
    "away": "ファジアーノ岡山",
    "venue": "YANMAR HANASAKA STADIUM",
-   "status": "FINISHED",
-   "score": "2-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -131,8 +124,7 @@ window.SCHEDULE_DATA = {
    "home": "アビスパ福岡",
    "away": "ヴィッセル神戸",
    "venue": "ベスト電器スタジアム",
-   "status": "FINISHED",
-   "score": "0-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -141,8 +133,7 @@ window.SCHEDULE_DATA = {
    "home": "サンフレッチェ広島",
    "away": "ジェフユナイテッド千葉",
    "venue": "エディオンピースウイング広島",
-   "status": "FINISHED",
-   "score": "3-0"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -151,8 +142,7 @@ window.SCHEDULE_DATA = {
    "home": "東京ヴェルディ",
    "away": "川崎フロンターレ",
    "venue": "味の素スタジアム",
-   "status": "FINISHED",
-   "score": "1-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -161,8 +151,7 @@ window.SCHEDULE_DATA = {
    "home": "Ｖ・ファーレン長崎",
    "away": "京都サンガF.C.",
    "venue": "PEACE STADIUM Connected by SoftBank",
-   "status": "FINISHED",
-   "score": "2-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -171,8 +160,7 @@ window.SCHEDULE_DATA = {
    "home": "東京ヴェルディ",
    "away": "柏レイソル",
    "venue": "ＭＵＦＧスタジアム",
-   "status": "FINISHED",
-   "score": "1-3"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -181,8 +169,7 @@ window.SCHEDULE_DATA = {
    "home": "鹿島アントラーズ",
    "away": "名古屋グランパス",
    "venue": "メルカリスタジアム",
-   "status": "FINISHED",
-   "score": "2-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -191,8 +178,7 @@ window.SCHEDULE_DATA = {
    "home": "水戸ホーリーホック",
    "away": "ガンバ大阪",
    "venue": "水戸信用金庫スタジアム",
-   "status": "FINISHED",
-   "score": "1-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -201,8 +187,7 @@ window.SCHEDULE_DATA = {
    "home": "清水エスパルス",
    "away": "横浜Ｆ・マリノス",
    "venue": "ＩＡＩスタジアム日本平",
-   "status": "FINISHED",
-   "score": "0-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -211,8 +196,7 @@ window.SCHEDULE_DATA = {
    "home": "ファジアーノ岡山",
    "away": "Ｖ・ファーレン長崎",
    "venue": "ＪＦＥ晴れの国スタジアム",
-   "status": "FINISHED",
-   "score": "1-0"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -221,8 +205,7 @@ window.SCHEDULE_DATA = {
    "home": "浦和レッズ",
    "away": "サンフレッチェ広島",
    "venue": "埼玉スタジアム２００２",
-   "status": "FINISHED",
-   "score": "1-4"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -231,8 +214,7 @@ window.SCHEDULE_DATA = {
    "home": "ヴィッセル神戸",
    "away": "ＦＣ東京",
    "venue": "ノエビアスタジアム神戸",
-   "status": "FINISHED",
-   "score": "2-2"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -241,8 +223,7 @@ window.SCHEDULE_DATA = {
    "home": "ジェフユナイテッド千葉",
    "away": "ＦＣ町田ゼルビア",
    "venue": "フクダ電子アリーナ",
-   "status": "FINISHED",
-   "score": "0-4"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -251,8 +232,7 @@ window.SCHEDULE_DATA = {
    "home": "川崎フロンターレ",
    "away": "京都サンガF.C.",
    "venue": "Ｕｖａｎｃｅとどろきスタジアム　ｂｙ　Ｆｕｊｉｔｓｕ",
-   "status": "FINISHED",
-   "score": "2-2"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -261,8 +241,7 @@ window.SCHEDULE_DATA = {
    "home": "アビスパ福岡",
    "away": "セレッソ大阪",
    "venue": "ベスト電器スタジアム",
-   "status": "FINISHED",
-   "score": "3-0"
+   "status": "FINISHED"
   },
   {
    "league": "J2",
@@ -271,8 +250,7 @@ window.SCHEDULE_DATA = {
    "home": "アルビレックス新潟",
    "away": "北海道コンサドーレ札幌",
    "venue": "デンカビッグスワンスタジアム",
-   "status": "FINISHED",
-   "score": "2-1"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -281,8 +259,7 @@ window.SCHEDULE_DATA = {
    "home": "アラベス",
    "away": "ヘタフェ",
    "venue": "メンディソローサ",
-   "status": "FINISHED",
-   "score": "3-0"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -291,8 +268,7 @@ window.SCHEDULE_DATA = {
    "home": "セビージャ",
    "away": "ラージョ・バジェカーノ",
    "venue": "ラモン・サンチェス・ピスフアン",
-   "status": "FINISHED",
-   "score": "2-1"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -301,8 +277,7 @@ window.SCHEDULE_DATA = {
    "home": "ラシン・サンタンデール",
    "away": "ビジャレアル",
    "venue": "エル・サルディネロ",
-   "status": "FINISHED",
-   "score": "2-2"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -311,8 +286,7 @@ window.SCHEDULE_DATA = {
    "home": "エスパニョール",
    "away": "レバンテ",
    "venue": "ＲＣＤＥスタジアム",
-   "status": "FINISHED",
-   "score": "3-0"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -321,8 +295,7 @@ window.SCHEDULE_DATA = {
    "home": "デポルティボ",
    "away": "エルチェ",
    "venue": "リアソール",
-   "status": "FINISHED",
-   "score": "1-1"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -331,8 +304,7 @@ window.SCHEDULE_DATA = {
    "home": "アトレティコ・マドリード",
    "away": "マラガ",
    "venue": "メトロポリターノ",
-   "status": "FINISHED",
-   "score": "2-0"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -341,8 +313,7 @@ window.SCHEDULE_DATA = {
    "home": "ラージョ・バジェカーノ",
    "away": "アラベス",
    "venue": "バジェカス",
-   "status": "FINISHED",
-   "score": "1-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -351,8 +322,7 @@ window.SCHEDULE_DATA = {
    "home": "柏レイソル",
    "away": "Ｖ・ファーレン長崎",
    "venue": "三協フロンテア柏スタジアム",
-   "status": "FINISHED",
-   "score": "4-2"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -361,8 +331,7 @@ window.SCHEDULE_DATA = {
    "home": "ＦＣ東京",
    "away": "ジェフユナイテッド千葉",
    "venue": "ＭＵＦＧスタジアム",
-   "status": "FINISHED",
-   "score": "2-0"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -371,8 +340,7 @@ window.SCHEDULE_DATA = {
    "home": "マルセイユ",
    "away": "ストラスブール",
    "venue": "スタッド・ヴェロドローム",
-   "status": "FINISHED",
-   "score": "4-0"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -380,8 +348,7 @@ window.SCHEDULE_DATA = {
    "utc": "2026-08-21T19:00:00Z",
    "home": "ベティス",
    "away": "レアル・ソシエダ",
-   "status": "FINISHED",
-   "score": "1-0"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -390,8 +357,7 @@ window.SCHEDULE_DATA = {
    "home": "アーセナル",
    "away": "コベントリー",
    "venue": "エミレーツ・スタジアム",
-   "status": "FINISHED",
-   "score": "3-0"
+   "status": "FINISHED"
   },
   {
    "league": "J2",
@@ -400,8 +366,7 @@ window.SCHEDULE_DATA = {
    "home": "北海道コンサドーレ札幌",
    "away": "ＲＢ大宮アルディージャ",
    "venue": "大和ハウス プレミストドーム",
-   "status": "FINISHED",
-   "score": "1-4"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -410,8 +375,7 @@ window.SCHEDULE_DATA = {
    "home": "鹿島アントラーズ",
    "away": "アビスパ福岡",
    "venue": "メルカリスタジアム",
-   "status": "FINISHED",
-   "score": "3-2"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -420,8 +384,7 @@ window.SCHEDULE_DATA = {
    "home": "ファジアーノ岡山",
    "away": "東京ヴェルディ",
    "venue": "ＪＦＥ晴れの国スタジアム",
-   "status": "FINISHED",
-   "score": "0-0"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -430,8 +393,7 @@ window.SCHEDULE_DATA = {
    "home": "名古屋グランパス",
    "away": "ガンバ大阪",
    "venue": "豊田スタジアム",
-   "status": "FINISHED",
-   "score": "3-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -440,8 +402,7 @@ window.SCHEDULE_DATA = {
    "home": "京都サンガF.C.",
    "away": "水戸ホーリーホック",
    "venue": "サンガスタジアム by ＫＹＯＣＥＲＡ",
-   "status": "FINISHED",
-   "score": "1-3"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -450,8 +411,7 @@ window.SCHEDULE_DATA = {
    "home": "セレッソ大阪",
    "away": "清水エスパルス",
    "venue": "YANMAR HANASAKA STADIUM",
-   "status": "FINISHED",
-   "score": "1-0"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -460,8 +420,7 @@ window.SCHEDULE_DATA = {
    "home": "サンフレッチェ広島",
    "away": "川崎フロンターレ",
    "venue": "エディオンピースウイング広島",
-   "status": "FINISHED",
-   "score": "1-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -470,8 +429,7 @@ window.SCHEDULE_DATA = {
    "home": "横浜Ｆ・マリノス",
    "away": "ヴィッセル神戸",
    "venue": "日産スタジアム",
-   "status": "FINISHED",
-   "score": "1-0"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -480,8 +438,7 @@ window.SCHEDULE_DATA = {
    "home": "ハル・シティ",
    "away": "マンチェスター・ユナイテッド",
    "venue": "ＭＫＭスタジアム",
-   "status": "FINISHED",
-   "score": "2-0"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -490,8 +447,7 @@ window.SCHEDULE_DATA = {
    "home": "イプスウィッチ",
    "away": "サンダーランド",
    "venue": "ポートマン・ロード",
-   "status": "FINISHED",
-   "score": "2-1"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -500,8 +456,7 @@ window.SCHEDULE_DATA = {
    "home": "ノッティンガム・フォレスト",
    "away": "リーズ",
    "venue": "シティ・グラウンド",
-   "status": "FINISHED",
-   "score": "0-1"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -510,8 +465,7 @@ window.SCHEDULE_DATA = {
    "home": "エヴァートン",
    "away": "クリスタル・パレス",
    "venue": "ヒル・ディキンソン・スタジアム",
-   "status": "FINISHED",
-   "score": "2-0"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -520,8 +474,7 @@ window.SCHEDULE_DATA = {
    "home": "アスレティック・ビルバオ",
    "away": "セビージャ",
    "venue": "サン・マメス",
-   "status": "FINISHED",
-   "score": "1-3"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -530,8 +483,7 @@ window.SCHEDULE_DATA = {
    "home": "ランス",
    "away": "オセール",
    "venue": "スタッド・ボラール＝ドレリス",
-   "status": "FINISHED",
-   "score": "5-2"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -540,8 +492,7 @@ window.SCHEDULE_DATA = {
    "home": "ブレントフォード",
    "away": "トッテナム",
    "venue": "Gtechコミュニティ・スタジアム",
-   "status": "FINISHED",
-   "score": "3-0"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -550,8 +501,7 @@ window.SCHEDULE_DATA = {
    "home": "ウディネーゼ",
    "away": "コモ",
    "venue": "ブルーエナジー・スタジアム",
-   "status": "FINISHED",
-   "score": "1-1"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -560,8 +510,7 @@ window.SCHEDULE_DATA = {
    "home": "インテル",
    "away": "モンツァ",
    "venue": "サン・シーロ",
-   "status": "FINISHED",
-   "score": "4-1"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -570,8 +519,7 @@ window.SCHEDULE_DATA = {
    "home": "バレンシア",
    "away": "セルタ",
    "venue": "メスタージャ",
-   "status": "FINISHED",
-   "score": "0-0"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -580,8 +528,7 @@ window.SCHEDULE_DATA = {
    "home": "ル・マン",
    "away": "ブレスト",
    "venue": "ＭＭＡレナ",
-   "status": "FINISHED",
-   "score": "2-2"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -590,8 +537,7 @@ window.SCHEDULE_DATA = {
    "home": "トロワ",
    "away": "パリＦＣ",
    "venue": "スタッド・ド・ローブ",
-   "status": "FINISHED",
-   "score": "0-0"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -600,8 +546,7 @@ window.SCHEDULE_DATA = {
    "home": "ニース",
    "away": "ロリアン",
    "venue": "アリアンツ・リビエラ",
-   "status": "FINISHED",
-   "score": "0-0"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -610,8 +555,7 @@ window.SCHEDULE_DATA = {
    "home": "トゥールーズ",
    "away": "リヨン",
    "venue": "スタジアム・ド・トゥールーズ",
-   "status": "FINISHED",
-   "score": "0-2"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -620,8 +564,7 @@ window.SCHEDULE_DATA = {
    "home": "ジェノア",
    "away": "ナポリ",
    "venue": "ルイジ・フェッラーリス",
-   "status": "FINISHED",
-   "score": "0-2"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -630,8 +573,7 @@ window.SCHEDULE_DATA = {
    "home": "パルマ",
    "away": "カリアリ",
    "venue": "エンニオ・タルディーニ",
-   "status": "FINISHED",
-   "score": "0-1"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -640,8 +582,7 @@ window.SCHEDULE_DATA = {
    "home": "エスパニョール",
    "away": "レアル・マドリード",
    "venue": "ＲＣＤＥスタジアム",
-   "status": "FINISHED",
-   "score": "1-2"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -650,8 +591,7 @@ window.SCHEDULE_DATA = {
    "home": "ＦＣ町田ゼルビア",
    "away": "浦和レッズ",
    "venue": "ＭＵＦＧスタジアム",
-   "status": "FINISHED",
-   "score": "3-1"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -660,8 +600,7 @@ window.SCHEDULE_DATA = {
    "home": "アンジェ",
    "away": "リール",
    "venue": "スタッド・レイモン・コパ",
-   "status": "FINISHED",
-   "score": "0-2"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -670,8 +609,7 @@ window.SCHEDULE_DATA = {
    "home": "マンチェスター・シティ",
    "away": "ボーンマス",
    "venue": "エティハド・スタジアム",
-   "status": "FINISHED",
-   "score": "2-1"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -680,8 +618,7 @@ window.SCHEDULE_DATA = {
    "home": "ブライトン",
    "away": "アストン・ヴィラ",
    "venue": "アメックス・スタジアム",
-   "status": "FINISHED",
-   "score": "4-0"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -690,8 +627,7 @@ window.SCHEDULE_DATA = {
    "home": "アトレティコ・マドリード",
    "away": "ビジャレアル",
    "venue": "メトロポリターノ",
-   "status": "FINISHED",
-   "score": "2-2"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -700,8 +636,7 @@ window.SCHEDULE_DATA = {
    "home": "ル・アーヴル",
    "away": "モナコ",
    "venue": "スタッド・オセアン",
-   "status": "FINISHED",
-   "score": "0-1"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -710,8 +645,7 @@ window.SCHEDULE_DATA = {
    "home": "ニューカッスル",
    "away": "リヴァプール",
    "venue": "セント・ジェームズ・パーク",
-   "status": "FINISHED",
-   "score": "2-2"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -720,8 +654,7 @@ window.SCHEDULE_DATA = {
    "home": "フロジノーネ",
    "away": "ユヴェントス",
    "venue": "ベニート・スティルペ",
-   "status": "FINISHED",
-   "score": "0-1"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -730,8 +663,7 @@ window.SCHEDULE_DATA = {
    "home": "ヴェネツィア",
    "away": "レッチェ",
    "venue": "ピエルルイジ・ペンツォ",
-   "status": "FINISHED",
-   "score": "0-2"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -740,8 +672,7 @@ window.SCHEDULE_DATA = {
    "home": "ヘタフェ",
    "away": "ラシン・サンタンデール",
    "venue": "コリセウム",
-   "status": "FINISHED",
-   "score": "1-0"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -750,8 +681,7 @@ window.SCHEDULE_DATA = {
    "home": "レンヌ",
    "away": "パリ・サンジェルマン",
    "venue": "ロアゾン・パルク",
-   "status": "FINISHED",
-   "score": "2-2"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -760,8 +690,7 @@ window.SCHEDULE_DATA = {
    "home": "アタランタ",
    "away": "サッスオーロ",
    "venue": "ジェイビス・スタジアム",
-   "status": "FINISHED",
-   "score": "2-1"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -770,8 +699,7 @@ window.SCHEDULE_DATA = {
    "home": "トリノ",
    "away": "ミラン",
    "venue": "スタディオ・オリンピコ・グランデ・トリノ",
-   "status": "FINISHED",
-   "score": "1-2"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -780,8 +708,7 @@ window.SCHEDULE_DATA = {
    "home": "エルチェ",
    "away": "バルセロナ",
    "venue": "マルティネス・バレロ",
-   "status": "FINISHED",
-   "score": "0-5"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -790,8 +717,7 @@ window.SCHEDULE_DATA = {
    "home": "ボローニャ",
    "away": "ラツィオ",
    "venue": "レナート・ダッラーラ",
-   "status": "FINISHED",
-   "score": "0-1"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -800,8 +726,7 @@ window.SCHEDULE_DATA = {
    "home": "オサスナ",
    "away": "レバンテ",
    "venue": "エル・サダル",
-   "status": "FINISHED",
-   "score": "0-0"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -810,8 +735,7 @@ window.SCHEDULE_DATA = {
    "home": "ローマ",
    "away": "フィオレンティーナ",
    "venue": "スタディオ・オリンピコ",
-   "status": "FINISHED",
-   "score": "4-0"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -820,8 +744,7 @@ window.SCHEDULE_DATA = {
    "home": "フラム",
    "away": "チェルシー",
    "venue": "クレイヴン・コテージ",
-   "status": "FINISHED",
-   "score": "2-3"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -830,8 +753,7 @@ window.SCHEDULE_DATA = {
    "home": "マラガ",
    "away": "デポルティボ",
    "venue": "ラ・ロサレダ",
-   "status": "FINISHED",
-   "score": "1-1"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -840,8 +762,7 @@ window.SCHEDULE_DATA = {
    "home": "バレンシア",
    "away": "ベティス",
    "venue": "メスタージャ",
-   "status": "FINISHED",
-   "score": "0-1"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -850,8 +771,7 @@ window.SCHEDULE_DATA = {
    "home": "レアル・マドリード",
    "away": "レアル・ソシエダ",
    "venue": "サンティアゴ・ベルナベウ",
-   "status": "FINISHED",
-   "score": "4-1"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -860,8 +780,7 @@ window.SCHEDULE_DATA = {
    "home": "セルタ",
    "away": "オサスナ",
    "venue": "バライードス",
-   "status": "FINISHED",
-   "score": "1-2"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -869,8 +788,7 @@ window.SCHEDULE_DATA = {
    "utc": "2026-08-27T19:00:00Z",
    "home": "バルセロナ",
    "away": "アスレティック・ビルバオ",
-   "status": "FINISHED",
-   "score": "2-0"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -879,8 +797,7 @@ window.SCHEDULE_DATA = {
    "home": "ラシン・サンタンデール",
    "away": "エルチェ",
    "venue": "エル・サルディネロ",
-   "status": "FINISHED",
-   "score": "3-2"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -889,8 +806,7 @@ window.SCHEDULE_DATA = {
    "home": "バイエルン",
    "away": "シュトゥットガルト",
    "venue": "アリアンツ・アレーナ",
-   "status": "FINISHED",
-   "score": "5-1"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -899,8 +815,7 @@ window.SCHEDULE_DATA = {
    "home": "リール",
    "away": "パリ・サンジェルマン",
    "venue": "スタッド・ピエール・モーロワ",
-   "status": "FINISHED",
-   "score": "2-2"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -909,8 +824,7 @@ window.SCHEDULE_DATA = {
    "home": "ミラン",
    "away": "ヴェネツィア",
    "venue": "サン・シーロ",
-   "status": "FINISHED",
-   "score": "2-0"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -919,8 +833,7 @@ window.SCHEDULE_DATA = {
    "home": "クリスタル・パレス",
    "away": "マンチェスター・シティ",
    "venue": "セルハースト・パーク",
-   "status": "FINISHED",
-   "score": "1-4"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -929,8 +842,7 @@ window.SCHEDULE_DATA = {
    "home": "アラベス",
    "away": "ビジャレアル",
    "venue": "メンディソローサ",
-   "status": "FINISHED",
-   "score": "1-0"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -939,8 +851,7 @@ window.SCHEDULE_DATA = {
    "home": "水戸ホーリーホック",
    "away": "ＦＣ町田ゼルビア",
    "venue": "水戸信用金庫スタジアム",
-   "status": "FINISHED",
-   "score": "1-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -949,8 +860,7 @@ window.SCHEDULE_DATA = {
    "home": "ガンバ大阪",
    "away": "サンフレッチェ広島",
    "venue": "パナソニック スタジアム 吹田",
-   "status": "FINISHED",
-   "score": "0-0"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -959,8 +869,7 @@ window.SCHEDULE_DATA = {
    "home": "清水エスパルス",
    "away": "柏レイソル",
    "venue": "ＩＡＩスタジアム日本平",
-   "status": "FINISHED",
-   "score": "0-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -969,8 +878,7 @@ window.SCHEDULE_DATA = {
    "home": "Ｖ・ファーレン長崎",
    "away": "ＦＣ東京",
    "venue": "PEACE STADIUM Connected by SoftBank",
-   "status": "FINISHED",
-   "score": "0-3"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -979,8 +887,7 @@ window.SCHEDULE_DATA = {
    "home": "東京ヴェルディ",
    "away": "鹿島アントラーズ",
    "venue": "味の素スタジアム",
-   "status": "FINISHED",
-   "score": "0-2"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -989,8 +896,7 @@ window.SCHEDULE_DATA = {
    "home": "浦和レッズ",
    "away": "横浜Ｆ・マリノス",
    "venue": "埼玉スタジアム２００２",
-   "status": "FINISHED",
-   "score": "3-2"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -999,8 +905,7 @@ window.SCHEDULE_DATA = {
    "home": "川崎フロンターレ",
    "away": "ジェフユナイテッド千葉",
    "venue": "Ｕｖａｎｃｅとどろきスタジアム　ｂｙ　Ｆｕｊｉｔｓｕ",
-   "status": "FINISHED",
-   "score": "4-2"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1009,8 +914,7 @@ window.SCHEDULE_DATA = {
    "home": "名古屋グランパス",
    "away": "ファジアーノ岡山",
    "venue": "豊田スタジアム",
-   "status": "FINISHED",
-   "score": "2-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1019,8 +923,7 @@ window.SCHEDULE_DATA = {
    "home": "京都サンガF.C.",
    "away": "アビスパ福岡",
    "venue": "サンガスタジアム by ＫＹＯＣＥＲＡ",
-   "status": "FINISHED",
-   "score": "2-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1029,8 +932,7 @@ window.SCHEDULE_DATA = {
    "home": "ヴィッセル神戸",
    "away": "セレッソ大阪",
    "venue": "ノエビアスタジアム神戸",
-   "status": "FINISHED",
-   "score": "1-0"
+   "status": "FINISHED"
   },
   {
    "league": "J2",
@@ -1039,8 +941,7 @@ window.SCHEDULE_DATA = {
    "home": "ヴァンフォーレ甲府",
    "away": "北海道コンサドーレ札幌",
    "venue": "JIT リサイクルインク スタジアム",
-   "status": "FINISHED",
-   "score": "2-1"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -1049,8 +950,7 @@ window.SCHEDULE_DATA = {
    "home": "ライプツィヒ",
    "away": "ボルシアＭＧ",
    "venue": "レッドブル・アレーナ",
-   "status": "FINISHED",
-   "score": "3-0"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -1059,8 +959,7 @@ window.SCHEDULE_DATA = {
    "home": "マインツ",
    "away": "パーダーボルン",
    "venue": "メーヴァ・アレーナ",
-   "status": "FINISHED",
-   "score": "0-0"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -1069,8 +968,7 @@ window.SCHEDULE_DATA = {
    "home": "ウニオン・ベルリン",
    "away": "フランクフルト",
    "venue": "アルテ・フェルスターライ",
-   "status": "FINISHED",
-   "score": "3-3"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -1079,8 +977,7 @@ window.SCHEDULE_DATA = {
    "home": "エルフェアスベルク",
    "away": "レバークーゼン",
    "venue": "ウルスアパルク",
-   "status": "FINISHED",
-   "score": "3-2"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -1089,8 +986,7 @@ window.SCHEDULE_DATA = {
    "home": "ケルン",
    "away": "ホッフェンハイム",
    "venue": "ラインエネルギーシュタディオン",
-   "status": "FINISHED",
-   "score": "3-2"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1099,8 +995,7 @@ window.SCHEDULE_DATA = {
    "home": "リヴァプール",
    "away": "ノッティンガム・フォレスト",
    "venue": "アンフィールド",
-   "status": "FINISHED",
-   "score": "2-2"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1109,8 +1004,7 @@ window.SCHEDULE_DATA = {
    "home": "ボーンマス",
    "away": "エヴァートン",
    "venue": "バイタリティ・スタジアム",
-   "status": "FINISHED",
-   "score": "1-1"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1119,8 +1013,7 @@ window.SCHEDULE_DATA = {
    "home": "コベントリー",
    "away": "ハル・シティ",
    "venue": "ＣＢＳアリーナ",
-   "status": "FINISHED",
-   "score": "0-1"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1129,8 +1022,7 @@ window.SCHEDULE_DATA = {
    "home": "レバンテ",
    "away": "ベティス",
    "venue": "シウタット・デ・バレンシア",
-   "status": "FINISHED",
-   "score": "5-2"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -1139,8 +1031,7 @@ window.SCHEDULE_DATA = {
    "home": "ストラスブール",
    "away": "ランス",
    "venue": "スタッド・ド・ラ・メノー",
-   "status": "FINISHED",
-   "score": "2-1"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -1149,8 +1040,7 @@ window.SCHEDULE_DATA = {
    "home": "ドルトムント",
    "away": "ハンブルガーＳＶ",
    "venue": "ジグナル・イドゥナ・パルク",
-   "status": "FINISHED",
-   "score": "2-0"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1159,8 +1049,7 @@ window.SCHEDULE_DATA = {
    "home": "トッテナム",
    "away": "ニューカッスル",
    "venue": "トッテナム・ホットスパー・スタジアム",
-   "status": "FINISHED",
-   "score": "0-2"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1169,8 +1058,7 @@ window.SCHEDULE_DATA = {
    "home": "サッスオーロ",
    "away": "トリノ",
    "venue": "マペイ・スタジアム",
-   "status": "FINISHED",
-   "score": "2-1"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1179,8 +1067,7 @@ window.SCHEDULE_DATA = {
    "home": "モンツァ",
    "away": "ウディネーゼ",
    "venue": "ウ・パワー・スタジアム",
-   "status": "FINISHED",
-   "score": "2-3"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1189,8 +1076,7 @@ window.SCHEDULE_DATA = {
    "home": "フィオレンティーナ",
    "away": "フロジノーネ",
    "venue": "アルテミオ・フランキ",
-   "status": "FINISHED",
-   "score": "0-3"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1199,8 +1085,7 @@ window.SCHEDULE_DATA = {
    "home": "レアル・ソシエダ",
    "away": "エスパニョール",
    "venue": "レアレ・アレーナ",
-   "status": "FINISHED",
-   "score": "2-1"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -1209,8 +1094,7 @@ window.SCHEDULE_DATA = {
    "home": "ロリアン",
    "away": "トロワ",
    "venue": "スタッド・デュ・ムストワール",
-   "status": "FINISHED",
-   "score": "1-2"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -1219,8 +1103,7 @@ window.SCHEDULE_DATA = {
    "home": "リヨン",
    "away": "ル・アーヴル",
    "venue": "グルパマ・スタジアム",
-   "status": "FINISHED",
-   "score": "1-1"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -1229,8 +1112,7 @@ window.SCHEDULE_DATA = {
    "home": "オセール",
    "away": "アンジェ",
    "venue": "スタッド・アベ・デシャン",
-   "status": "FINISHED",
-   "score": "1-3"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -1239,8 +1121,7 @@ window.SCHEDULE_DATA = {
    "home": "ブレスト",
    "away": "トゥールーズ",
    "venue": "スタッド・フランシス・ル・ブレ",
-   "status": "FINISHED",
-   "score": "2-2"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1249,8 +1130,7 @@ window.SCHEDULE_DATA = {
    "home": "ユヴェントス",
    "away": "パルマ",
    "venue": "アリアンツ・スタジアム",
-   "status": "FINISHED",
-   "score": "2-0"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1259,8 +1139,7 @@ window.SCHEDULE_DATA = {
    "home": "セビージャ",
    "away": "アトレティコ・マドリード",
    "venue": "ラモン・サンチェス・ピスフアン",
-   "status": "FINISHED",
-   "score": "1-3"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -1269,8 +1148,7 @@ window.SCHEDULE_DATA = {
    "home": "パリＦＣ",
    "away": "ニース",
    "venue": "スタッド・ジャン・ブアン",
-   "status": "FINISHED",
-   "score": "3-0"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1279,8 +1157,7 @@ window.SCHEDULE_DATA = {
    "home": "サンダーランド",
    "away": "フラム",
    "venue": "スタジアム・オブ・ライト",
-   "status": "FINISHED",
-   "score": "1-0"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1289,8 +1166,7 @@ window.SCHEDULE_DATA = {
    "home": "チェルシー",
    "away": "ブライトン",
    "venue": "スタンフォード・ブリッジ",
-   "status": "FINISHED",
-   "score": "4-3"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1299,8 +1175,7 @@ window.SCHEDULE_DATA = {
    "home": "リーズ",
    "away": "ブレントフォード",
    "venue": "エランド・ロード",
-   "status": "FINISHED",
-   "score": "1-1"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -1309,8 +1184,7 @@ window.SCHEDULE_DATA = {
    "home": "フライブルク",
    "away": "ヴェルダー・ブレーメン",
    "venue": "ヨーロッパ・パルク・シュタディオン",
-   "status": "FINISHED",
-   "score": "4-1"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1319,8 +1193,7 @@ window.SCHEDULE_DATA = {
    "home": "レアル・マドリード",
    "away": "マラガ",
    "venue": "サンティアゴ・ベルナベウ",
-   "status": "FINISHED",
-   "score": "4-0"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -1329,8 +1202,7 @@ window.SCHEDULE_DATA = {
    "home": "レンヌ",
    "away": "ル・マン",
    "venue": "ロアゾン・パルク",
-   "status": "FINISHED",
-   "score": "3-2"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -1339,8 +1211,7 @@ window.SCHEDULE_DATA = {
    "home": "アウクスブルク",
    "away": "シャルケ",
    "venue": "ＷＷＫアレーナ",
-   "status": "FINISHED",
-   "score": "3-0"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1349,8 +1220,7 @@ window.SCHEDULE_DATA = {
    "home": "マンチェスター・ユナイテッド",
    "away": "イプスウィッチ",
    "venue": "オールド・トラッフォード",
-   "status": "FINISHED",
-   "score": "5-2"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1359,8 +1229,7 @@ window.SCHEDULE_DATA = {
    "home": "ナポリ",
    "away": "コモ",
    "venue": "スタディオ・マラドーナ",
-   "status": "FINISHED",
-   "score": "1-2"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1369,8 +1238,7 @@ window.SCHEDULE_DATA = {
    "home": "デポルティボ",
    "away": "バレンシア",
    "venue": "リアソール",
-   "status": "FINISHED",
-   "score": "3-1"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -1379,8 +1247,7 @@ window.SCHEDULE_DATA = {
    "home": "モナコ",
    "away": "マルセイユ",
    "venue": "スタッド・ルイ２世",
-   "status": "FINISHED",
-   "score": "2-0"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1389,8 +1256,7 @@ window.SCHEDULE_DATA = {
    "home": "ラツィオ",
    "away": "ジェノア",
    "venue": "スタディオ・オリンピコ",
-   "status": "FINISHED",
-   "score": "1-0"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1399,8 +1265,7 @@ window.SCHEDULE_DATA = {
    "home": "カリアリ",
    "away": "インテル",
    "venue": "ウニポル・ドムス",
-   "status": "FINISHED",
-   "score": "0-1"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1409,8 +1274,7 @@ window.SCHEDULE_DATA = {
    "home": "セルタ",
    "away": "アスレティック・ビルバオ",
    "venue": "バライードス",
-   "status": "FINISHED",
-   "score": "0-2"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1419,8 +1283,7 @@ window.SCHEDULE_DATA = {
    "home": "レッチェ",
    "away": "ローマ",
    "venue": "ヴィア・デル・マーレ",
-   "status": "FINISHED",
-   "score": "0-4"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1429,8 +1292,7 @@ window.SCHEDULE_DATA = {
    "home": "オサスナ",
    "away": "ヘタフェ",
    "venue": "エル・サダル",
-   "status": "FINISHED",
-   "score": "1-0"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1439,8 +1301,7 @@ window.SCHEDULE_DATA = {
    "home": "アタランタ",
    "away": "ボローニャ",
    "venue": "ジェイビス・スタジアム",
-   "status": "FINISHED",
-   "score": "1-0"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1449,8 +1310,7 @@ window.SCHEDULE_DATA = {
    "home": "アストン・ヴィラ",
    "away": "アーセナル",
    "venue": "ヴィラ・パーク",
-   "status": "FINISHED",
-   "score": "0-1"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1458,8 +1318,7 @@ window.SCHEDULE_DATA = {
    "utc": "2026-08-31T19:30:00Z",
    "home": "バルセロナ",
    "away": "ラージョ・バジェカーノ",
-   "status": "FINISHED",
-   "score": "5-2"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1468,8 +1327,7 @@ window.SCHEDULE_DATA = {
    "home": "水戸ホーリーホック",
    "away": "鹿島アントラーズ",
    "venue": "水戸信用金庫スタジアム",
-   "status": "FINISHED",
-   "score": "4-2"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1478,8 +1336,7 @@ window.SCHEDULE_DATA = {
    "home": "アビスパ福岡",
    "away": "浦和レッズ",
    "venue": "ベスト電器スタジアム",
-   "status": "FINISHED",
-   "score": "2-3"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1488,8 +1345,7 @@ window.SCHEDULE_DATA = {
    "home": "セレッソ大阪",
    "away": "柏レイソル",
    "venue": "YANMAR HANASAKA STADIUM",
-   "status": "FINISHED",
-   "score": "2-0"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1498,8 +1354,7 @@ window.SCHEDULE_DATA = {
    "home": "清水エスパルス",
    "away": "ＦＣ東京",
    "venue": "ＩＡＩスタジアム日本平",
-   "status": "FINISHED",
-   "score": "1-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1508,8 +1363,7 @@ window.SCHEDULE_DATA = {
    "home": "東京ヴェルディ",
    "away": "ヴィッセル神戸",
    "venue": "味の素スタジアム",
-   "status": "FINISHED",
-   "score": "0-2"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1518,8 +1372,7 @@ window.SCHEDULE_DATA = {
    "home": "ＦＣ町田ゼルビア",
    "away": "川崎フロンターレ",
    "venue": "町田ＧＩＯＮスタジアム",
-   "status": "FINISHED",
-   "score": "2-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1528,8 +1381,7 @@ window.SCHEDULE_DATA = {
    "home": "横浜Ｆ・マリノス",
    "away": "京都サンガF.C.",
    "venue": "日産スタジアム",
-   "status": "FINISHED",
-   "score": "1-1"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1538,8 +1390,7 @@ window.SCHEDULE_DATA = {
    "home": "サンフレッチェ広島",
    "away": "名古屋グランパス",
    "venue": "エディオンピースウイング広島",
-   "status": "FINISHED",
-   "score": "3-0"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1548,8 +1399,7 @@ window.SCHEDULE_DATA = {
    "home": "Ｖ・ファーレン長崎",
    "away": "ガンバ大阪",
    "venue": "PEACE STADIUM Connected by SoftBank",
-   "status": "FINISHED",
-   "score": "2-2"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1558,8 +1408,7 @@ window.SCHEDULE_DATA = {
    "home": "ジェフユナイテッド千葉",
    "away": "ファジアーノ岡山",
    "venue": "フクダ電子アリーナ",
-   "status": "FINISHED",
-   "score": "1-2"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -1586,8 +1435,7 @@ window.SCHEDULE_DATA = {
    "home": "リヨン",
    "away": "オセール",
    "venue": "グルパマ・スタジアム",
-   "status": "FINISHED",
-   "score": "3-1"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -1596,8 +1444,7 @@ window.SCHEDULE_DATA = {
    "home": "シュトゥットガルト",
    "away": "ケルン",
    "venue": "ＭＨＰアレーナ",
-   "status": "FINISHED",
-   "score": "4-1"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1606,8 +1453,7 @@ window.SCHEDULE_DATA = {
    "home": "ジェノア",
    "away": "コモ",
    "venue": "ルイジ・フェッラーリス",
-   "status": "FINISHED",
-   "score": "1-4"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1615,8 +1461,7 @@ window.SCHEDULE_DATA = {
    "utc": "2026-09-04T19:00:00Z",
    "home": "ベティス",
    "away": "レアル・マドリード",
-   "status": "FINISHED",
-   "score": "1-0"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1634,8 +1479,7 @@ window.SCHEDULE_DATA = {
    "home": "パリ・サンジェルマン",
    "away": "モナコ",
    "venue": "パルク・デ・プランス",
-   "status": "FINISHED",
-   "score": "1-2"
+   "status": "FINISHED"
   },
   {
    "league": "J1",

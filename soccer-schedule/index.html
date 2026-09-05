@@ -166,7 +166,7 @@
     <div class="scroller" id="chips"></div>
     <div class="tools">
       <div class="seg" id="mode">
-        <button data-v="upcoming">今後</button><button data-v="results">結果</button><button data-v="all">すべて</button>
+        <button data-v="upcoming">今後</button><button data-v="results">終了</button><button data-v="all">すべて</button>
       </div>
       <label class="search"><input type="search" id="q" placeholder="クラブ・スタジアムで絞り込み" autocomplete="off" aria-label="絞り込み"><button class="clear" id="qClear" aria-label="クリア" hidden>×</button></label>
       <div class="seg" id="view">
@@ -224,7 +224,8 @@
   const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   const $ = id => document.getElementById(id);
   let toastT; function toast(msg){ const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 1600); }
-  function scoreParts(m){ if(!m.score) return null; const p = m.score.split("-").map(Number); return p.length === 2 && p.every(n => !isNaN(n)) ? p : null; }
+  // ネタバレ防止: スコアは絶対に表示しない（データに含まれていても無視する）
+  const scoreParts = () => null;
   function isLive(m){ const t = Date.now() - m._d.getTime(); return m.status !== "FINISHED" && !m.tbd && t > 0 && t < 135 * 60e3; }
   function statusOf(m){
     if(m.status === "FINISHED") return ["終了", "done"];
@@ -297,9 +298,7 @@
   // ---- 試合行 ----
   function teamBtn(name, side, m, parts, idx){
     const fav = S.favs.has(name);
-    let wl = "";
-    if(parts){ const me = parts[idx], op = parts[1 - idx]; wl = me > op ? " win" : me < op ? " lose" : ""; }
-    return '<button class="team' + (fav ? " fav" : "") + wl + '" data-team="' + esc(name) + '" title="タップで推しクラブに登録/解除">' +
+    return '<button class="team' + (fav ? " fav" : "") + '" data-team="' + esc(name) + '" title="タップで推しクラブに登録/解除">' +
       (fav ? '<span class="st">★</span>' : "") + '<span class="nm">' + esc(name) + '</span><span class="ha">' + side + "</span></button>";
   }
   function matchRow(m, showDate){
@@ -314,7 +313,7 @@
       '<div>' + timeCell + '<div style="text-align:center"><span class="lg">' + esc(lg.short) + "</span></div></div>" +
       '<div class="body">' + teamBtn(m.home, "HOME", m, parts, 0) + teamBtn(m.away, "AWAY", m, parts, 1) +
         (meta ? '<div class="meta">' + esc(meta) + "</div>" : "") + "</div>" +
-      (parts ? '<div class="sc"><b class="' + (parts[0] < parts[1] ? "lose" : "") + '">' + parts[0] + '</b><b class="' + (parts[1] < parts[0] ? "lose" : "") + '">' + parts[1] + "</b></div>" : "<div></div>") +
+      "<div></div>" +
       (stLabel ? '<div class="status ' + stClass + '">' + stLabel + "</div>" : "") +
       "</div>";
   }
@@ -400,7 +399,8 @@
   if(DATA.generatedAt){
     const g = new Date(DATA.generatedAt);
     $("ft").innerHTML = "データ更新: " + fMD.format(g) + " " + fTime.format(g) + "（JST）／ 全" + M.length + "試合収録<br>" +
-      "「時刻未定」は暫定の日付表示（放送編成等で確定次第変わります）。クラブ名タップで推しクラブを登録すると「★ 推し」で絞り込めます。";
+      "「時刻未定」は暫定の日付表示（放送編成等で確定次第変わります）。クラブ名タップで推しクラブを登録すると「★ 推し」で絞り込めます。<br>" +
+      "ネタバレ防止のため、試合結果・スコアは表示しません（終了した試合は「終了」とだけ表示）。";
   }
 
   renderAll();

@@ -116,8 +116,8 @@ async function fetchEurope() {
         home: ja(m.homeTeam),
         away: ja(m.awayTeam),
         venue: m.venue || undefined,
-        status: m.status || "SCHEDULED",
-        score: (ft && ft.home != null) ? `${ft.home}-${ft.away}` : undefined
+        // ネタバレ防止: スコアは保存しない（status だけ持つ）
+        status: (ft && ft.home != null) ? "FINISHED" : (m.status || "SCHEDULED")
       });
       n++;
     }
@@ -163,8 +163,7 @@ function parseJleagueHtml(html, seasonYear, leagueId = "J1") {
       utc: utc.toISOString(),
       home, away,
       venue: venue || undefined,
-      status: sc ? "FINISHED" : "SCHEDULED",
-      score: sc ? `${sc[1]}-${sc[2]}` : undefined,
+      status: sc ? "FINISHED" : "SCHEDULED", // スコアはネタバレ防止のため保存しない
       tbd: tbd || undefined
     });
   }
@@ -231,6 +230,7 @@ if (existsSync(OUT) && (args["no-eu"] || args["no-j"])) {
   } catch { /* 引き継ぎ失敗時は取得分のみで出力 */ }
 }
 
+for (const m of matches) delete m.score; // 既存データ引き継ぎ分も含めてスコアは残さない
 matches.sort((a, b) => a.utc.localeCompare(b.utc) || a.league.localeCompare(b.league));
 const data = {
   generatedAt: new Date().toISOString(),

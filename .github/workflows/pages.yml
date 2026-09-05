@@ -1,6 +1,8 @@
 name: Deploy to GitHub Pages
 
 # jockey-sim/build.js で dist/ を組み立て GitHub Pages へ公開する。
+# あわせて soccer-schedule/（６リーグ日程帳）を dist/soccer/ に同梱し
+#   https://<user>.github.io/<repo>/soccer/ で公開する（サインイン不要）。
 # 有効化手順: リポジトリをGitHubへpush → Settings → Pages → Source を「GitHub Actions」に設定。
 # 以降 main/master への push（または手動実行）で自動デプロイ。公開URL = https://<user>.github.io/<repo>/
 
@@ -8,7 +10,7 @@ on:
   push:
     # 注意: github-pages環境のデプロイ許可ブランチ（Settings→Environments）に無いブランチを
     #       ここへ足すと、その実行は環境保護で即失敗し、concurrencyで本命デプロイをキャンセルしてしまう。
-    branches: [ main, master, feat/aaa-phase1 ]
+    branches: [ main, master, feat/aaa-phase1, claude/five-leagues-jp-schedule-app-750s5w ]
   workflow_dispatch:
 
 permissions:
@@ -45,6 +47,11 @@ jobs:
       - name: Build dist/
         working-directory: jockey-sim
         run: node build.js
+      - name: Add soccer-schedule to dist/soccer/
+        run: |
+          mkdir -p jockey-sim/dist/soccer
+          cp -r soccer-schedule/index.html soccer-schedule/data jockey-sim/dist/soccer/
+          touch jockey-sim/dist/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -1,6 +1,6 @@
-// scripts/update.mjs / merge_build.mjs により自動生成。手で編集しないこと。
+// scripts/update*.mjs により自動生成。手で編集しないこと。
 window.SCHEDULE_DATA = {
- "generatedAt": "2026-09-05T00:28:33.324Z",
+ "generatedAt": "2026-10-09T22:29:51.426Z",
  "sample": false,
  "leagues": [
   {
@@ -944,6 +944,15 @@ window.SCHEDULE_DATA = {
    "status": "FINISHED"
   },
   {
+   "league": "PL",
+   "matchday": 2,
+   "utc": "2026-08-29T11:30:00Z",
+   "home": "リヴァプール",
+   "away": "ノッティンガム・フォレスト",
+   "venue": "アンフィールド",
+   "status": "FINISHED"
+  },
+  {
    "league": "BL1",
    "matchday": 1,
    "utc": "2026-08-29T13:30:00Z",
@@ -986,15 +995,6 @@ window.SCHEDULE_DATA = {
    "home": "ケルン",
    "away": "ホッフェンハイム",
    "venue": "ラインエネルギーシュタディオン",
-   "status": "FINISHED"
-  },
-  {
-   "league": "PL",
-   "matchday": 2,
-   "utc": "2026-08-29T14:00:00Z",
-   "home": "リヴァプール",
-   "away": "ノッティンガム・フォレスト",
-   "venue": "アンフィールド",
    "status": "FINISHED"
   },
   {
@@ -1417,7 +1417,7 @@ window.SCHEDULE_DATA = {
    "home": "トゥールーズ",
    "away": "リール",
    "venue": "スタジアム・ド・トゥールーズ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1426,7 +1426,7 @@ window.SCHEDULE_DATA = {
    "home": "レアル・ソシエダ",
    "away": "セルタ",
    "venue": "レアレ・アレーナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -1470,7 +1470,7 @@ window.SCHEDULE_DATA = {
    "home": "イプスウィッチ",
    "away": "リヴァプール",
    "venue": "ポートマン・ロード",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -1488,7 +1488,7 @@ window.SCHEDULE_DATA = {
    "home": "アビスパ福岡",
    "away": "水戸ホーリーホック",
    "venue": "ベスト電器スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1497,7 +1497,7 @@ window.SCHEDULE_DATA = {
    "home": "ニューカッスル",
    "away": "ボーンマス",
    "venue": "セント・ジェームズ・パーク",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1506,7 +1506,7 @@ window.SCHEDULE_DATA = {
    "home": "フィオレンティーナ",
    "away": "トリノ",
    "venue": "アルテミオ・フランキ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -1515,7 +1515,7 @@ window.SCHEDULE_DATA = {
    "home": "ヴェルダー・ブレーメン",
    "away": "ライプツィヒ",
    "venue": "ヴェーザーシュタディオン",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -1524,7 +1524,7 @@ window.SCHEDULE_DATA = {
    "home": "ホッフェンハイム",
    "away": "ドルトムント",
    "venue": "プレゼロ・アレーナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -1533,7 +1533,7 @@ window.SCHEDULE_DATA = {
    "home": "レバークーゼン",
    "away": "ウニオン・ベルリン",
    "venue": "バイアレーナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -1542,7 +1542,7 @@ window.SCHEDULE_DATA = {
    "home": "ボルシアＭＧ",
    "away": "エルフェアスベルク",
    "venue": "ボルシア・パルク",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -1551,7 +1551,7 @@ window.SCHEDULE_DATA = {
    "home": "パーダーボルン",
    "away": "フライブルク",
    "venue": "ホーム・デルーフ・アレーナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1560,7 +1560,7 @@ window.SCHEDULE_DATA = {
    "home": "ノッティンガム・フォレスト",
    "away": "トッテナム",
    "venue": "シティ・グラウンド",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1569,7 +1569,7 @@ window.SCHEDULE_DATA = {
    "home": "マンチェスター・シティ",
    "away": "コベントリー",
    "venue": "エティハド・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1578,7 +1578,7 @@ window.SCHEDULE_DATA = {
    "home": "ブライトン",
    "away": "リーズ",
    "venue": "アメックス・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1587,7 +1587,7 @@ window.SCHEDULE_DATA = {
    "home": "ブレントフォード",
    "away": "サンダーランド",
    "venue": "Gtechコミュニティ・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1596,7 +1596,7 @@ window.SCHEDULE_DATA = {
    "home": "フラム",
    "away": "クリスタル・パレス",
    "venue": "クレイヴン・コテージ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1605,7 +1605,7 @@ window.SCHEDULE_DATA = {
    "home": "アスレティック・ビルバオ",
    "away": "アトレティコ・マドリード",
    "venue": "サン・マメス",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -1614,7 +1614,7 @@ window.SCHEDULE_DATA = {
    "home": "ランス",
    "away": "ロリアン",
    "venue": "スタッド・ボラール＝ドレリス",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1623,7 +1623,7 @@ window.SCHEDULE_DATA = {
    "home": "インテル",
    "away": "ナポリ",
    "venue": "サン・シーロ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -1632,7 +1632,7 @@ window.SCHEDULE_DATA = {
    "home": "シャルケ",
    "away": "バイエルン",
    "venue": "フェルティンス・アレーナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1641,7 +1641,7 @@ window.SCHEDULE_DATA = {
    "home": "ラージョ・バジェカーノ",
    "away": "ラシン・サンタンデール",
    "venue": "バジェカス",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1650,7 +1650,7 @@ window.SCHEDULE_DATA = {
    "home": "ハル・シティ",
    "away": "アストン・ヴィラ",
    "venue": "ＭＫＭスタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -1659,7 +1659,7 @@ window.SCHEDULE_DATA = {
    "home": "ル・アーヴル",
    "away": "ブレスト",
    "venue": "スタッド・オセアン",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -1668,7 +1668,7 @@ window.SCHEDULE_DATA = {
    "home": "ニース",
    "away": "ル・マン",
    "venue": "アリアンツ・リビエラ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1677,7 +1677,7 @@ window.SCHEDULE_DATA = {
    "home": "ローマ",
    "away": "アタランタ",
    "venue": "スタディオ・オリンピコ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1686,7 +1686,7 @@ window.SCHEDULE_DATA = {
    "home": "ビジャレアル",
    "away": "デポルティボ",
    "venue": "エスタディオ・デ・ラ・セラミカ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J2",
@@ -1695,7 +1695,7 @@ window.SCHEDULE_DATA = {
    "home": "北海道コンサドーレ札幌",
    "away": "栃木シティ",
    "venue": "札幌厚別公園競技場",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1704,7 +1704,7 @@ window.SCHEDULE_DATA = {
    "home": "鹿島アントラーズ",
    "away": "浦和レッズ",
    "venue": "メルカリスタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1713,7 +1713,7 @@ window.SCHEDULE_DATA = {
    "home": "名古屋グランパス",
    "away": "ＦＣ町田ゼルビア",
    "venue": "豊田スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1722,7 +1722,7 @@ window.SCHEDULE_DATA = {
    "home": "ジェフユナイテッド千葉",
    "away": "ガンバ大阪",
    "venue": "フクダ電子アリーナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1731,7 +1731,7 @@ window.SCHEDULE_DATA = {
    "home": "ファジアーノ岡山",
    "away": "サンフレッチェ広島",
    "venue": "ＪＦＥ晴れの国スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1740,7 +1740,7 @@ window.SCHEDULE_DATA = {
    "home": "柏レイソル",
    "away": "横浜Ｆ・マリノス",
    "venue": "三協フロンテア柏スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1749,7 +1749,7 @@ window.SCHEDULE_DATA = {
    "home": "セレッソ大阪",
    "away": "東京ヴェルディ",
    "venue": "YANMAR HANASAKA STADIUM",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1758,7 +1758,7 @@ window.SCHEDULE_DATA = {
    "home": "川崎フロンターレ",
    "away": "清水エスパルス",
    "venue": "ＭＵＦＧスタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1767,7 +1767,7 @@ window.SCHEDULE_DATA = {
    "home": "ヴィッセル神戸",
    "away": "Ｖ・ファーレン長崎",
    "venue": "ノエビアスタジアム神戸",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1776,7 +1776,7 @@ window.SCHEDULE_DATA = {
    "home": "ＦＣ東京",
    "away": "京都サンガF.C.",
    "venue": "味の素スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -1785,7 +1785,7 @@ window.SCHEDULE_DATA = {
    "home": "トロワ",
    "away": "ストラスブール",
    "venue": "スタッド・ド・ローブ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1794,7 +1794,7 @@ window.SCHEDULE_DATA = {
    "home": "エヴァートン",
    "away": "マンチェスター・ユナイテッド",
    "venue": "ヒル・ディキンソン・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1803,7 +1803,7 @@ window.SCHEDULE_DATA = {
    "home": "パルマ",
    "away": "モンツァ",
    "venue": "エンニオ・タルディーニ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1812,7 +1812,7 @@ window.SCHEDULE_DATA = {
    "home": "フロジノーネ",
    "away": "ヴェネツィア",
    "venue": "ベニート・スティルペ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -1821,7 +1821,7 @@ window.SCHEDULE_DATA = {
    "home": "ハンブルガーＳＶ",
    "away": "マインツ",
    "venue": "フォルクスパルクシュタディオン",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1830,7 +1830,7 @@ window.SCHEDULE_DATA = {
    "home": "バレンシア",
    "away": "バルセロナ",
    "venue": "メスタージャ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -1839,7 +1839,7 @@ window.SCHEDULE_DATA = {
    "home": "アンジェ",
    "away": "レンヌ",
    "venue": "スタッド・レイモン・コパ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -1848,7 +1848,7 @@ window.SCHEDULE_DATA = {
    "home": "フランクフルト",
    "away": "アウクスブルク",
    "venue": "ドイチェ・バンク・パルク",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -1857,7 +1857,7 @@ window.SCHEDULE_DATA = {
    "home": "アーセナル",
    "away": "チェルシー",
    "venue": "エミレーツ・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1866,7 +1866,7 @@ window.SCHEDULE_DATA = {
    "home": "ボローニャ",
    "away": "サッスオーロ",
    "venue": "レナート・ダッラーラ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1875,7 +1875,7 @@ window.SCHEDULE_DATA = {
    "home": "アラベス",
    "away": "オサスナ",
    "venue": "メンディソローサ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1884,7 +1884,7 @@ window.SCHEDULE_DATA = {
    "home": "マラガ",
    "away": "レバンテ",
    "venue": "ラ・ロサレダ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -1893,7 +1893,7 @@ window.SCHEDULE_DATA = {
    "home": "マルセイユ",
    "away": "パリＦＣ",
    "venue": "スタッド・ヴェロドローム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1902,7 +1902,7 @@ window.SCHEDULE_DATA = {
    "home": "ユヴェントス",
    "away": "ミラン",
    "venue": "アリアンツ・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1911,7 +1911,7 @@ window.SCHEDULE_DATA = {
    "home": "エスパニョール",
    "away": "セビージャ",
    "venue": "ＲＣＤＥスタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1920,7 +1920,7 @@ window.SCHEDULE_DATA = {
    "home": "カリアリ",
    "away": "レッチェ",
    "venue": "ウニポル・ドムス",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1929,7 +1929,7 @@ window.SCHEDULE_DATA = {
    "home": "ヘタフェ",
    "away": "セルタ",
    "venue": "コリセウム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1938,7 +1938,7 @@ window.SCHEDULE_DATA = {
    "home": "ウディネーゼ",
    "away": "ラツィオ",
    "venue": "ブルーエナジー・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -1947,7 +1947,7 @@ window.SCHEDULE_DATA = {
    "home": "エルチェ",
    "away": "レアル・ソシエダ",
    "venue": "マルティネス・バレロ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1956,7 +1956,7 @@ window.SCHEDULE_DATA = {
    "home": "ヴィッセル神戸",
    "away": "鹿島アントラーズ",
    "venue": "ノエビアスタジアム神戸",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -1965,7 +1965,7 @@ window.SCHEDULE_DATA = {
    "home": "京都サンガF.C.",
    "away": "柏レイソル",
    "venue": "サンガスタジアム by ＫＹＯＣＥＲＡ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -1974,7 +1974,7 @@ window.SCHEDULE_DATA = {
    "home": "ウニオン・ベルリン",
    "away": "シャルケ",
    "venue": "アルテ・フェルスターライ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -1983,7 +1983,7 @@ window.SCHEDULE_DATA = {
    "home": "レンヌ",
    "away": "マルセイユ",
    "venue": "ロアゾン・パルク",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -1992,7 +1992,7 @@ window.SCHEDULE_DATA = {
    "home": "ヴェネツィア",
    "away": "フィオレンティーナ",
    "venue": "ピエルルイジ・ペンツォ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2001,7 +2001,7 @@ window.SCHEDULE_DATA = {
    "home": "セビージャ",
    "away": "バレンシア",
    "venue": "ラモン・サンチェス・ピスフアン",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -2010,7 +2010,7 @@ window.SCHEDULE_DATA = {
    "home": "水戸ホーリーホック",
    "away": "川崎フロンターレ",
    "venue": "水戸信用金庫スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -2019,7 +2019,7 @@ window.SCHEDULE_DATA = {
    "home": "清水エスパルス",
    "away": "アビスパ福岡",
    "venue": "ＩＡＩスタジアム日本平",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -2028,7 +2028,7 @@ window.SCHEDULE_DATA = {
    "home": "ガンバ大阪",
    "away": "ＦＣ東京",
    "venue": "パナソニック スタジアム 吹田",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -2037,7 +2037,7 @@ window.SCHEDULE_DATA = {
    "home": "ＦＣ町田ゼルビア",
    "away": "横浜Ｆ・マリノス",
    "venue": "ＭＵＦＧスタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -2046,7 +2046,7 @@ window.SCHEDULE_DATA = {
    "home": "Ｖ・ファーレン長崎",
    "away": "名古屋グランパス",
    "venue": "PEACE STADIUM Connected by SoftBank",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -2055,7 +2055,7 @@ window.SCHEDULE_DATA = {
    "home": "サンフレッチェ広島",
    "away": "セレッソ大阪",
    "venue": "エディオンピースウイング広島",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2064,7 +2064,7 @@ window.SCHEDULE_DATA = {
    "home": "ラシン・サンタンデール",
    "away": "アラベス",
    "venue": "エル・サルディネロ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -2073,7 +2073,7 @@ window.SCHEDULE_DATA = {
    "home": "ジェノア",
    "away": "フロジノーネ",
    "venue": "ルイジ・フェッラーリス",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -2082,7 +2082,7 @@ window.SCHEDULE_DATA = {
    "home": "ホッフェンハイム",
    "away": "シュトゥットガルト",
    "venue": "プレゼロ・アレーナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -2091,7 +2091,7 @@ window.SCHEDULE_DATA = {
    "home": "ドルトムント",
    "away": "パーダーボルン",
    "venue": "ジグナル・イドゥナ・パルク",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -2100,7 +2100,7 @@ window.SCHEDULE_DATA = {
    "home": "アウクスブルク",
    "away": "レバークーゼン",
    "venue": "ＷＷＫアレーナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -2109,7 +2109,7 @@ window.SCHEDULE_DATA = {
    "home": "マインツ",
    "away": "フランクフルト",
    "venue": "メーヴァ・アレーナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -2118,7 +2118,7 @@ window.SCHEDULE_DATA = {
    "home": "フライブルク",
    "away": "ボルシアＭＧ",
    "venue": "ヨーロッパ・パルク・シュタディオン",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -2127,7 +2127,7 @@ window.SCHEDULE_DATA = {
    "home": "クリスタル・パレス",
    "away": "イプスウィッチ",
    "venue": "セルハースト・パーク",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -2136,7 +2136,7 @@ window.SCHEDULE_DATA = {
    "home": "リヴァプール",
    "away": "フラム",
    "venue": "アンフィールド",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -2145,7 +2145,7 @@ window.SCHEDULE_DATA = {
    "home": "アストン・ヴィラ",
    "away": "ノッティンガム・フォレスト",
    "venue": "ヴィラ・パーク",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -2154,7 +2154,7 @@ window.SCHEDULE_DATA = {
    "home": "ボーンマス",
    "away": "ブレントフォード",
    "venue": "バイタリティ・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -2163,7 +2163,7 @@ window.SCHEDULE_DATA = {
    "home": "チェルシー",
    "away": "ハル・シティ",
    "venue": "スタンフォード・ブリッジ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2172,7 +2172,7 @@ window.SCHEDULE_DATA = {
    "home": "オサスナ",
    "away": "エスパニョール",
    "venue": "エル・サダル",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -2181,7 +2181,7 @@ window.SCHEDULE_DATA = {
    "home": "ストラスブール",
    "away": "モナコ",
    "venue": "スタッド・ド・ラ・メノー",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -2190,7 +2190,7 @@ window.SCHEDULE_DATA = {
    "home": "ラツィオ",
    "away": "ミラン",
    "venue": "スタディオ・オリンピコ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -2199,7 +2199,7 @@ window.SCHEDULE_DATA = {
    "home": "ケルン",
    "away": "ヴェルダー・ブレーメン",
    "venue": "ラインエネルギーシュタディオン",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2208,7 +2208,7 @@ window.SCHEDULE_DATA = {
    "home": "アスレティック・ビルバオ",
    "away": "エルチェ",
    "venue": "サン・マメス",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -2217,7 +2217,7 @@ window.SCHEDULE_DATA = {
    "home": "トッテナム",
    "away": "エヴァートン",
    "venue": "トッテナム・ホットスパー・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -2226,7 +2226,7 @@ window.SCHEDULE_DATA = {
    "home": "ロリアン",
    "away": "トゥールーズ",
    "venue": "スタッド・デュ・ムストワール",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -2235,7 +2235,7 @@ window.SCHEDULE_DATA = {
    "home": "オセール",
    "away": "ニース",
    "venue": "スタッド・アベ・デシャン",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -2244,7 +2244,7 @@ window.SCHEDULE_DATA = {
    "home": "ル・アーヴル",
    "away": "アンジェ",
    "venue": "スタッド・オセアン",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -2253,7 +2253,7 @@ window.SCHEDULE_DATA = {
    "home": "パリＦＣ",
    "away": "リヨン",
    "venue": "スタッド・ジャン・ブアン",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -2262,7 +2262,7 @@ window.SCHEDULE_DATA = {
    "home": "アタランタ",
    "away": "カリアリ",
    "venue": "ジェイビス・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2271,7 +2271,7 @@ window.SCHEDULE_DATA = {
    "home": "レアル・マドリード",
    "away": "ラージョ・バジェカーノ",
    "venue": "サンティアゴ・ベルナベウ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -2280,7 +2280,7 @@ window.SCHEDULE_DATA = {
    "home": "サンダーランド",
    "away": "アーセナル",
    "venue": "スタジアム・オブ・ライト",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -2289,7 +2289,7 @@ window.SCHEDULE_DATA = {
    "home": "東京ヴェルディ",
    "away": "ジェフユナイテッド千葉",
    "venue": "味の素スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J2",
@@ -2298,7 +2298,7 @@ window.SCHEDULE_DATA = {
    "home": "ベガルタ仙台",
    "away": "北海道コンサドーレ札幌",
    "venue": "ユアテックスタジアム仙台",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -2307,7 +2307,7 @@ window.SCHEDULE_DATA = {
    "home": "浦和レッズ",
    "away": "ファジアーノ岡山",
    "venue": "埼玉スタジアム２００２",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2316,7 +2316,7 @@ window.SCHEDULE_DATA = {
    "home": "セルタ",
    "away": "マラガ",
    "venue": "バライードス",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -2325,7 +2325,7 @@ window.SCHEDULE_DATA = {
    "home": "リール",
    "away": "トロワ",
    "venue": "スタッド・ピエール・モーロワ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -2334,7 +2334,7 @@ window.SCHEDULE_DATA = {
    "home": "コベントリー",
    "away": "ブライトン",
    "venue": "ＣＢＳアリーナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -2343,7 +2343,7 @@ window.SCHEDULE_DATA = {
    "home": "レッチェ",
    "away": "モンツァ",
    "venue": "ヴィア・デル・マーレ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -2352,7 +2352,7 @@ window.SCHEDULE_DATA = {
    "home": "ライプツィヒ",
    "away": "ハンブルガーＳＶ",
    "venue": "レッドブル・アレーナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2361,7 +2361,7 @@ window.SCHEDULE_DATA = {
    "home": "レバンテ",
    "away": "バルセロナ",
    "venue": "シウタット・デ・バレンシア",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -2370,7 +2370,7 @@ window.SCHEDULE_DATA = {
    "home": "ル・マン",
    "away": "ランス",
    "venue": "ＭＭＡレナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -2379,7 +2379,7 @@ window.SCHEDULE_DATA = {
    "home": "エルフェアスベルク",
    "away": "バイエルン",
    "venue": "ウルスアパルク",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -2388,7 +2388,7 @@ window.SCHEDULE_DATA = {
    "home": "マンチェスター・ユナイテッド",
    "away": "マンチェスター・シティ",
    "venue": "オールド・トラッフォード",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -2397,7 +2397,7 @@ window.SCHEDULE_DATA = {
    "home": "ナポリ",
    "away": "ボローニャ",
    "venue": "スタディオ・マラドーナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2406,7 +2406,7 @@ window.SCHEDULE_DATA = {
    "home": "ヘタフェ",
    "away": "デポルティボ",
    "venue": "コリセウム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -2415,7 +2415,7 @@ window.SCHEDULE_DATA = {
    "home": "ブレスト",
    "away": "パリ・サンジェルマン",
    "venue": "スタッド・フランシス・ル・ブレ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -2424,7 +2424,7 @@ window.SCHEDULE_DATA = {
    "home": "サッスオーロ",
    "away": "ユヴェントス",
    "venue": "マペイ・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2433,7 +2433,7 @@ window.SCHEDULE_DATA = {
    "home": "レアル・ソシエダ",
    "away": "アトレティコ・マドリード",
    "venue": "レアレ・アレーナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -2442,7 +2442,7 @@ window.SCHEDULE_DATA = {
    "home": "コモ",
    "away": "パルマ",
    "venue": "ジュゼッペ・シニガリア",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -2451,7 +2451,7 @@ window.SCHEDULE_DATA = {
    "home": "トリノ",
    "away": "ローマ",
    "venue": "スタディオ・オリンピコ・グランデ・トリノ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -2460,7 +2460,7 @@ window.SCHEDULE_DATA = {
    "home": "インテル",
    "away": "ウディネーゼ",
    "venue": "サン・シーロ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2469,7 +2469,7 @@ window.SCHEDULE_DATA = {
    "home": "ビジャレアル",
    "away": "ベティス",
    "venue": "エスタディオ・デ・ラ・セラミカ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -2478,7 +2478,7 @@ window.SCHEDULE_DATA = {
    "home": "リーズ",
    "away": "ニューカッスル",
    "venue": "エランド・ロード",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2487,7 +2487,7 @@ window.SCHEDULE_DATA = {
    "home": "ラージョ・バジェカーノ",
    "away": "エスパニョール",
    "venue": "バジェカス",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2496,7 +2496,7 @@ window.SCHEDULE_DATA = {
    "home": "アラベス",
    "away": "バレンシア",
    "venue": "メンディソローサ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2505,7 +2505,7 @@ window.SCHEDULE_DATA = {
    "home": "エルチェ",
    "away": "レアル・マドリード",
    "venue": "マルティネス・バレロ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2514,7 +2514,7 @@ window.SCHEDULE_DATA = {
    "home": "デポルティボ",
    "away": "セビージャ",
    "venue": "リアソール",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2523,16 +2523,7 @@ window.SCHEDULE_DATA = {
    "home": "アトレティコ・マドリード",
    "away": "オサスナ",
    "venue": "メトロポリターノ",
-   "status": "SCHEDULED"
-  },
-  {
-   "league": "PD",
-   "matchday": 6,
-   "utc": "2026-09-16T19:30:00Z",
-   "home": "レバンテ",
-   "away": "アスレティック・ビルバオ",
-   "venue": "シウタット・デ・バレンシア",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2540,7 +2531,7 @@ window.SCHEDULE_DATA = {
    "utc": "2026-09-16T19:30:00Z",
    "home": "バルセロナ",
    "away": "ラシン・サンタンデール",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2548,7 +2539,7 @@ window.SCHEDULE_DATA = {
    "utc": "2026-09-17T17:00:00Z",
    "home": "ベティス",
    "away": "ヘタフェ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2557,7 +2548,7 @@ window.SCHEDULE_DATA = {
    "home": "マラガ",
    "away": "ビジャレアル",
    "venue": "ラ・ロサレダ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -2566,7 +2557,7 @@ window.SCHEDULE_DATA = {
    "home": "バイエルン",
    "away": "ウニオン・ベルリン",
    "venue": "アリアンツ・アレーナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -2575,7 +2566,7 @@ window.SCHEDULE_DATA = {
    "home": "モナコ",
    "away": "ランス",
    "venue": "スタッド・ルイ２世",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -2584,7 +2575,7 @@ window.SCHEDULE_DATA = {
    "home": "モンツァ",
    "away": "サッスオーロ",
    "venue": "ウ・パワー・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2593,7 +2584,7 @@ window.SCHEDULE_DATA = {
    "home": "エスパニョール",
    "away": "エルチェ",
    "venue": "ＲＣＤＥスタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -2602,7 +2593,7 @@ window.SCHEDULE_DATA = {
    "home": "ブレントフォード",
    "away": "チェルシー",
    "venue": "Gtechコミュニティ・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J2",
@@ -2611,7 +2602,7 @@ window.SCHEDULE_DATA = {
    "home": "北海道コンサドーレ札幌",
    "away": "大分トリニータ",
    "venue": "大和ハウス プレミストドーム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -2620,7 +2611,7 @@ window.SCHEDULE_DATA = {
    "home": "川崎フロンターレ",
    "away": "鹿島アントラーズ",
    "venue": "Ｕｖａｎｃｅとどろきスタジアム　ｂｙ　Ｆｕｊｉｔｓｕ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -2629,7 +2620,7 @@ window.SCHEDULE_DATA = {
    "home": "アビスパ福岡",
    "away": "サンフレッチェ広島",
    "venue": "ベスト電器スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -2638,7 +2629,7 @@ window.SCHEDULE_DATA = {
    "home": "浦和レッズ",
    "away": "東京ヴェルディ",
    "venue": "埼玉スタジアム２００２",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -2647,7 +2638,7 @@ window.SCHEDULE_DATA = {
    "home": "Ｖ・ファーレン長崎",
    "away": "セレッソ大阪",
    "venue": "PEACE STADIUM Connected by SoftBank",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -2656,7 +2647,7 @@ window.SCHEDULE_DATA = {
    "home": "清水エスパルス",
    "away": "ジェフユナイテッド千葉",
    "venue": "ＩＡＩスタジアム日本平",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -2665,7 +2656,7 @@ window.SCHEDULE_DATA = {
    "home": "ＦＣ東京",
    "away": "名古屋グランパス",
    "venue": "ＭＵＦＧスタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -2674,7 +2665,7 @@ window.SCHEDULE_DATA = {
    "home": "ファジアーノ岡山",
    "away": "京都サンガF.C.",
    "venue": "ＪＦＥ晴れの国スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -2683,7 +2674,7 @@ window.SCHEDULE_DATA = {
    "home": "横浜Ｆ・マリノス",
    "away": "水戸ホーリーホック",
    "venue": "日産スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -2692,7 +2683,7 @@ window.SCHEDULE_DATA = {
    "home": "トッテナム",
    "away": "アストン・ヴィラ",
    "venue": "トッテナム・ホットスパー・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2701,7 +2692,7 @@ window.SCHEDULE_DATA = {
    "home": "オサスナ",
    "away": "ラージョ・バジェカーノ",
    "venue": "エル・サダル",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -2710,7 +2701,7 @@ window.SCHEDULE_DATA = {
    "home": "ボローニャ",
    "away": "トリノ",
    "venue": "レナート・ダッラーラ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -2719,7 +2710,7 @@ window.SCHEDULE_DATA = {
    "home": "ウディネーゼ",
    "away": "カリアリ",
    "venue": "ブルーエナジー・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -2728,7 +2719,7 @@ window.SCHEDULE_DATA = {
    "home": "ハンブルガーＳＶ",
    "away": "ケルン",
    "venue": "フォルクスパルクシュタディオン",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -2737,7 +2728,7 @@ window.SCHEDULE_DATA = {
    "home": "ボルシアＭＧ",
    "away": "マインツ",
    "venue": "ボルシア・パルク",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -2746,7 +2737,7 @@ window.SCHEDULE_DATA = {
    "home": "ヴェルダー・ブレーメン",
    "away": "アウクスブルク",
    "venue": "ヴェーザーシュタディオン",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -2755,7 +2746,7 @@ window.SCHEDULE_DATA = {
    "home": "フランクフルト",
    "away": "フライブルク",
    "venue": "ドイチェ・バンク・パルク",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -2764,7 +2755,7 @@ window.SCHEDULE_DATA = {
    "home": "エヴァートン",
    "away": "イプスウィッチ",
    "venue": "ヒル・ディキンソン・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -2773,7 +2764,7 @@ window.SCHEDULE_DATA = {
    "home": "ブライトン",
    "away": "アーセナル",
    "venue": "アメックス・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -2782,16 +2773,7 @@ window.SCHEDULE_DATA = {
    "home": "ニューカッスル",
    "away": "ハル・シティ",
    "venue": "セント・ジェームズ・パーク",
-   "status": "SCHEDULED"
-  },
-  {
-   "league": "PL",
-   "matchday": 5,
-   "utc": "2026-09-19T14:00:00Z",
-   "home": "マンチェスター・シティ",
-   "away": "サンダーランド",
-   "venue": "エティハド・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2800,7 +2782,7 @@ window.SCHEDULE_DATA = {
    "home": "アスレティック・ビルバオ",
    "away": "アラベス",
    "venue": "サン・マメス",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -2809,7 +2791,7 @@ window.SCHEDULE_DATA = {
    "home": "パリＦＣ",
    "away": "ストラスブール",
    "venue": "スタッド・ジャン・ブアン",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -2818,7 +2800,7 @@ window.SCHEDULE_DATA = {
    "home": "ローマ",
    "away": "インテル",
    "venue": "スタディオ・オリンピコ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -2827,7 +2809,7 @@ window.SCHEDULE_DATA = {
    "home": "シュトゥットガルト",
    "away": "ドルトムント",
    "venue": "ＭＨＰアレーナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2836,7 +2818,7 @@ window.SCHEDULE_DATA = {
    "home": "セルタ",
    "away": "ラシン・サンタンデール",
    "venue": "バライードス",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -2845,7 +2827,7 @@ window.SCHEDULE_DATA = {
    "home": "ノッティンガム・フォレスト",
    "away": "コベントリー",
    "venue": "シティ・グラウンド",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -2854,7 +2836,7 @@ window.SCHEDULE_DATA = {
    "home": "ル・マン",
    "away": "ロリアン",
    "venue": "ＭＭＡレナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -2863,7 +2845,7 @@ window.SCHEDULE_DATA = {
    "home": "トゥールーズ",
    "away": "ル・アーヴル",
    "venue": "スタジアム・ド・トゥールーズ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -2872,7 +2854,7 @@ window.SCHEDULE_DATA = {
    "home": "アンジェ",
    "away": "トロワ",
    "venue": "スタッド・レイモン・コパ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -2881,7 +2863,7 @@ window.SCHEDULE_DATA = {
    "home": "リヨン",
    "away": "レンヌ",
    "venue": "グルパマ・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -2890,7 +2872,7 @@ window.SCHEDULE_DATA = {
    "home": "ヴェネツィア",
    "away": "ラツィオ",
    "venue": "ピエルルイジ・ペンツォ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2899,7 +2881,7 @@ window.SCHEDULE_DATA = {
    "home": "セビージャ",
    "away": "バルセロナ",
    "venue": "ラモン・サンチェス・ピスフアン",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -2908,7 +2890,7 @@ window.SCHEDULE_DATA = {
    "home": "ＦＣ町田ゼルビア",
    "away": "柏レイソル",
    "venue": "町田ＧＩＯＮスタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -2917,7 +2899,7 @@ window.SCHEDULE_DATA = {
    "home": "ガンバ大阪",
    "away": "ヴィッセル神戸",
    "venue": "パナソニック スタジアム 吹田",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -2926,7 +2908,7 @@ window.SCHEDULE_DATA = {
    "home": "フィオレンティーナ",
    "away": "ナポリ",
    "venue": "アルテミオ・フランキ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2935,7 +2917,7 @@ window.SCHEDULE_DATA = {
    "home": "ヘタフェ",
    "away": "マラガ",
    "venue": "コリセウム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -2944,7 +2926,16 @@ window.SCHEDULE_DATA = {
    "home": "オセール",
    "away": "ブレスト",
    "venue": "スタッド・アベ・デシャン",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
+  },
+  {
+   "league": "PL",
+   "matchday": 5,
+   "utc": "2026-09-20T13:00:00Z",
+   "home": "マンチェスター・シティ",
+   "away": "サンダーランド",
+   "venue": "エティハド・スタジアム",
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -2953,7 +2944,7 @@ window.SCHEDULE_DATA = {
    "home": "リーズ",
    "away": "クリスタル・パレス",
    "venue": "エランド・ロード",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -2962,7 +2953,7 @@ window.SCHEDULE_DATA = {
    "home": "ボーンマス",
    "away": "リヴァプール",
    "venue": "バイタリティ・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -2971,7 +2962,7 @@ window.SCHEDULE_DATA = {
    "home": "フロジノーネ",
    "away": "コモ",
    "venue": "ベニート・スティルペ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -2980,7 +2971,7 @@ window.SCHEDULE_DATA = {
    "home": "パルマ",
    "away": "ジェノア",
    "venue": "エンニオ・タルディーニ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -2989,7 +2980,7 @@ window.SCHEDULE_DATA = {
    "home": "レバークーゼン",
    "away": "ライプツィヒ",
    "venue": "バイアレーナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -2998,7 +2989,7 @@ window.SCHEDULE_DATA = {
    "home": "アトレティコ・マドリード",
    "away": "レアル・マドリード",
    "venue": "メトロポリターノ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -3007,7 +2998,7 @@ window.SCHEDULE_DATA = {
    "home": "ニース",
    "away": "リール",
    "venue": "アリアンツ・リビエラ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -3016,7 +3007,7 @@ window.SCHEDULE_DATA = {
    "home": "シャルケ",
    "away": "エルフェアスベルク",
    "venue": "フェルティンス・アレーナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PL",
@@ -3025,7 +3016,7 @@ window.SCHEDULE_DATA = {
    "home": "フラム",
    "away": "マンチェスター・ユナイテッド",
    "venue": "クレイヴン・コテージ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -3034,7 +3025,7 @@ window.SCHEDULE_DATA = {
    "home": "ユヴェントス",
    "away": "アタランタ",
    "venue": "アリアンツ・スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -3043,7 +3034,7 @@ window.SCHEDULE_DATA = {
    "home": "デポルティボ",
    "away": "ベティス",
    "venue": "リアソール",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -3052,7 +3043,7 @@ window.SCHEDULE_DATA = {
    "home": "ビジャレアル",
    "away": "レバンテ",
    "venue": "エスタディオ・デ・ラ・セラミカ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "BL1",
@@ -3061,7 +3052,7 @@ window.SCHEDULE_DATA = {
    "home": "パーダーボルン",
    "away": "ホッフェンハイム",
    "venue": "ホーム・デルーフ・アレーナ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -3070,7 +3061,7 @@ window.SCHEDULE_DATA = {
    "home": "マルセイユ",
    "away": "パリ・サンジェルマン",
    "venue": "スタッド・ヴェロドローム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "SA",
@@ -3079,7 +3070,7 @@ window.SCHEDULE_DATA = {
    "home": "ミラン",
    "away": "レッチェ",
    "venue": "サン・シーロ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "PD",
@@ -3088,7 +3079,7 @@ window.SCHEDULE_DATA = {
    "home": "バレンシア",
    "away": "レアル・ソシエダ",
    "venue": "メスタージャ",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J2",
@@ -3097,7 +3088,7 @@ window.SCHEDULE_DATA = {
    "home": "テゲバジャーロ宮崎",
    "away": "北海道コンサドーレ札幌",
    "venue": "いちご宮崎新富サッカー場",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J2",
@@ -3106,7 +3097,7 @@ window.SCHEDULE_DATA = {
    "home": "北海道コンサドーレ札幌",
    "away": "いわきＦＣ",
    "venue": "函館どつくスポーツガーデン",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -3115,7 +3106,7 @@ window.SCHEDULE_DATA = {
    "home": "鹿島アントラーズ",
    "away": "ガンバ大阪",
    "venue": "メルカリスタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -3124,7 +3115,16 @@ window.SCHEDULE_DATA = {
    "home": "柏レイソル",
    "away": "ヴィッセル神戸",
    "venue": "三協フロンテア柏スタジアム",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 5,
+   "utc": "2026-10-09T18:30:00Z",
+   "home": "ドルトムント",
+   "away": "ヴェルダー・ブレーメン",
+   "venue": "ジグナル・イドゥナ・パルク",
+   "status": "FINISHED"
   },
   {
    "league": "FL1",
@@ -3133,7 +3133,16 @@ window.SCHEDULE_DATA = {
    "home": "ランス",
    "away": "リヨン",
    "venue": "スタッド・ボラール＝ドレリス",
-   "status": "SCHEDULED"
+   "status": "FINISHED"
+  },
+  {
+   "league": "PD",
+   "matchday": 8,
+   "utc": "2026-10-09T19:00:00Z",
+   "home": "マラガ",
+   "away": "エスパニョール",
+   "venue": "ラ・ロサレダ",
+   "status": "FINISHED"
   },
   {
    "league": "J1",
@@ -3190,94 +3199,13 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
-   "league": "BL1",
-   "matchday": 5,
-   "utc": "2026-10-10T13:00:00Z",
-   "home": "マインツ",
-   "away": "レバークーゼン",
-   "venue": "メーヴァ・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 5,
-   "utc": "2026-10-10T13:00:00Z",
-   "home": "パーダーボルン",
-   "away": "シュトゥットガルト",
-   "venue": "ホーム・デルーフ・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 5,
-   "utc": "2026-10-10T13:00:00Z",
-   "home": "ケルン",
-   "away": "ボルシアＭＧ",
-   "venue": "ラインエネルギーシュタディオン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 5,
-   "utc": "2026-10-10T13:00:00Z",
-   "home": "ライプツィヒ",
-   "away": "フランクフルト",
-   "venue": "レッドブル・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 5,
-   "utc": "2026-10-10T13:00:00Z",
-   "home": "フライブルク",
-   "away": "シャルケ",
-   "venue": "ヨーロッパ・パルク・シュタディオン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 5,
-   "utc": "2026-10-10T13:00:00Z",
-   "home": "ウニオン・ベルリン",
-   "away": "エルフェアスベルク",
-   "venue": "アルテ・フェルスターライ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 5,
-   "utc": "2026-10-10T13:00:00Z",
-   "home": "ホッフェンハイム",
-   "away": "ハンブルガーＳＶ",
-   "venue": "プレゼロ・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 5,
-   "utc": "2026-10-10T13:00:00Z",
-   "home": "アウクスブルク",
-   "away": "バイエルン",
-   "venue": "ＷＷＫアレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 5,
-   "utc": "2026-10-10T13:00:00Z",
-   "home": "ドルトムント",
-   "away": "ヴェルダー・ブレーメン",
-   "venue": "ジグナル・イドゥナ・パルク",
-   "status": "SCHEDULED",
-   "tbd": true
+   "league": "PD",
+   "matchday": 8,
+   "utc": "2026-10-10T12:00:00Z",
+   "home": "ラージョ・バジェカーノ",
+   "away": "アスレティック・ビルバオ",
+   "venue": "バジェカス",
+   "status": "SCHEDULED"
   },
   {
    "league": "SA",
@@ -3286,6 +3214,51 @@ window.SCHEDULE_DATA = {
    "home": "ジェノア",
    "away": "フィオレンティーナ",
    "venue": "ルイジ・フェッラーリス",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 5,
+   "utc": "2026-10-10T13:30:00Z",
+   "home": "マインツ",
+   "away": "レバークーゼン",
+   "venue": "メーヴァ・アレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 5,
+   "utc": "2026-10-10T13:30:00Z",
+   "home": "パーダーボルン",
+   "away": "シュトゥットガルト",
+   "venue": "ホーム・デルーフ・アレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 5,
+   "utc": "2026-10-10T13:30:00Z",
+   "home": "ウニオン・ベルリン",
+   "away": "エルフェアスベルク",
+   "venue": "アルテ・フェルスターライ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 5,
+   "utc": "2026-10-10T13:30:00Z",
+   "home": "ホッフェンハイム",
+   "away": "ハンブルガーＳＶ",
+   "venue": "プレゼロ・アレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 5,
+   "utc": "2026-10-10T13:30:00Z",
+   "home": "アウクスブルク",
+   "away": "バイエルン",
+   "venue": "ＷＷＫアレーナ",
    "status": "SCHEDULED"
   },
   {
@@ -3325,6 +3298,15 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "PD",
+   "matchday": 8,
+   "utc": "2026-10-10T14:15:00Z",
+   "home": "アラベス",
+   "away": "アトレティコ・マドリード",
+   "venue": "メンディソローサ",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "FL1",
    "matchday": 6,
    "utc": "2026-10-10T15:15:00Z",
@@ -3340,6 +3322,23 @@ window.SCHEDULE_DATA = {
    "home": "インテル",
    "away": "パルマ",
    "venue": "サン・シーロ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 5,
+   "utc": "2026-10-10T16:30:00Z",
+   "home": "ライプツィヒ",
+   "away": "フランクフルト",
+   "venue": "レッドブル・アレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PD",
+   "matchday": 8,
+   "utc": "2026-10-10T16:30:00Z",
+   "home": "バルセロナ",
+   "away": "ヘタフェ",
    "status": "SCHEDULED"
   },
   {
@@ -3397,6 +3396,15 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "PD",
+   "matchday": 8,
+   "utc": "2026-10-10T19:00:00Z",
+   "home": "レアル・マドリード",
+   "away": "ビジャレアル",
+   "venue": "サンティアゴ・ベルナベウ",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "J1",
    "matchday": 9,
    "utc": "2026-10-11T05:00:00Z",
@@ -3442,6 +3450,15 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "PD",
+   "matchday": 8,
+   "utc": "2026-10-11T12:00:00Z",
+   "home": "エルチェ",
+   "away": "セルタ",
+   "venue": "マルティネス・バレロ",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "FL1",
    "matchday": 6,
    "utc": "2026-10-11T13:00:00Z",
@@ -3449,104 +3466,6 @@ window.SCHEDULE_DATA = {
    "away": "ストラスブール",
    "venue": "アリアンツ・リビエラ",
    "status": "SCHEDULED"
-  },
-  {
-   "league": "PD",
-   "matchday": 8,
-   "utc": "2026-10-11T13:00:00Z",
-   "home": "ラージョ・バジェカーノ",
-   "away": "アスレティック・ビルバオ",
-   "venue": "バジェカス",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PD",
-   "matchday": 8,
-   "utc": "2026-10-11T13:00:00Z",
-   "home": "アラベス",
-   "away": "アトレティコ・マドリード",
-   "venue": "メンディソローサ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PD",
-   "matchday": 8,
-   "utc": "2026-10-11T13:00:00Z",
-   "home": "バルセロナ",
-   "away": "ヘタフェ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PD",
-   "matchday": 8,
-   "utc": "2026-10-11T13:00:00Z",
-   "home": "ベティス",
-   "away": "オサスナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PD",
-   "matchday": 8,
-   "utc": "2026-10-11T13:00:00Z",
-   "home": "レアル・マドリード",
-   "away": "ビジャレアル",
-   "venue": "サンティアゴ・ベルナベウ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PD",
-   "matchday": 8,
-   "utc": "2026-10-11T13:00:00Z",
-   "home": "エルチェ",
-   "away": "セルタ",
-   "venue": "マルティネス・バレロ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PD",
-   "matchday": 8,
-   "utc": "2026-10-11T13:00:00Z",
-   "home": "レバンテ",
-   "away": "セビージャ",
-   "venue": "シウタット・デ・バレンシア",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PD",
-   "matchday": 8,
-   "utc": "2026-10-11T13:00:00Z",
-   "home": "ラシン・サンタンデール",
-   "away": "バレンシア",
-   "venue": "エル・サルディネロ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PD",
-   "matchday": 8,
-   "utc": "2026-10-11T13:00:00Z",
-   "home": "マラガ",
-   "away": "エスパニョール",
-   "venue": "ラ・ロサレダ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PD",
-   "matchday": 8,
-   "utc": "2026-10-11T13:00:00Z",
-   "home": "レアル・ソシエダ",
-   "away": "デポルティボ",
-   "venue": "レアレ・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
   },
   {
    "league": "PL",
@@ -3585,12 +3504,39 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "BL1",
+   "matchday": 5,
+   "utc": "2026-10-11T13:30:00Z",
+   "home": "ケルン",
+   "away": "ボルシアＭＧ",
+   "venue": "ラインエネルギーシュタディオン",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PD",
+   "matchday": 8,
+   "utc": "2026-10-11T14:15:00Z",
+   "home": "レアル・ソシエダ",
+   "away": "デポルティボ",
+   "venue": "レアレ・アレーナ",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "FL1",
    "matchday": 6,
    "utc": "2026-10-11T15:15:00Z",
    "home": "レンヌ",
    "away": "オセール",
    "venue": "ロアゾン・パルク",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 5,
+   "utc": "2026-10-11T15:30:00Z",
+   "home": "フライブルク",
+   "away": "シャルケ",
+   "venue": "ヨーロッパ・パルク・シュタディオン",
    "status": "SCHEDULED"
   },
   {
@@ -3612,6 +3558,14 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "PD",
+   "matchday": 8,
+   "utc": "2026-10-11T16:30:00Z",
+   "home": "ベティス",
+   "away": "オサスナ",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "FL1",
    "matchday": 6,
    "utc": "2026-10-11T18:45:00Z",
@@ -3627,6 +3581,15 @@ window.SCHEDULE_DATA = {
    "home": "カリアリ",
    "away": "ユヴェントス",
    "venue": "ウニポル・ドムス",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PD",
+   "matchday": 8,
+   "utc": "2026-10-11T19:00:00Z",
+   "home": "ラシン・サンタンデール",
+   "away": "バレンシア",
+   "venue": "エル・サルディネロ",
    "status": "SCHEDULED"
   },
   {
@@ -3648,12 +3611,30 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "PD",
+   "matchday": 8,
+   "utc": "2026-10-12T19:00:00Z",
+   "home": "レバンテ",
+   "away": "セビージャ",
+   "venue": "シウタット・デ・バレンシア",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "PL",
    "matchday": 6,
    "utc": "2026-10-12T19:00:00Z",
    "home": "コベントリー",
    "away": "ニューカッスル",
    "venue": "ＣＢＳアリーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 6,
+   "utc": "2026-10-16T18:30:00Z",
+   "home": "フランクフルト",
+   "away": "ケルン",
+   "venue": "ドイチェ・バンク・パルク",
    "status": "SCHEDULED"
   },
   {
@@ -3672,6 +3653,15 @@ window.SCHEDULE_DATA = {
    "home": "フロジノーネ",
    "away": "サッスオーロ",
    "venue": "ベニート・スティルペ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PD",
+   "matchday": 9,
+   "utc": "2026-10-16T19:00:00Z",
+   "home": "デポルティボ",
+   "away": "レバンテ",
+   "venue": "リアソール",
    "status": "SCHEDULED"
   },
   {
@@ -3765,94 +3755,13 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
-   "league": "BL1",
-   "matchday": 6,
-   "utc": "2026-10-17T13:00:00Z",
-   "home": "ウニオン・ベルリン",
-   "away": "ドルトムント",
-   "venue": "アルテ・フェルスターライ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 6,
-   "utc": "2026-10-17T13:00:00Z",
-   "home": "ハンブルガーＳＶ",
-   "away": "シュトゥットガルト",
-   "venue": "フォルクスパルクシュタディオン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 6,
-   "utc": "2026-10-17T13:00:00Z",
-   "home": "ヴェルダー・ブレーメン",
-   "away": "パーダーボルン",
-   "venue": "ヴェーザーシュタディオン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 6,
-   "utc": "2026-10-17T13:00:00Z",
-   "home": "エルフェアスベルク",
-   "away": "アウクスブルク",
-   "venue": "ウルスアパルク",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 6,
-   "utc": "2026-10-17T13:00:00Z",
-   "home": "バイエルン",
-   "away": "ライプツィヒ",
-   "venue": "アリアンツ・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 6,
-   "utc": "2026-10-17T13:00:00Z",
-   "home": "ボルシアＭＧ",
-   "away": "ホッフェンハイム",
-   "venue": "ボルシア・パルク",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 6,
-   "utc": "2026-10-17T13:00:00Z",
-   "home": "レバークーゼン",
-   "away": "フライブルク",
-   "venue": "バイアレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 6,
-   "utc": "2026-10-17T13:00:00Z",
-   "home": "フランクフルト",
-   "away": "ケルン",
-   "venue": "ドイチェ・バンク・パルク",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 6,
-   "utc": "2026-10-17T13:00:00Z",
-   "home": "シャルケ",
-   "away": "マインツ",
-   "venue": "フェルティンス・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
+   "league": "PD",
+   "matchday": 9,
+   "utc": "2026-10-17T12:00:00Z",
+   "home": "エスパニョール",
+   "away": "アトレティコ・マドリード",
+   "venue": "ＲＣＤＥスタジアム",
+   "status": "SCHEDULED"
   },
   {
    "league": "SA",
@@ -3861,6 +3770,51 @@ window.SCHEDULE_DATA = {
    "home": "ヴェネツィア",
    "away": "ナポリ",
    "venue": "ピエルルイジ・ペンツォ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 6,
+   "utc": "2026-10-17T13:30:00Z",
+   "home": "ウニオン・ベルリン",
+   "away": "ドルトムント",
+   "venue": "アルテ・フェルスターライ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 6,
+   "utc": "2026-10-17T13:30:00Z",
+   "home": "ハンブルガーＳＶ",
+   "away": "シュトゥットガルト",
+   "venue": "フォルクスパルクシュタディオン",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 6,
+   "utc": "2026-10-17T13:30:00Z",
+   "home": "ヴェルダー・ブレーメン",
+   "away": "パーダーボルン",
+   "venue": "ヴェーザーシュタディオン",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 6,
+   "utc": "2026-10-17T13:30:00Z",
+   "home": "エルフェアスベルク",
+   "away": "アウクスブルク",
+   "venue": "ウルスアパルク",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 6,
+   "utc": "2026-10-17T13:30:00Z",
+   "home": "シャルケ",
+   "away": "マインツ",
+   "venue": "フェルティンス・アレーナ",
    "status": "SCHEDULED"
   },
   {
@@ -3891,6 +3845,15 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "PD",
+   "matchday": 9,
+   "utc": "2026-10-17T14:15:00Z",
+   "home": "ビジャレアル",
+   "away": "エルチェ",
+   "venue": "エスタディオ・デ・ラ・セラミカ",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "FL1",
    "matchday": 7,
    "utc": "2026-10-17T15:15:00Z",
@@ -3906,6 +3869,23 @@ window.SCHEDULE_DATA = {
    "home": "ボローニャ",
    "away": "インテル",
    "venue": "レナート・ダッラーラ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 6,
+   "utc": "2026-10-17T16:30:00Z",
+   "home": "バイエルン",
+   "away": "ライプツィヒ",
+   "venue": "アリアンツ・アレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PD",
+   "matchday": 9,
+   "utc": "2026-10-17T16:30:00Z",
+   "home": "ベティス",
+   "away": "バルセロナ",
    "status": "SCHEDULED"
   },
   {
@@ -3945,6 +3925,15 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "PD",
+   "matchday": 9,
+   "utc": "2026-10-17T19:00:00Z",
+   "home": "バレンシア",
+   "away": "アスレティック・ビルバオ",
+   "venue": "メスタージャ",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "J1",
    "matchday": 10,
    "utc": "2026-10-18T04:55:00Z",
@@ -3972,6 +3961,15 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "PD",
+   "matchday": 9,
+   "utc": "2026-10-18T12:00:00Z",
+   "home": "オサスナ",
+   "away": "ラシン・サンタンデール",
+   "venue": "エル・サダル",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "FL1",
    "matchday": 7,
    "utc": "2026-10-18T13:00:00Z",
@@ -3979,105 +3977,6 @@ window.SCHEDULE_DATA = {
    "away": "マルセイユ",
    "venue": "スタッド・レイモン・コパ",
    "status": "SCHEDULED"
-  },
-  {
-   "league": "PD",
-   "matchday": 9,
-   "utc": "2026-10-18T13:00:00Z",
-   "home": "ビジャレアル",
-   "away": "エルチェ",
-   "venue": "エスタディオ・デ・ラ・セラミカ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PD",
-   "matchday": 9,
-   "utc": "2026-10-18T13:00:00Z",
-   "home": "レアル・マドリード",
-   "away": "セビージャ",
-   "venue": "サンティアゴ・ベルナベウ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PD",
-   "matchday": 9,
-   "utc": "2026-10-18T13:00:00Z",
-   "home": "エスパニョール",
-   "away": "アトレティコ・マドリード",
-   "venue": "ＲＣＤＥスタジアム",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PD",
-   "matchday": 9,
-   "utc": "2026-10-18T13:00:00Z",
-   "home": "バレンシア",
-   "away": "アスレティック・ビルバオ",
-   "venue": "メスタージャ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PD",
-   "matchday": 9,
-   "utc": "2026-10-18T13:00:00Z",
-   "home": "セルタ",
-   "away": "アラベス",
-   "venue": "バライードス",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PD",
-   "matchday": 9,
-   "utc": "2026-10-18T13:00:00Z",
-   "home": "ベティス",
-   "away": "バルセロナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PD",
-   "matchday": 9,
-   "utc": "2026-10-18T13:00:00Z",
-   "home": "マラガ",
-   "away": "レアル・ソシエダ",
-   "venue": "ラ・ロサレダ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PD",
-   "matchday": 9,
-   "utc": "2026-10-18T13:00:00Z",
-   "home": "オサスナ",
-   "away": "ラシン・サンタンデール",
-   "venue": "エル・サダル",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PD",
-   "matchday": 9,
-   "utc": "2026-10-18T13:00:00Z",
-   "home": "デポルティボ",
-   "away": "レバンテ",
-   "venue": "リアソール",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PD",
-   "matchday": 9,
-   "utc": "2026-10-18T13:00:00Z",
-   "home": "ヘタフェ",
-   "away": "ラージョ・バジェカーノ",
-   "venue": "コリセウム",
-   "status": "SCHEDULED",
-   "tbd": true
   },
   {
    "league": "PL",
@@ -4110,30 +4009,28 @@ window.SCHEDULE_DATA = {
    "league": "SA",
    "matchday": 7,
    "utc": "2026-10-18T13:00:00Z",
-   "home": "モンツァ",
-   "away": "カリアリ",
-   "venue": "ウ・パワー・スタジアム",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "SA",
-   "matchday": 7,
-   "utc": "2026-10-18T13:00:00Z",
    "home": "フィオレンティーナ",
    "away": "コモ",
    "venue": "アルテミオ・フランキ",
    "status": "SCHEDULED"
   },
   {
-   "league": "SA",
-   "matchday": 7,
-   "utc": "2026-10-18T13:00:00Z",
-   "home": "パルマ",
-   "away": "トリノ",
-   "venue": "エンニオ・タルディーニ",
-   "status": "SCHEDULED",
-   "tbd": true
+   "league": "BL1",
+   "matchday": 6,
+   "utc": "2026-10-18T13:30:00Z",
+   "home": "レバークーゼン",
+   "away": "フライブルク",
+   "venue": "バイアレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PD",
+   "matchday": 9,
+   "utc": "2026-10-18T14:15:00Z",
+   "home": "セルタ",
+   "away": "アラベス",
+   "venue": "バライードス",
+   "status": "SCHEDULED"
   },
   {
    "league": "FL1",
@@ -4163,6 +4060,15 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "BL1",
+   "matchday": 6,
+   "utc": "2026-10-18T15:30:00Z",
+   "home": "ボルシアＭＧ",
+   "away": "ホッフェンハイム",
+   "venue": "ボルシア・パルク",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "PL",
    "matchday": 7,
    "utc": "2026-10-18T15:30:00Z",
@@ -4181,6 +4087,15 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "PD",
+   "matchday": 9,
+   "utc": "2026-10-18T16:30:00Z",
+   "home": "マラガ",
+   "away": "レアル・ソシエダ",
+   "venue": "ラ・ロサレダ",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "FL1",
    "matchday": 7,
    "utc": "2026-10-18T18:45:00Z",
@@ -4196,6 +4111,42 @@ window.SCHEDULE_DATA = {
    "home": "ユヴェントス",
    "away": "ラツィオ",
    "venue": "アリアンツ・スタジアム",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PD",
+   "matchday": 9,
+   "utc": "2026-10-18T19:00:00Z",
+   "home": "レアル・マドリード",
+   "away": "セビージャ",
+   "venue": "サンティアゴ・ベルナベウ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "SA",
+   "matchday": 7,
+   "utc": "2026-10-19T16:30:00Z",
+   "home": "モンツァ",
+   "away": "カリアリ",
+   "venue": "ウ・パワー・スタジアム",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "SA",
+   "matchday": 7,
+   "utc": "2026-10-19T18:45:00Z",
+   "home": "パルマ",
+   "away": "トリノ",
+   "venue": "エンニオ・タルディーニ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PD",
+   "matchday": 9,
+   "utc": "2026-10-19T19:00:00Z",
+   "home": "ヘタフェ",
+   "away": "ラージョ・バジェカーノ",
+   "venue": "コリセウム",
    "status": "SCHEDULED"
   },
   {
@@ -4307,6 +4258,33 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "PD",
+   "matchday": 6,
+   "utc": "2026-10-21T18:00:00Z",
+   "home": "レバンテ",
+   "away": "アスレティック・ビルバオ",
+   "venue": "シウタット・デ・バレンシア",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 7,
+   "utc": "2026-10-23T18:30:00Z",
+   "home": "シュトゥットガルト",
+   "away": "ボルシアＭＧ",
+   "venue": "ＭＨＰアレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 8,
+   "utc": "2026-10-23T18:45:00Z",
+   "home": "ブレスト",
+   "away": "ニース",
+   "venue": "スタッド・フランシス・ル・ブレ",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "SA",
    "matchday": 8,
    "utc": "2026-10-23T18:45:00Z",
@@ -4379,176 +4357,6 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
-   "league": "BL1",
-   "matchday": 7,
-   "utc": "2026-10-24T13:00:00Z",
-   "home": "マインツ",
-   "away": "ヴェルダー・ブレーメン",
-   "venue": "メーヴァ・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 7,
-   "utc": "2026-10-24T13:00:00Z",
-   "home": "ケルン",
-   "away": "シャルケ",
-   "venue": "ラインエネルギーシュタディオン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 7,
-   "utc": "2026-10-24T13:00:00Z",
-   "home": "ライプツィヒ",
-   "away": "エルフェアスベルク",
-   "venue": "レッドブル・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 7,
-   "utc": "2026-10-24T13:00:00Z",
-   "home": "シュトゥットガルト",
-   "away": "ボルシアＭＧ",
-   "venue": "ＭＨＰアレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 7,
-   "utc": "2026-10-24T13:00:00Z",
-   "home": "パーダーボルン",
-   "away": "ハンブルガーＳＶ",
-   "venue": "ホーム・デルーフ・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 7,
-   "utc": "2026-10-24T13:00:00Z",
-   "home": "ホッフェンハイム",
-   "away": "レバークーゼン",
-   "venue": "プレゼロ・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 7,
-   "utc": "2026-10-24T13:00:00Z",
-   "home": "フライブルク",
-   "away": "バイエルン",
-   "venue": "ヨーロッパ・パルク・シュタディオン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 7,
-   "utc": "2026-10-24T13:00:00Z",
-   "home": "ドルトムント",
-   "away": "フランクフルト",
-   "venue": "ジグナル・イドゥナ・パルク",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 7,
-   "utc": "2026-10-24T13:00:00Z",
-   "home": "アウクスブルク",
-   "away": "ウニオン・ベルリン",
-   "venue": "ＷＷＫアレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 8,
-   "utc": "2026-10-24T13:00:00Z",
-   "home": "マルセイユ",
-   "away": "ル・アーヴル",
-   "venue": "スタッド・ヴェロドローム",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 8,
-   "utc": "2026-10-24T13:00:00Z",
-   "home": "モナコ",
-   "away": "リール",
-   "venue": "スタッド・ルイ２世",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 8,
-   "utc": "2026-10-24T13:00:00Z",
-   "home": "レンヌ",
-   "away": "ストラスブール",
-   "venue": "ロアゾン・パルク",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 8,
-   "utc": "2026-10-24T13:00:00Z",
-   "home": "ランス",
-   "away": "パリＦＣ",
-   "venue": "スタッド・ボラール＝ドレリス",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 8,
-   "utc": "2026-10-24T13:00:00Z",
-   "home": "アンジェ",
-   "away": "ロリアン",
-   "venue": "スタッド・レイモン・コパ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 8,
-   "utc": "2026-10-24T13:00:00Z",
-   "home": "ブレスト",
-   "away": "ニース",
-   "venue": "スタッド・フランシス・ル・ブレ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 8,
-   "utc": "2026-10-24T13:00:00Z",
-   "home": "トゥールーズ",
-   "away": "トロワ",
-   "venue": "スタジアム・ド・トゥールーズ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 8,
-   "utc": "2026-10-24T13:00:00Z",
-   "home": "オセール",
-   "away": "ル・マン",
-   "venue": "スタッド・アベ・デシャン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
    "league": "SA",
    "matchday": 8,
    "utc": "2026-10-24T13:00:00Z",
@@ -4567,12 +4375,48 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
-   "league": "PL",
-   "matchday": 8,
-   "utc": "2026-10-24T14:00:00Z",
-   "home": "リヴァプール",
-   "away": "ブライトン",
-   "venue": "アンフィールド",
+   "league": "BL1",
+   "matchday": 7,
+   "utc": "2026-10-24T13:30:00Z",
+   "home": "マインツ",
+   "away": "ヴェルダー・ブレーメン",
+   "venue": "メーヴァ・アレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 7,
+   "utc": "2026-10-24T13:30:00Z",
+   "home": "ケルン",
+   "away": "シャルケ",
+   "venue": "ラインエネルギーシュタディオン",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 7,
+   "utc": "2026-10-24T13:30:00Z",
+   "home": "ライプツィヒ",
+   "away": "エルフェアスベルク",
+   "venue": "レッドブル・アレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 7,
+   "utc": "2026-10-24T13:30:00Z",
+   "home": "パーダーボルン",
+   "away": "ハンブルガーＳＶ",
+   "venue": "ホーム・デルーフ・アレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 7,
+   "utc": "2026-10-24T13:30:00Z",
+   "home": "アウクスブルク",
+   "away": "ウニオン・ベルリン",
+   "venue": "ＷＷＫアレーナ",
    "status": "SCHEDULED"
   },
   {
@@ -4594,6 +4438,15 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "FL1",
+   "matchday": 8,
+   "utc": "2026-10-24T15:15:00Z",
+   "home": "トゥールーズ",
+   "away": "トロワ",
+   "venue": "スタジアム・ド・トゥールーズ",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "SA",
    "matchday": 8,
    "utc": "2026-10-24T16:00:00Z",
@@ -4603,12 +4456,30 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "BL1",
+   "matchday": 7,
+   "utc": "2026-10-24T16:30:00Z",
+   "home": "ドルトムント",
+   "away": "フランクフルト",
+   "venue": "ジグナル・イドゥナ・パルク",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "PL",
    "matchday": 8,
    "utc": "2026-10-24T16:30:00Z",
    "home": "チェルシー",
    "away": "トッテナム",
    "venue": "スタンフォード・ブリッジ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 8,
+   "utc": "2026-10-24T18:45:00Z",
+   "home": "ランス",
+   "away": "パリＦＣ",
+   "venue": "スタッド・ボラール＝ドレリス",
    "status": "SCHEDULED"
   },
   {
@@ -4681,6 +4552,15 @@ window.SCHEDULE_DATA = {
    "home": "インテル",
    "away": "フィオレンティーナ",
    "venue": "サン・シーロ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 8,
+   "utc": "2026-10-25T14:00:00Z",
+   "home": "モナコ",
+   "away": "リール",
+   "venue": "スタッド・ルイ２世",
    "status": "SCHEDULED"
   },
   {
@@ -4786,6 +4666,15 @@ window.SCHEDULE_DATA = {
    "league": "PL",
    "matchday": 8,
    "utc": "2026-10-25T14:00:00Z",
+   "home": "リヴァプール",
+   "away": "ブライトン",
+   "venue": "アンフィールド",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 8,
+   "utc": "2026-10-25T14:00:00Z",
    "home": "クリスタル・パレス",
    "away": "ニューカッスル",
    "venue": "セルハースト・パーク",
@@ -4825,6 +4714,60 @@ window.SCHEDULE_DATA = {
    "home": "ジェノア",
    "away": "ヴェネツィア",
    "venue": "ルイジ・フェッラーリス",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 7,
+   "utc": "2026-10-25T14:30:00Z",
+   "home": "ホッフェンハイム",
+   "away": "レバークーゼン",
+   "venue": "プレゼロ・アレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 8,
+   "utc": "2026-10-25T16:15:00Z",
+   "home": "マルセイユ",
+   "away": "ル・アーヴル",
+   "venue": "スタッド・ヴェロドローム",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 8,
+   "utc": "2026-10-25T16:15:00Z",
+   "home": "レンヌ",
+   "away": "ストラスブール",
+   "venue": "ロアゾン・パルク",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 8,
+   "utc": "2026-10-25T16:15:00Z",
+   "home": "アンジェ",
+   "away": "ロリアン",
+   "venue": "スタッド・レイモン・コパ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 8,
+   "utc": "2026-10-25T16:15:00Z",
+   "home": "オセール",
+   "away": "ル・マン",
+   "venue": "スタッド・アベ・デシャン",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 7,
+   "utc": "2026-10-25T16:30:00Z",
+   "home": "フライブルク",
+   "away": "バイエルン",
+   "venue": "ヨーロッパ・パルク・シュタディオン",
    "status": "SCHEDULED"
   },
   {
@@ -4954,6 +4897,33 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "FL1",
+   "matchday": 9,
+   "utc": "2026-10-30T18:00:00Z",
+   "home": "ル・アーヴル",
+   "away": "パリ・サンジェルマン",
+   "venue": "スタッド・オセアン",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 8,
+   "utc": "2026-10-30T19:30:00Z",
+   "home": "エルフェアスベルク",
+   "away": "マインツ",
+   "venue": "ウルスアパルク",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 9,
+   "utc": "2026-10-30T20:05:00Z",
+   "home": "リール",
+   "away": "ランス",
+   "venue": "スタッド・ピエール・モーロワ",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "J2",
    "matchday": 14,
    "utc": "2026-10-31T04:00:00Z",
@@ -5026,192 +4996,57 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
-   "league": "BL1",
-   "matchday": 8,
-   "utc": "2026-10-31T14:00:00Z",
-   "home": "ボルシアＭＧ",
-   "away": "パーダーボルン",
-   "venue": "ボルシア・パルク",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 8,
-   "utc": "2026-10-31T14:00:00Z",
-   "home": "シャルケ",
-   "away": "ライプツィヒ",
-   "venue": "フェルティンス・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 8,
-   "utc": "2026-10-31T14:00:00Z",
-   "home": "ウニオン・ベルリン",
-   "away": "ケルン",
-   "venue": "アルテ・フェルスターライ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 8,
-   "utc": "2026-10-31T14:00:00Z",
-   "home": "アウクスブルク",
-   "away": "フライブルク",
-   "venue": "ＷＷＫアレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 8,
-   "utc": "2026-10-31T14:00:00Z",
-   "home": "ヴェルダー・ブレーメン",
-   "away": "ホッフェンハイム",
-   "venue": "ヴェーザーシュタディオン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 8,
-   "utc": "2026-10-31T14:00:00Z",
-   "home": "フランクフルト",
-   "away": "ハンブルガーＳＶ",
-   "venue": "ドイチェ・バンク・パルク",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 8,
-   "utc": "2026-10-31T14:00:00Z",
-   "home": "バイエルン",
-   "away": "ドルトムント",
-   "venue": "アリアンツ・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 8,
-   "utc": "2026-10-31T14:00:00Z",
-   "home": "エルフェアスベルク",
-   "away": "マインツ",
-   "venue": "ウルスアパルク",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 8,
-   "utc": "2026-10-31T14:00:00Z",
-   "home": "レバークーゼン",
-   "away": "シュトゥットガルト",
-   "venue": "バイアレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 9,
-   "utc": "2026-10-31T14:00:00Z",
-   "home": "リール",
-   "away": "ランス",
-   "venue": "スタッド・ピエール・モーロワ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 9,
-   "utc": "2026-10-31T14:00:00Z",
-   "home": "リヨン",
-   "away": "アンジェ",
-   "venue": "グルパマ・スタジアム",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 9,
-   "utc": "2026-10-31T14:00:00Z",
-   "home": "ロリアン",
-   "away": "ブレスト",
-   "venue": "スタッド・デュ・ムストワール",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 9,
-   "utc": "2026-10-31T14:00:00Z",
-   "home": "パリＦＣ",
-   "away": "モナコ",
-   "venue": "スタッド・ジャン・ブアン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 9,
-   "utc": "2026-10-31T14:00:00Z",
-   "home": "トロワ",
-   "away": "ル・マン",
-   "venue": "スタッド・ド・ローブ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 9,
-   "utc": "2026-10-31T14:00:00Z",
-   "home": "ル・アーヴル",
-   "away": "パリ・サンジェルマン",
-   "venue": "スタッド・オセアン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 9,
-   "utc": "2026-10-31T14:00:00Z",
-   "home": "マルセイユ",
-   "away": "トゥールーズ",
-   "venue": "スタッド・ヴェロドローム",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 9,
-   "utc": "2026-10-31T14:00:00Z",
-   "home": "ニース",
-   "away": "レンヌ",
-   "venue": "アリアンツ・リビエラ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 9,
-   "utc": "2026-10-31T14:00:00Z",
-   "home": "ストラスブール",
-   "away": "オセール",
-   "venue": "スタッド・ド・ラ・メノー",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
    "league": "SA",
    "matchday": 10,
    "utc": "2026-10-31T14:00:00Z",
    "home": "ボローニャ",
    "away": "モンツァ",
    "venue": "レナート・ダッラーラ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 8,
+   "utc": "2026-10-31T14:30:00Z",
+   "home": "ボルシアＭＧ",
+   "away": "パーダーボルン",
+   "venue": "ボルシア・パルク",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 8,
+   "utc": "2026-10-31T14:30:00Z",
+   "home": "シャルケ",
+   "away": "ライプツィヒ",
+   "venue": "フェルティンス・アレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 8,
+   "utc": "2026-10-31T14:30:00Z",
+   "home": "アウクスブルク",
+   "away": "フライブルク",
+   "venue": "ＷＷＫアレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 8,
+   "utc": "2026-10-31T14:30:00Z",
+   "home": "ヴェルダー・ブレーメン",
+   "away": "ホッフェンハイム",
+   "venue": "ヴェーザーシュタディオン",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 8,
+   "utc": "2026-10-31T14:30:00Z",
+   "home": "レバークーゼン",
+   "away": "シュトゥットガルト",
+   "venue": "バイアレーナ",
    "status": "SCHEDULED"
   },
   {
@@ -5260,6 +5095,15 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "FL1",
+   "matchday": 9,
+   "utc": "2026-10-31T16:15:00Z",
+   "home": "ニース",
+   "away": "レンヌ",
+   "venue": "アリアンツ・リビエラ",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "SA",
    "matchday": 10,
    "utc": "2026-10-31T17:00:00Z",
@@ -5269,12 +5113,48 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "BL1",
+   "matchday": 8,
+   "utc": "2026-10-31T17:30:00Z",
+   "home": "バイエルン",
+   "away": "ドルトムント",
+   "venue": "アリアンツ・アレーナ",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "PL",
    "matchday": 9,
    "utc": "2026-10-31T17:30:00Z",
    "home": "トッテナム",
    "away": "クリスタル・パレス",
    "venue": "トッテナム・ホットスパー・スタジアム",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 9,
+   "utc": "2026-10-31T19:45:00Z",
+   "home": "リヨン",
+   "away": "アンジェ",
+   "venue": "グルパマ・スタジアム",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 9,
+   "utc": "2026-10-31T19:45:00Z",
+   "home": "ロリアン",
+   "away": "ブレスト",
+   "venue": "スタッド・デュ・ムストワール",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 9,
+   "utc": "2026-10-31T19:45:00Z",
+   "home": "トロワ",
+   "away": "ル・マン",
+   "venue": "スタッド・ド・ローブ",
    "status": "SCHEDULED"
   },
   {
@@ -5338,6 +5218,15 @@ window.SCHEDULE_DATA = {
    "home": "コモ",
    "away": "ヴェネツィア",
    "venue": "ジュゼッペ・シニガリア",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 9,
+   "utc": "2026-11-01T14:00:00Z",
+   "home": "ストラスブール",
+   "away": "オセール",
+   "venue": "スタッド・ド・ラ・メノー",
    "status": "SCHEDULED"
   },
   {
@@ -5457,6 +5346,33 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "BL1",
+   "matchday": 8,
+   "utc": "2026-11-01T14:30:00Z",
+   "home": "ウニオン・ベルリン",
+   "away": "ケルン",
+   "venue": "アルテ・フェルスターライ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 9,
+   "utc": "2026-11-01T16:15:00Z",
+   "home": "パリＦＣ",
+   "away": "モナコ",
+   "venue": "スタッド・ジャン・ブアン",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 8,
+   "utc": "2026-11-01T16:30:00Z",
+   "home": "フランクフルト",
+   "away": "ハンブルガーＳＶ",
+   "venue": "ドイチェ・バンク・パルク",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "PL",
    "matchday": 9,
    "utc": "2026-11-01T16:30:00Z",
@@ -5472,6 +5388,15 @@ window.SCHEDULE_DATA = {
    "home": "レッチェ",
    "away": "ジェノア",
    "venue": "ヴィア・デル・マーレ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 9,
+   "utc": "2026-11-01T19:45:00Z",
+   "home": "マルセイユ",
+   "away": "トゥールーズ",
+   "venue": "スタッド・ヴェロドローム",
    "status": "SCHEDULED"
   },
   {
@@ -5517,6 +5442,24 @@ window.SCHEDULE_DATA = {
    "home": "ＦＣ今治",
    "away": "北海道コンサドーレ札幌",
    "venue": "アシックス里山スタジアム",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 9,
+   "utc": "2026-11-06T19:30:00Z",
+   "home": "ハンブルガーＳＶ",
+   "away": "ボルシアＭＧ",
+   "venue": "フォルクスパルクシュタディオン",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 10,
+   "utc": "2026-11-06T19:45:00Z",
+   "home": "トゥールーズ",
+   "away": "ストラスブール",
+   "venue": "スタジアム・ド・トゥールーズ",
    "status": "SCHEDULED"
   },
   {
@@ -5583,182 +5526,57 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
-   "league": "BL1",
-   "matchday": 9,
-   "utc": "2026-11-07T14:00:00Z",
-   "home": "ライプツィヒ",
-   "away": "アウクスブルク",
-   "venue": "レッドブル・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 9,
-   "utc": "2026-11-07T14:00:00Z",
-   "home": "シュトゥットガルト",
-   "away": "ヴェルダー・ブレーメン",
-   "venue": "ＭＨＰアレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 9,
-   "utc": "2026-11-07T14:00:00Z",
-   "home": "ドルトムント",
-   "away": "エルフェアスベルク",
-   "venue": "ジグナル・イドゥナ・パルク",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 9,
-   "utc": "2026-11-07T14:00:00Z",
-   "home": "マインツ",
-   "away": "バイエルン",
-   "venue": "メーヴァ・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 9,
-   "utc": "2026-11-07T14:00:00Z",
-   "home": "ハンブルガーＳＶ",
-   "away": "ボルシアＭＧ",
-   "venue": "フォルクスパルクシュタディオン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 9,
-   "utc": "2026-11-07T14:00:00Z",
-   "home": "パーダーボルン",
-   "away": "フランクフルト",
-   "venue": "ホーム・デルーフ・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 9,
-   "utc": "2026-11-07T14:00:00Z",
-   "home": "フライブルク",
-   "away": "ウニオン・ベルリン",
-   "venue": "ヨーロッパ・パルク・シュタディオン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 9,
-   "utc": "2026-11-07T14:00:00Z",
-   "home": "ケルン",
-   "away": "レバークーゼン",
-   "venue": "ラインエネルギーシュタディオン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 9,
-   "utc": "2026-11-07T14:00:00Z",
-   "home": "ホッフェンハイム",
-   "away": "シャルケ",
-   "venue": "プレゼロ・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 10,
-   "utc": "2026-11-07T14:00:00Z",
-   "home": "ル・マン",
-   "away": "モナコ",
-   "venue": "ＭＭＡレナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 10,
-   "utc": "2026-11-07T14:00:00Z",
-   "home": "ブレスト",
-   "away": "リヨン",
-   "venue": "スタッド・フランシス・ル・ブレ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 10,
-   "utc": "2026-11-07T14:00:00Z",
-   "home": "ル・アーヴル",
-   "away": "ロリアン",
-   "venue": "スタッド・オセアン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 10,
-   "utc": "2026-11-07T14:00:00Z",
-   "home": "アンジェ",
-   "away": "ニース",
-   "venue": "スタッド・レイモン・コパ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 10,
-   "utc": "2026-11-07T14:00:00Z",
-   "home": "パリ・サンジェルマン",
-   "away": "トロワ",
-   "venue": "パルク・デ・プランス",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 10,
-   "utc": "2026-11-07T14:00:00Z",
-   "home": "レンヌ",
-   "away": "リール",
-   "venue": "ロアゾン・パルク",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 10,
-   "utc": "2026-11-07T14:00:00Z",
-   "home": "オセール",
-   "away": "パリＦＣ",
-   "venue": "スタッド・アベ・デシャン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 10,
-   "utc": "2026-11-07T14:00:00Z",
-   "home": "トゥールーズ",
-   "away": "ストラスブール",
-   "venue": "スタジアム・ド・トゥールーズ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
    "league": "SA",
    "matchday": 11,
    "utc": "2026-11-07T14:00:00Z",
    "home": "カリアリ",
    "away": "フロジノーネ",
    "venue": "ウニポル・ドムス",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "SA",
+   "matchday": 11,
+   "utc": "2026-11-07T14:00:00Z",
+   "home": "トリノ",
+   "away": "レッチェ",
+   "venue": "スタディオ・オリンピコ・グランデ・トリノ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 9,
+   "utc": "2026-11-07T14:30:00Z",
+   "home": "ライプツィヒ",
+   "away": "アウクスブルク",
+   "venue": "レッドブル・アレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 9,
+   "utc": "2026-11-07T14:30:00Z",
+   "home": "ドルトムント",
+   "away": "エルフェアスベルク",
+   "venue": "ジグナル・イドゥナ・パルク",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 9,
+   "utc": "2026-11-07T14:30:00Z",
+   "home": "マインツ",
+   "away": "バイエルン",
+   "venue": "メーヴァ・アレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 9,
+   "utc": "2026-11-07T14:30:00Z",
+   "home": "パーダーボルン",
+   "away": "フランクフルト",
+   "venue": "ホーム・デルーフ・アレーナ",
    "status": "SCHEDULED"
   },
   {
@@ -5862,6 +5680,15 @@ window.SCHEDULE_DATA = {
    "tbd": true
   },
   {
+   "league": "FL1",
+   "matchday": 10,
+   "utc": "2026-11-07T16:15:00Z",
+   "home": "オセール",
+   "away": "パリＦＣ",
+   "venue": "スタッド・アベ・デシャン",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "SA",
    "matchday": 11,
    "utc": "2026-11-07T17:00:00Z",
@@ -5871,12 +5698,21 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "BL1",
+   "matchday": 9,
+   "utc": "2026-11-07T17:30:00Z",
+   "home": "シュトゥットガルト",
+   "away": "ヴェルダー・ブレーメン",
+   "venue": "ＭＨＰアレーナ",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "FL1",
    "matchday": 10,
    "utc": "2026-11-07T19:45:00Z",
-   "home": "ランス",
-   "away": "マルセイユ",
-   "venue": "スタッド・ボラール＝ドレリス",
+   "home": "パリ・サンジェルマン",
+   "away": "トロワ",
+   "venue": "パルク・デ・プランス",
    "status": "SCHEDULED"
   },
   {
@@ -5940,6 +5776,15 @@ window.SCHEDULE_DATA = {
    "home": "ナポリ",
    "away": "ラツィオ",
    "venue": "スタディオ・マラドーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 10,
+   "utc": "2026-11-08T14:00:00Z",
+   "home": "レンヌ",
+   "away": "リール",
+   "venue": "ロアゾン・パルク",
    "status": "SCHEDULED"
   },
   {
@@ -6046,16 +5891,6 @@ window.SCHEDULE_DATA = {
    "league": "SA",
    "matchday": 11,
    "utc": "2026-11-08T14:00:00Z",
-   "home": "トリノ",
-   "away": "レッチェ",
-   "venue": "スタディオ・オリンピコ・グランデ・トリノ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "SA",
-   "matchday": 11,
-   "utc": "2026-11-08T14:00:00Z",
    "home": "ジェノア",
    "away": "ミラン",
    "venue": "ルイジ・フェッラーリス",
@@ -6071,12 +5906,84 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "BL1",
+   "matchday": 9,
+   "utc": "2026-11-08T14:30:00Z",
+   "home": "ケルン",
+   "away": "レバークーゼン",
+   "venue": "ラインエネルギーシュタディオン",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 10,
+   "utc": "2026-11-08T16:15:00Z",
+   "home": "ル・マン",
+   "away": "モナコ",
+   "venue": "ＭＭＡレナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 10,
+   "utc": "2026-11-08T16:15:00Z",
+   "home": "ブレスト",
+   "away": "リヨン",
+   "venue": "スタッド・フランシス・ル・ブレ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 10,
+   "utc": "2026-11-08T16:15:00Z",
+   "home": "ル・アーヴル",
+   "away": "ロリアン",
+   "venue": "スタッド・オセアン",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 10,
+   "utc": "2026-11-08T16:15:00Z",
+   "home": "アンジェ",
+   "away": "ニース",
+   "venue": "スタッド・レイモン・コパ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 9,
+   "utc": "2026-11-08T16:30:00Z",
+   "home": "フライブルク",
+   "away": "ウニオン・ベルリン",
+   "venue": "ヨーロッパ・パルク・シュタディオン",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "SA",
    "matchday": 11,
    "utc": "2026-11-08T17:00:00Z",
    "home": "インテル",
    "away": "コモ",
    "venue": "サン・シーロ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 9,
+   "utc": "2026-11-08T18:30:00Z",
+   "home": "ホッフェンハイム",
+   "away": "シャルケ",
+   "venue": "プレゼロ・アレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 10,
+   "utc": "2026-11-08T19:45:00Z",
+   "home": "ランス",
+   "away": "マルセイユ",
+   "venue": "スタッド・ボラール＝ドレリス",
    "status": "SCHEDULED"
   },
   {
@@ -6122,6 +6029,24 @@ window.SCHEDULE_DATA = {
    "home": "ヴィッセル神戸",
    "away": "水戸ホーリーホック",
    "venue": "ノエビアスタジアム神戸",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 10,
+   "utc": "2026-11-20T19:30:00Z",
+   "home": "バイエルン",
+   "away": "ケルン",
+   "venue": "アリアンツ・アレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 11,
+   "utc": "2026-11-20T19:45:00Z",
+   "home": "トロワ",
+   "away": "ル・アーヴル",
+   "venue": "スタッド・ド・ローブ",
    "status": "SCHEDULED"
   },
   {
@@ -6197,186 +6122,6 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
-   "league": "BL1",
-   "matchday": 10,
-   "utc": "2026-11-21T14:00:00Z",
-   "home": "レバークーゼン",
-   "away": "パーダーボルン",
-   "venue": "バイアレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 10,
-   "utc": "2026-11-21T14:00:00Z",
-   "home": "ウニオン・ベルリン",
-   "away": "ライプツィヒ",
-   "venue": "アルテ・フェルスターライ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 10,
-   "utc": "2026-11-21T14:00:00Z",
-   "home": "バイエルン",
-   "away": "ケルン",
-   "venue": "アリアンツ・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 10,
-   "utc": "2026-11-21T14:00:00Z",
-   "home": "エルフェアスベルク",
-   "away": "フライブルク",
-   "venue": "ウルスアパルク",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 10,
-   "utc": "2026-11-21T14:00:00Z",
-   "home": "シャルケ",
-   "away": "シュトゥットガルト",
-   "venue": "フェルティンス・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 10,
-   "utc": "2026-11-21T14:00:00Z",
-   "home": "ボルシアＭＧ",
-   "away": "ドルトムント",
-   "venue": "ボルシア・パルク",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 10,
-   "utc": "2026-11-21T14:00:00Z",
-   "home": "ヴェルダー・ブレーメン",
-   "away": "ハンブルガーＳＶ",
-   "venue": "ヴェーザーシュタディオン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 10,
-   "utc": "2026-11-21T14:00:00Z",
-   "home": "アウクスブルク",
-   "away": "マインツ",
-   "venue": "ＷＷＫアレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 10,
-   "utc": "2026-11-21T14:00:00Z",
-   "home": "フランクフルト",
-   "away": "ホッフェンハイム",
-   "venue": "ドイチェ・バンク・パルク",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 11,
-   "utc": "2026-11-21T14:00:00Z",
-   "home": "モナコ",
-   "away": "オセール",
-   "venue": "スタッド・ルイ２世",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 11,
-   "utc": "2026-11-21T14:00:00Z",
-   "home": "トロワ",
-   "away": "ル・アーヴル",
-   "venue": "スタッド・ド・ローブ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 11,
-   "utc": "2026-11-21T14:00:00Z",
-   "home": "ランス",
-   "away": "トゥールーズ",
-   "venue": "スタッド・ボラール＝ドレリス",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 11,
-   "utc": "2026-11-21T14:00:00Z",
-   "home": "リール",
-   "away": "リヨン",
-   "venue": "スタッド・ピエール・モーロワ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 11,
-   "utc": "2026-11-21T14:00:00Z",
-   "home": "パリＦＣ",
-   "away": "アンジェ",
-   "venue": "スタッド・ジャン・ブアン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 11,
-   "utc": "2026-11-21T14:00:00Z",
-   "home": "ロリアン",
-   "away": "レンヌ",
-   "venue": "スタッド・デュ・ムストワール",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 11,
-   "utc": "2026-11-21T14:00:00Z",
-   "home": "ストラスブール",
-   "away": "ブレスト",
-   "venue": "スタッド・ド・ラ・メノー",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 11,
-   "utc": "2026-11-21T14:00:00Z",
-   "home": "ニース",
-   "away": "パリ・サンジェルマン",
-   "venue": "アリアンツ・リビエラ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 11,
-   "utc": "2026-11-21T14:00:00Z",
-   "home": "マルセイユ",
-   "away": "ル・マン",
-   "venue": "スタッド・ヴェロドローム",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
    "league": "SA",
    "matchday": 12,
    "utc": "2026-11-21T14:00:00Z",
@@ -6392,6 +6137,51 @@ window.SCHEDULE_DATA = {
    "home": "ラツィオ",
    "away": "レッチェ",
    "venue": "スタディオ・オリンピコ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 10,
+   "utc": "2026-11-21T14:30:00Z",
+   "home": "レバークーゼン",
+   "away": "パーダーボルン",
+   "venue": "バイアレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 10,
+   "utc": "2026-11-21T14:30:00Z",
+   "home": "ウニオン・ベルリン",
+   "away": "ライプツィヒ",
+   "venue": "アルテ・フェルスターライ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 10,
+   "utc": "2026-11-21T14:30:00Z",
+   "home": "エルフェアスベルク",
+   "away": "フライブルク",
+   "venue": "ウルスアパルク",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 10,
+   "utc": "2026-11-21T14:30:00Z",
+   "home": "ボルシアＭＧ",
+   "away": "ドルトムント",
+   "venue": "ボルシア・パルク",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 10,
+   "utc": "2026-11-21T14:30:00Z",
+   "home": "フランクフルト",
+   "away": "ホッフェンハイム",
+   "venue": "ドイチェ・バンク・パルク",
    "status": "SCHEDULED"
   },
   {
@@ -6495,12 +6285,66 @@ window.SCHEDULE_DATA = {
    "tbd": true
   },
   {
+   "league": "FL1",
+   "matchday": 11,
+   "utc": "2026-11-21T16:15:00Z",
+   "home": "ニース",
+   "away": "パリ・サンジェルマン",
+   "venue": "アリアンツ・リビエラ",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "SA",
    "matchday": 12,
    "utc": "2026-11-21T17:00:00Z",
    "home": "パルマ",
    "away": "ローマ",
    "venue": "エンニオ・タルディーニ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 10,
+   "utc": "2026-11-21T17:30:00Z",
+   "home": "シャルケ",
+   "away": "シュトゥットガルト",
+   "venue": "フェルティンス・アレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 11,
+   "utc": "2026-11-21T19:45:00Z",
+   "home": "モナコ",
+   "away": "オセール",
+   "venue": "スタッド・ルイ２世",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 11,
+   "utc": "2026-11-21T19:45:00Z",
+   "home": "ランス",
+   "away": "トゥールーズ",
+   "venue": "スタッド・ボラール＝ドレリス",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 11,
+   "utc": "2026-11-21T19:45:00Z",
+   "home": "リール",
+   "away": "リヨン",
+   "venue": "スタッド・ピエール・モーロワ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 11,
+   "utc": "2026-11-21T19:45:00Z",
+   "home": "ストラスブール",
+   "away": "ブレスト",
+   "venue": "スタッド・ド・ラ・メノー",
    "status": "SCHEDULED"
   },
   {
@@ -6519,6 +6363,15 @@ window.SCHEDULE_DATA = {
    "home": "サッスオーロ",
    "away": "ジェノア",
    "venue": "マペイ・スタジアム",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 11,
+   "utc": "2026-11-22T14:00:00Z",
+   "home": "パリＦＣ",
+   "away": "アンジェ",
+   "venue": "スタッド・ジャン・ブアン",
    "status": "SCHEDULED"
   },
   {
@@ -6630,12 +6483,48 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "BL1",
+   "matchday": 10,
+   "utc": "2026-11-22T14:30:00Z",
+   "home": "アウクスブルク",
+   "away": "マインツ",
+   "venue": "ＷＷＫアレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 11,
+   "utc": "2026-11-22T16:15:00Z",
+   "home": "ロリアン",
+   "away": "レンヌ",
+   "venue": "スタッド・デュ・ムストワール",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 10,
+   "utc": "2026-11-22T16:30:00Z",
+   "home": "ヴェルダー・ブレーメン",
+   "away": "ハンブルガーＳＶ",
+   "venue": "ヴェーザーシュタディオン",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "SA",
    "matchday": 12,
    "utc": "2026-11-22T17:00:00Z",
    "home": "ボローニャ",
    "away": "ウディネーゼ",
    "venue": "レナート・ダッラーラ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 11,
+   "utc": "2026-11-22T19:45:00Z",
+   "home": "マルセイユ",
+   "away": "ル・マン",
+   "venue": "スタッド・ヴェロドローム",
    "status": "SCHEDULED"
   },
   {
@@ -6738,6 +6627,24 @@ window.SCHEDULE_DATA = {
    "status": "SCHEDULED"
   },
   {
+   "league": "BL1",
+   "matchday": 11,
+   "utc": "2026-11-27T19:30:00Z",
+   "home": "ヴェルダー・ブレーメン",
+   "away": "ボルシアＭＧ",
+   "venue": "ヴェーザーシュタディオン",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 12,
+   "utc": "2026-11-27T19:45:00Z",
+   "home": "ブレスト",
+   "away": "パリＦＣ",
+   "venue": "スタッド・フランシス・ル・ブレ",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "J1",
    "matchday": 17,
    "utc": "2026-11-28T05:00:00Z",
@@ -6785,182 +6692,38 @@ window.SCHEDULE_DATA = {
   {
    "league": "BL1",
    "matchday": 11,
-   "utc": "2026-11-28T14:00:00Z",
+   "utc": "2026-11-28T14:30:00Z",
    "home": "ケルン",
    "away": "エルフェアスベルク",
    "venue": "ラインエネルギーシュタディオン",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "BL1",
    "matchday": 11,
-   "utc": "2026-11-28T14:00:00Z",
+   "utc": "2026-11-28T14:30:00Z",
    "home": "マインツ",
    "away": "ウニオン・ベルリン",
    "venue": "メーヴァ・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "BL1",
    "matchday": 11,
-   "utc": "2026-11-28T14:00:00Z",
+   "utc": "2026-11-28T14:30:00Z",
    "home": "パーダーボルン",
    "away": "シャルケ",
    "venue": "ホーム・デルーフ・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "BL1",
    "matchday": 11,
-   "utc": "2026-11-28T14:00:00Z",
-   "home": "ヴェルダー・ブレーメン",
-   "away": "ボルシアＭＧ",
-   "venue": "ヴェーザーシュタディオン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 11,
-   "utc": "2026-11-28T14:00:00Z",
-   "home": "シュトゥットガルト",
-   "away": "フランクフルト",
-   "venue": "ＭＨＰアレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 11,
-   "utc": "2026-11-28T14:00:00Z",
-   "home": "ホッフェンハイム",
-   "away": "アウクスブルク",
-   "venue": "プレゼロ・アレーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 11,
-   "utc": "2026-11-28T14:00:00Z",
-   "home": "ドルトムント",
-   "away": "レバークーゼン",
-   "venue": "ジグナル・イドゥナ・パルク",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 11,
-   "utc": "2026-11-28T14:00:00Z",
-   "home": "フライブルク",
-   "away": "ライプツィヒ",
-   "venue": "ヨーロッパ・パルク・シュタディオン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "BL1",
-   "matchday": 11,
-   "utc": "2026-11-28T14:00:00Z",
+   "utc": "2026-11-28T14:30:00Z",
    "home": "ハンブルガーＳＶ",
    "away": "バイエルン",
    "venue": "フォルクスパルクシュタディオン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 12,
-   "utc": "2026-11-28T14:00:00Z",
-   "home": "ブレスト",
-   "away": "パリＦＣ",
-   "venue": "スタッド・フランシス・ル・ブレ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 12,
-   "utc": "2026-11-28T14:00:00Z",
-   "home": "ル・マン",
-   "away": "リール",
-   "venue": "ＭＭＡレナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 12,
-   "utc": "2026-11-28T14:00:00Z",
-   "home": "トゥールーズ",
-   "away": "レンヌ",
-   "venue": "スタジアム・ド・トゥールーズ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 12,
-   "utc": "2026-11-28T14:00:00Z",
-   "home": "オセール",
-   "away": "マルセイユ",
-   "venue": "スタッド・アベ・デシャン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 12,
-   "utc": "2026-11-28T14:00:00Z",
-   "home": "ニース",
-   "away": "トロワ",
-   "venue": "アリアンツ・リビエラ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 12,
-   "utc": "2026-11-28T14:00:00Z",
-   "home": "アンジェ",
-   "away": "ランス",
-   "venue": "スタッド・レイモン・コパ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 12,
-   "utc": "2026-11-28T14:00:00Z",
-   "home": "ル・アーヴル",
-   "away": "ストラスブール",
-   "venue": "スタッド・オセアン",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 12,
-   "utc": "2026-11-28T14:00:00Z",
-   "home": "パリ・サンジェルマン",
-   "away": "ロリアン",
-   "venue": "パルク・デ・プランス",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 12,
-   "utc": "2026-11-28T14:00:00Z",
-   "home": "リヨン",
-   "away": "モナコ",
-   "venue": "グルパマ・スタジアム",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
@@ -7063,6 +6826,60 @@ window.SCHEDULE_DATA = {
    "tbd": true
   },
   {
+   "league": "FL1",
+   "matchday": 12,
+   "utc": "2026-11-28T16:15:00Z",
+   "home": "アンジェ",
+   "away": "ランス",
+   "venue": "スタッド・レイモン・コパ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 11,
+   "utc": "2026-11-28T17:30:00Z",
+   "home": "シュトゥットガルト",
+   "away": "フランクフルト",
+   "venue": "ＭＨＰアレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 12,
+   "utc": "2026-11-28T19:45:00Z",
+   "home": "ル・マン",
+   "away": "リール",
+   "venue": "ＭＭＡレナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 12,
+   "utc": "2026-11-28T19:45:00Z",
+   "home": "ニース",
+   "away": "トロワ",
+   "venue": "アリアンツ・リビエラ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 12,
+   "utc": "2026-11-28T19:45:00Z",
+   "home": "ル・アーヴル",
+   "away": "ストラスブール",
+   "venue": "スタッド・オセアン",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 12,
+   "utc": "2026-11-28T19:45:00Z",
+   "home": "パリ・サンジェルマン",
+   "away": "ロリアン",
+   "venue": "パルク・デ・プランス",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "J1",
    "matchday": 17,
    "utc": "2026-11-29T05:00:00Z",
@@ -7114,6 +6931,15 @@ window.SCHEDULE_DATA = {
    "home": "ＦＣ町田ゼルビア",
    "away": "東京ヴェルディ",
    "venue": "町田ＧＩＯＮスタジアム",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 12,
+   "utc": "2026-11-29T14:00:00Z",
+   "home": "オセール",
+   "away": "マルセイユ",
+   "venue": "スタッド・アベ・デシャン",
    "status": "SCHEDULED"
   },
   {
@@ -7314,6 +7140,51 @@ window.SCHEDULE_DATA = {
    "venue": "サン・シーロ",
    "status": "SCHEDULED",
    "tbd": true
+  },
+  {
+   "league": "BL1",
+   "matchday": 11,
+   "utc": "2026-11-29T14:30:00Z",
+   "home": "フライブルク",
+   "away": "ライプツィヒ",
+   "venue": "ヨーロッパ・パルク・シュタディオン",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 12,
+   "utc": "2026-11-29T16:15:00Z",
+   "home": "トゥールーズ",
+   "away": "レンヌ",
+   "venue": "スタジアム・ド・トゥールーズ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 11,
+   "utc": "2026-11-29T16:30:00Z",
+   "home": "ホッフェンハイム",
+   "away": "アウクスブルク",
+   "venue": "プレゼロ・アレーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "BL1",
+   "matchday": 11,
+   "utc": "2026-11-29T18:30:00Z",
+   "home": "ドルトムント",
+   "away": "レバークーゼン",
+   "venue": "ジグナル・イドゥナ・パルク",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 12,
+   "utc": "2026-11-29T19:45:00Z",
+   "home": "リヨン",
+   "away": "モナコ",
+   "venue": "グルパマ・スタジアム",
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
@@ -9072,32 +8943,11 @@ window.SCHEDULE_DATA = {
   {
    "league": "PL",
    "matchday": 17,
-   "utc": "2026-12-26T15:00:00Z",
+   "utc": "2026-12-26T12:30:00Z",
    "home": "アストン・ヴィラ",
    "away": "リーズ",
    "venue": "ヴィラ・パーク",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 17,
-   "utc": "2026-12-26T15:00:00Z",
-   "home": "マンチェスター・ユナイテッド",
-   "away": "ノッティンガム・フォレスト",
-   "venue": "オールド・トラッフォード",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 17,
-   "utc": "2026-12-26T15:00:00Z",
-   "home": "クリスタル・パレス",
-   "away": "アーセナル",
-   "venue": "セルハースト・パーク",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
@@ -9106,28 +8956,7 @@ window.SCHEDULE_DATA = {
    "home": "エヴァートン",
    "away": "サンダーランド",
    "venue": "ヒル・ディキンソン・スタジアム",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 17,
-   "utc": "2026-12-26T15:00:00Z",
-   "home": "コベントリー",
-   "away": "チェルシー",
-   "venue": "ＣＢＳアリーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 17,
-   "utc": "2026-12-26T15:00:00Z",
-   "home": "ニューカッスル",
-   "away": "マンチェスター・シティ",
-   "venue": "セント・ジェームズ・パーク",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
@@ -9136,8 +8965,7 @@ window.SCHEDULE_DATA = {
    "home": "フラム",
    "away": "ブライトン",
    "venue": "クレイヴン・コテージ",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
@@ -9146,18 +8974,7 @@ window.SCHEDULE_DATA = {
    "home": "トッテナム",
    "away": "ボーンマス",
    "venue": "トッテナム・ホットスパー・スタジアム",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 17,
-   "utc": "2026-12-26T15:00:00Z",
-   "home": "ハル・シティ",
-   "away": "リヴァプール",
-   "venue": "ＭＫＭスタジアム",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
@@ -9166,108 +8983,160 @@ window.SCHEDULE_DATA = {
    "home": "イプスウィッチ",
    "away": "ブレントフォード",
    "venue": "ポートマン・ロード",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
-   "matchday": 18,
-   "utc": "2026-12-30T20:00:00Z",
-   "home": "フラム",
-   "away": "アーセナル",
-   "venue": "クレイヴン・コテージ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 18,
-   "utc": "2026-12-30T20:00:00Z",
-   "home": "コベントリー",
-   "away": "ブレントフォード",
-   "venue": "ＣＢＳアリーナ",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 18,
-   "utc": "2026-12-30T20:00:00Z",
-   "home": "アストン・ヴィラ",
+   "matchday": 17,
+   "utc": "2026-12-26T17:30:00Z",
+   "home": "ハル・シティ",
    "away": "リヴァプール",
-   "venue": "ヴィラ・パーク",
-   "status": "SCHEDULED",
-   "tbd": true
+   "venue": "ＭＫＭスタジアム",
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
-   "matchday": 18,
-   "utc": "2026-12-30T20:00:00Z",
+   "matchday": 17,
+   "utc": "2026-12-26T20:00:00Z",
    "home": "ニューカッスル",
-   "away": "ノッティンガム・フォレスト",
+   "away": "マンチェスター・シティ",
    "venue": "セント・ジェームズ・パーク",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 17,
+   "utc": "2026-12-27T14:00:00Z",
+   "home": "コベントリー",
+   "away": "チェルシー",
+   "venue": "ＣＢＳアリーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 17,
+   "utc": "2026-12-27T16:30:00Z",
+   "home": "マンチェスター・ユナイテッド",
+   "away": "ノッティンガム・フォレスト",
+   "venue": "オールド・トラッフォード",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 17,
+   "utc": "2026-12-27T19:00:00Z",
+   "home": "クリスタル・パレス",
+   "away": "アーセナル",
+   "venue": "セルハースト・パーク",
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
    "matchday": 18,
-   "utc": "2026-12-30T20:00:00Z",
+   "utc": "2026-12-29T19:30:00Z",
    "home": "ハル・シティ",
    "away": "リーズ",
    "venue": "ＭＫＭスタジアム",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
    "matchday": 18,
-   "utc": "2026-12-30T20:00:00Z",
-   "home": "マンチェスター・ユナイテッド",
-   "away": "サンダーランド",
-   "venue": "オールド・トラッフォード",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 18,
-   "utc": "2026-12-30T20:00:00Z",
-   "home": "イプスウィッチ",
-   "away": "チェルシー",
-   "venue": "ポートマン・ロード",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 18,
-   "utc": "2026-12-30T20:00:00Z",
+   "utc": "2026-12-29T19:30:00Z",
    "home": "トッテナム",
    "away": "ブライトン",
    "venue": "トッテナム・ホットスパー・スタジアム",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
    "matchday": 18,
-   "utc": "2026-12-30T20:00:00Z",
+   "utc": "2026-12-29T20:15:00Z",
    "home": "エヴァートン",
    "away": "マンチェスター・シティ",
    "venue": "ヒル・ディキンソン・スタジアム",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
    "matchday": 18,
-   "utc": "2026-12-30T20:00:00Z",
+   "utc": "2026-12-30T19:30:00Z",
+   "home": "フラム",
+   "away": "アーセナル",
+   "venue": "クレイヴン・コテージ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 18,
+   "utc": "2026-12-30T19:30:00Z",
+   "home": "コベントリー",
+   "away": "ブレントフォード",
+   "venue": "ＣＢＳアリーナ",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 18,
+   "utc": "2026-12-30T19:30:00Z",
+   "home": "ニューカッスル",
+   "away": "ノッティンガム・フォレスト",
+   "venue": "セント・ジェームズ・パーク",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 18,
+   "utc": "2026-12-30T19:30:00Z",
+   "home": "マンチェスター・ユナイテッド",
+   "away": "サンダーランド",
+   "venue": "オールド・トラッフォード",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 18,
+   "utc": "2026-12-30T19:30:00Z",
    "home": "クリスタル・パレス",
    "away": "ボーンマス",
    "venue": "セルハースト・パーク",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 18,
+   "utc": "2026-12-30T20:15:00Z",
+   "home": "アストン・ヴィラ",
+   "away": "リヴァプール",
+   "venue": "ヴィラ・パーク",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 18,
+   "utc": "2026-12-30T20:15:00Z",
+   "home": "イプスウィッチ",
+   "away": "チェルシー",
+   "venue": "ポートマン・ロード",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 19,
+   "utc": "2027-01-01T20:00:00Z",
+   "home": "リーズ",
+   "away": "エヴァートン",
+   "venue": "エランド・ロード",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 19,
+   "utc": "2027-01-02T12:30:00Z",
+   "home": "ブライトン",
+   "away": "マンチェスター・ユナイテッド",
+   "venue": "アメックス・スタジアム",
+   "status": "SCHEDULED"
   },
   {
    "league": "FL1",
@@ -9353,31 +9222,10 @@ window.SCHEDULE_DATA = {
    "league": "PL",
    "matchday": 19,
    "utc": "2027-01-02T15:00:00Z",
-   "home": "ボーンマス",
-   "away": "アストン・ヴィラ",
-   "venue": "バイタリティ・スタジアム",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 19,
-   "utc": "2027-01-02T15:00:00Z",
    "home": "ブレントフォード",
    "away": "クリスタル・パレス",
    "venue": "Gtechコミュニティ・スタジアム",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 19,
-   "utc": "2027-01-02T15:00:00Z",
-   "home": "リーズ",
-   "away": "エヴァートン",
-   "venue": "エランド・ロード",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
@@ -9386,8 +9234,7 @@ window.SCHEDULE_DATA = {
    "home": "アーセナル",
    "away": "イプスウィッチ",
    "venue": "エミレーツ・スタジアム",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
@@ -9396,8 +9243,7 @@ window.SCHEDULE_DATA = {
    "home": "サンダーランド",
    "away": "ハル・シティ",
    "venue": "スタジアム・オブ・ライト",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
@@ -9406,18 +9252,7 @@ window.SCHEDULE_DATA = {
    "home": "リヴァプール",
    "away": "コベントリー",
    "venue": "アンフィールド",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 19,
-   "utc": "2027-01-02T15:00:00Z",
-   "home": "チェルシー",
-   "away": "ニューカッスル",
-   "venue": "スタンフォード・ブリッジ",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
@@ -9426,36 +9261,15 @@ window.SCHEDULE_DATA = {
    "home": "ノッティンガム・フォレスト",
    "away": "フラム",
    "venue": "シティ・グラウンド",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
    "matchday": 19,
-   "utc": "2027-01-02T15:00:00Z",
-   "home": "ブライトン",
-   "away": "マンチェスター・ユナイテッド",
-   "venue": "アメックス・スタジアム",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 19,
-   "utc": "2027-01-02T15:00:00Z",
-   "home": "マンチェスター・シティ",
-   "away": "トッテナム",
-   "venue": "エティハド・スタジアム",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "FL1",
-   "matchday": 15,
-   "utc": "2027-01-03T14:00:00Z",
-   "home": "ランス",
-   "away": "パリ・サンジェルマン",
-   "venue": "スタッド・ボラール＝ドレリス",
+   "utc": "2027-01-02T17:30:00Z",
+   "home": "ボーンマス",
+   "away": "アストン・ヴィラ",
+   "venue": "バイタリティ・スタジアム",
    "status": "SCHEDULED"
   },
   {
@@ -9558,6 +9372,15 @@ window.SCHEDULE_DATA = {
    "tbd": true
   },
   {
+   "league": "PL",
+   "matchday": 19,
+   "utc": "2027-01-03T14:00:00Z",
+   "home": "チェルシー",
+   "away": "ニューカッスル",
+   "venue": "スタンフォード・ブリッジ",
+   "status": "SCHEDULED"
+  },
+  {
    "league": "SA",
    "matchday": 17,
    "utc": "2027-01-03T14:00:00Z",
@@ -9656,6 +9479,69 @@ window.SCHEDULE_DATA = {
    "venue": "アルテミオ・フランキ",
    "status": "SCHEDULED",
    "tbd": true
+  },
+  {
+   "league": "PL",
+   "matchday": 19,
+   "utc": "2027-01-03T16:30:00Z",
+   "home": "マンチェスター・シティ",
+   "away": "トッテナム",
+   "venue": "エティハド・スタジアム",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "FL1",
+   "matchday": 15,
+   "utc": "2027-01-03T19:45:00Z",
+   "home": "ランス",
+   "away": "パリ・サンジェルマン",
+   "venue": "スタッド・ボラール＝ドレリス",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 20,
+   "utc": "2027-01-05T19:30:00Z",
+   "home": "アーセナル",
+   "away": "ブレントフォード",
+   "venue": "エミレーツ・スタジアム",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 20,
+   "utc": "2027-01-05T19:30:00Z",
+   "home": "ブライトン",
+   "away": "ボーンマス",
+   "venue": "アメックス・スタジアム",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 20,
+   "utc": "2027-01-05T19:30:00Z",
+   "home": "ノッティンガム・フォレスト",
+   "away": "ハル・シティ",
+   "venue": "シティ・グラウンド",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 20,
+   "utc": "2027-01-05T19:30:00Z",
+   "home": "エヴァートン",
+   "away": "アストン・ヴィラ",
+   "venue": "ヒル・ディキンソン・スタジアム",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 20,
+   "utc": "2027-01-05T20:15:00Z",
+   "home": "サンダーランド",
+   "away": "リヴァプール",
+   "venue": "スタジアム・オブ・ライト",
+   "status": "SCHEDULED"
   },
   {
    "league": "SA",
@@ -9760,102 +9646,47 @@ window.SCHEDULE_DATA = {
   {
    "league": "PL",
    "matchday": 20,
-   "utc": "2027-01-06T20:00:00Z",
-   "home": "アーセナル",
-   "away": "ブレントフォード",
-   "venue": "エミレーツ・スタジアム",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 20,
-   "utc": "2027-01-06T20:00:00Z",
-   "home": "リーズ",
-   "away": "マンチェスター・シティ",
-   "venue": "エランド・ロード",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 20,
-   "utc": "2027-01-06T20:00:00Z",
-   "home": "マンチェスター・ユナイテッド",
-   "away": "ニューカッスル",
-   "venue": "オールド・トラッフォード",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 20,
-   "utc": "2027-01-06T20:00:00Z",
-   "home": "ブライトン",
-   "away": "ボーンマス",
-   "venue": "アメックス・スタジアム",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 20,
-   "utc": "2027-01-06T20:00:00Z",
-   "home": "ノッティンガム・フォレスト",
-   "away": "ハル・シティ",
-   "venue": "シティ・グラウンド",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 20,
-   "utc": "2027-01-06T20:00:00Z",
+   "utc": "2027-01-06T19:30:00Z",
    "home": "フラム",
    "away": "トッテナム",
    "venue": "クレイヴン・コテージ",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
    "matchday": 20,
-   "utc": "2027-01-06T20:00:00Z",
-   "home": "エヴァートン",
-   "away": "アストン・ヴィラ",
-   "venue": "ヒル・ディキンソン・スタジアム",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 20,
-   "utc": "2027-01-06T20:00:00Z",
-   "home": "サンダーランド",
-   "away": "リヴァプール",
-   "venue": "スタジアム・オブ・ライト",
-   "status": "SCHEDULED",
-   "tbd": true
-  },
-  {
-   "league": "PL",
-   "matchday": 20,
-   "utc": "2027-01-06T20:00:00Z",
+   "utc": "2027-01-06T19:30:00Z",
    "home": "クリスタル・パレス",
    "away": "チェルシー",
    "venue": "セルハースト・パーク",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
    "matchday": 20,
-   "utc": "2027-01-06T20:00:00Z",
+   "utc": "2027-01-06T19:30:00Z",
    "home": "イプスウィッチ",
    "away": "コベントリー",
    "venue": "ポートマン・ロード",
-   "status": "SCHEDULED",
-   "tbd": true
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 20,
+   "utc": "2027-01-06T20:15:00Z",
+   "home": "リーズ",
+   "away": "マンチェスター・シティ",
+   "venue": "エランド・ロード",
+   "status": "SCHEDULED"
+  },
+  {
+   "league": "PL",
+   "matchday": 20,
+   "utc": "2027-01-07T20:00:00Z",
+   "home": "マンチェスター・ユナイテッド",
+   "away": "ニューカッスル",
+   "venue": "オールド・トラッフォード",
+   "status": "SCHEDULED"
   },
   {
    "league": "BL1",
@@ -11944,15 +11775,6 @@ window.SCHEDULE_DATA = {
    "tbd": true
   },
   {
-   "league": "FL1",
-   "matchday": 19,
-   "utc": "2027-02-07T14:00:00Z",
-   "home": "パリ・サンジェルマン",
-   "away": "マルセイユ",
-   "venue": "パルク・デ・プランス",
-   "status": "SCHEDULED"
-  },
-  {
    "league": "PD",
    "matchday": 23,
    "utc": "2027-02-07T14:00:00Z",
@@ -12149,6 +11971,15 @@ window.SCHEDULE_DATA = {
    "venue": "アルテミオ・フランキ",
    "status": "SCHEDULED",
    "tbd": true
+  },
+  {
+   "league": "FL1",
+   "matchday": 19,
+   "utc": "2027-02-07T19:45:00Z",
+   "home": "パリ・サンジェルマン",
+   "away": "マルセイユ",
+   "venue": "パルク・デ・プランス",
+   "status": "SCHEDULED"
   },
   {
    "league": "PL",
@@ -13700,15 +13531,6 @@ window.SCHEDULE_DATA = {
    "tbd": true
   },
   {
-   "league": "FL1",
-   "matchday": 22,
-   "utc": "2027-02-28T14:00:00Z",
-   "home": "パリ・サンジェルマン",
-   "away": "ランス",
-   "venue": "パルク・デ・プランス",
-   "status": "SCHEDULED"
-  },
-  {
    "league": "PD",
    "matchday": 26,
    "utc": "2027-02-28T14:00:00Z",
@@ -13906,6 +13728,15 @@ window.SCHEDULE_DATA = {
    "venue": "ベニート・スティルペ",
    "status": "SCHEDULED",
    "tbd": true
+  },
+  {
+   "league": "FL1",
+   "matchday": 22,
+   "utc": "2027-02-28T19:45:00Z",
+   "home": "パリ・サンジェルマン",
+   "away": "ランス",
+   "venue": "パルク・デ・プランス",
+   "status": "SCHEDULED"
   },
   {
    "league": "BL1",
@@ -15665,15 +15496,6 @@ window.SCHEDULE_DATA = {
    "tbd": true
   },
   {
-   "league": "FL1",
-   "matchday": 25,
-   "utc": "2027-03-21T14:00:00Z",
-   "home": "マルセイユ",
-   "away": "リヨン",
-   "venue": "スタッド・ヴェロドローム",
-   "status": "SCHEDULED"
-  },
-  {
    "league": "PD",
    "matchday": 29,
    "utc": "2027-03-21T14:00:00Z",
@@ -15872,6 +15694,15 @@ window.SCHEDULE_DATA = {
    "venue": "ジェイビス・スタジアム",
    "status": "SCHEDULED",
    "tbd": true
+  },
+  {
+   "league": "FL1",
+   "matchday": 25,
+   "utc": "2027-03-21T19:45:00Z",
+   "home": "マルセイユ",
+   "away": "リヨン",
+   "venue": "スタッド・ヴェロドローム",
+   "status": "SCHEDULED"
   },
   {
    "league": "J2",
@@ -19137,15 +18968,6 @@ window.SCHEDULE_DATA = {
    "tbd": true
   },
   {
-   "league": "FL1",
-   "matchday": 31,
-   "utc": "2027-05-09T13:00:00Z",
-   "home": "リヨン",
-   "away": "パリ・サンジェルマン",
-   "venue": "グルパマ・スタジアム",
-   "status": "SCHEDULED"
-  },
-  {
    "league": "PD",
    "matchday": 35,
    "utc": "2027-05-09T13:00:00Z",
@@ -19343,6 +19165,15 @@ window.SCHEDULE_DATA = {
    "venue": "アルテミオ・フランキ",
    "status": "SCHEDULED",
    "tbd": true
+  },
+  {
+   "league": "FL1",
+   "matchday": 31,
+   "utc": "2027-05-09T18:45:00Z",
+   "home": "リヨン",
+   "away": "パリ・サンジェルマン",
+   "venue": "グルパマ・スタジアム",
+   "status": "SCHEDULED"
   },
   {
    "league": "J1",

@@ -22,7 +22,7 @@
 
 `data/matches.js` には **2026-27シーズンの実際の日程 全2,170試合** を収録済み
 （Ｊ１ 380・Ｊ２札幌 38・プレミア 380・ラリーガ 380・セリエＡ 380・ブンデス 306・リーグアン 306）。
-2026-09-05 時点までの消化状況（終了／未消化）を反映。スコアは収録しない。
+2026-10-10 時点までの消化状況（終了／未消化）と確定キックオフ日時を反映。スコアは収録しない。
 
 ### 収録内容と精度
 
@@ -31,25 +31,27 @@
   のクラブ別ICSを全クラブぶん突合して復元（ホーム側・アウェイ側の二重記録が全試合一致することを検証済み）。
   終了済みかどうかは報道各社の検索結果から反映（スコアは収録しない）。
   第20節 京都×岡山はＪリーグ公式でも「日程未定」のため、その旨表示している
-- **欧州5リーグ**: 全節の対戦カードと開催日は [openfootball](https://github.com/openfootball) の公式日程データ（週次更新・結果込み）、
-  放送編成で確定済みの節（プレミア第1-9節・ラリーガ第1-7節・セリエＡ第1-12節・ブンデス第1-4節・リーグアン第1-7節、
-  2026-09-05時点）は各リーグ公式発表・報道の確報で個別キックオフ日時・結果に補正済み
+- **欧州5リーグ**: 全節の対戦カードと開催日は [openfootball](https://github.com/openfootball) の公式日程データ（週次更新）。
+  放送編成で確定済みの節は openfootball と各リーグ公式発表・報道の確報（`data/corrections/`）で個別キックオフ日時に補正済み
 - **未確定の節は「時刻未定」表示**（日付は暫定。放送編成の発表で確定していく）
 - Ｗ杯影響によるラリーガ開幕節の延期4試合、セリエＡ第4節のEL日程待ち2試合なども反映済み
 
-### データを最新化する（要ネット接続、Node 18+）
+### データを最新化する（要ネット接続、Node 18+、APIキー不要）
 
 ```bash
-# Ｊリーグの日程更新（時刻未定→確定の反映など。git cloneできれば動く）
+# 1) 欧州5リーグ: openfootball から確定キックオフ日時・消化状況を取り込む
+node scripts/update-europe.mjs
+
+# 2) Ｊリーグ: 公式日程由来のICS（上流が止まっている間はスキップされる）
 node scripts/update-jleague-ics.mjs
 
-# 欧州5リーグの日時確定・終了状態の更新（football-data.org の無料APIキーが必要）
-FOOTBALL_DATA_API_KEY=あなたのキー node scripts/update.mjs --no-j
+# 3) 補正ファイルの適用と仕上げ（終了判定）。公式発表で分かった日時変更は
+#    data/corrections/YYYY-MM-DD-*.json に書いてから実行する（形式はスクリプト冒頭のコメント参照）
+node scripts/apply-corrections.mjs
 ```
 
-- `update-jleague-ics.mjs` は日程の更新のみ（消化済み試合は既存データを維持）
-- `update.mjs` は football-data.org（欧州）とＪリーグ公式データサイトのHTML解析（`--no-eu`でＪのみ）。
-  終了状態の取り込みにも使える（いずれもスコアは書き込まない）
+- どのスクリプトもスコアは書き込まない（ネタバレ防止）。終了判定はキックオフから2時間半経過で自動
+- `update.mjs`（football-data.org のAPIキーを使う旧方式）も残してあるが、通常は上の3本で足りる
 - 日次更新したい場合は cron 等で上記コマンドを回し、`data/matches.js` を配信すればよい
 
 ## ファイル構成
@@ -57,8 +59,12 @@ FOOTBALL_DATA_API_KEY=あなたのキー node scripts/update.mjs --no-j
 ```
 index.html                      表示アプリ本体（ゼロ依存）
 data/matches.js                 日程データ（window.SCHEDULE_DATA を定義）
+data/corrections/*.json         公式発表で確認した日時変更の記録（apply-corrections.mjs が適用）
+scripts/update-europe.mjs       欧州5リーグ更新（openfootball・キー不要）
 scripts/update-jleague-ics.mjs  Ｊリーグ日程更新（ICS方式・キー不要）
-scripts/update.mjs              欧州リーグ・結果更新（football-data.org / Ｊリーグ公式サイト）
+scripts/apply-corrections.mjs   補正適用＋終了判定の仕上げ
+scripts/update.mjs              旧方式（football-data.org / Ｊリーグ公式サイトHTML解析）
+scripts/lib/teams.mjs           クラブ名対訳・照合の共通モジュール
 ```
 
 ## データ形式

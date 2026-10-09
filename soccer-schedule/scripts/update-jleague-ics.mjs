@@ -68,7 +68,14 @@ const jstToUtc = (date, time) => {
 const seen = new Map();
 for (const f of J1_FILES) for (const e of parseIcs(f)) seen.set(`J1|${e.matchday}|${e.home}|${e.away}`, { league: "J1", ...e });
 for (const e of parseIcs("sapporo")) seen.set(`J2|${e.matchday}|${e.home}|${e.away}`, { league: "J2", ...e });
-console.log(`ICSから J1 ${[...seen.values()].filter(m => m.league === "J1").length}試合 / J2札幌 ${[...seen.values()].filter(m => m.league === "J2").length}試合 を取得`);
+const nJ1 = [...seen.values()].filter(m => m.league === "J1").length, nJ2 = [...seen.values()].filter(m => m.league === "J2").length;
+console.log(`ICSから J1 ${nJ1}試合 / J2札幌 ${nJ2}試合 を取得`);
+if (nJ1 === 0) {
+  console.error("✖ ICSに試合が1件も含まれていません（上流リポジトリの生成が止まっている可能性）。data/matches.js は変更しません。");
+  console.error("  代替: Ｊリーグ公式の発表を data/corrections/*.json に記録し、node scripts/apply-corrections.mjs で反映してください。");
+  if (cleanup) rmSync(dir, { recursive: true, force: true });
+  process.exit(2);
+}
 
 // 既存データとマージ
 const src = readFileSync(DATA, "utf8");

@@ -1,0 +1,777 @@
+{
+ "source": "2026-10-10 WebSearch収集（各リーグ公式発表・報道）を独立エージェントで検証済み。prev は適用前の値（記録用）",
+ "matches": [
+  {
+   "league": "PL",
+   "matchday": 10,
+   "home_en": "Everton FC",
+   "away_en": "Coventry City FC",
+   "jst_date": "2026-11-07",
+   "jst_time": "05:00",
+   "source": "Fri 6 Nov 20:00 GMT, Sky Sports - premierleague.com/en/news/4725574 ; ccfc.co.uk (21 Sep 2026) ; 101greatgoals",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 10,
+   "home_en": "Leeds United FC",
+   "away_en": "Tottenham Hotspur FC",
+   "jst_date": "2026-11-07",
+   "jst_time": "21:30",
+   "source": "Sat 7 Nov 12:30 GMT, TNT Sports - premierleague.com/en/news/4725574 ; tottenhamhotspur.com/news/1091527 ; footballchannel.jp (11/7 21:30 JST)",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 10,
+   "home_en": "Arsenal FC",
+   "away_en": "Hull City AFC",
+   "jst_date": "2026-11-08",
+   "jst_time": "00:00",
+   "source": "Sat 7 Nov 15:00 GMT (not selected for UK TV) - premierleague.com/en/news/4725574 ; nbcsports.com (10am ET) ; 101greatgoals",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 10,
+   "home_en": "Fulham FC",
+   "away_en": "Newcastle United FC",
+   "jst_date": "2026-11-08",
+   "jst_time": "00:00",
+   "source": "Sat 7 Nov 15:00 GMT (not selected for UK TV) - premierleague.com/en/news/4725574 ; nbcsports.com (10am ET) ; 101greatgoals",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 10,
+   "home_en": "Nottingham Forest FC",
+   "away_en": "Manchester City FC",
+   "jst_date": "2026-11-08",
+   "jst_time": "02:30",
+   "source": "Sat 7 Nov 17:30 GMT, Sky Sports - premierleague.com/en/news/4725574 ; readmancity.com (21 Sep 2026) ; 101greatgoals",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 10,
+   "home_en": "Brighton & Hove Albion FC",
+   "away_en": "Brentford FC",
+   "jst_date": "2026-11-08",
+   "jst_time": "23:00",
+   "source": "Sun 8 Nov 14:00 GMT, Sky Sports (UEFA displacement) - premierleague.com/en/news/4725574 ; brentfordfc.com news ; skysports.com/13590457",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 10,
+   "home_en": "Crystal Palace FC",
+   "away_en": "Liverpool FC",
+   "jst_date": "2026-11-08",
+   "jst_time": "23:00",
+   "source": "Sun 8 Nov 14:00 GMT, Sky Sports (UEFA displacement) - premierleague.com/en/news/4725574 ; skysports.com/13590457 ; 101greatgoals",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 10,
+   "home_en": "Ipswich Town FC",
+   "away_en": "AFC Bournemouth",
+   "jst_date": "2026-11-08",
+   "jst_time": "23:00",
+   "source": "Sun 8 Nov 14:00 GMT, Sky Sports (UEFA displacement) - premierleague.com/en/news/4725574 ; live-footballontv.com ; 101greatgoals",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 10,
+   "home_en": "Sunderland AFC",
+   "away_en": "Chelsea FC",
+   "jst_date": "2026-11-08",
+   "jst_time": "23:00",
+   "source": "Sun 8 Nov 14:00 GMT, Sky Sports (UEFA displacement) - premierleague.com/en/news/4725574 ; live-footballontv.com ; 101greatgoals",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 10,
+   "home_en": "Manchester United FC",
+   "away_en": "Aston Villa FC",
+   "jst_date": "2026-11-09",
+   "jst_time": "01:30",
+   "source": "Sun 8 Nov 16:30 GMT, Sky Sports - premierleague.com/en/news/4725574 ; skysports.com/13590457 ; 101greatgoals",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 11,
+   "home_en": "Manchester City FC",
+   "away_en": "Fulham FC",
+   "jst_date": "2026-11-21",
+   "jst_time": "21:30",
+   "source": "Sat 21 Nov 12:30 GMT, TNT Sports - premierleague.com/en/news/4725574 ; mancity.com (Nov fixture changes) ; live-footballontv.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 11,
+   "home_en": "AFC Bournemouth",
+   "away_en": "Nottingham Forest FC",
+   "jst_date": "2026-11-22",
+   "jst_time": "00:00",
+   "source": "Sat 21 Nov 15:00 GMT (not selected for UK TV) - premierleague.com/en/news/4725574 ; nbcsports.com (10am ET)",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 11,
+   "home_en": "Aston Villa FC",
+   "away_en": "Sunderland AFC",
+   "jst_date": "2026-11-22",
+   "jst_time": "00:00",
+   "source": "Sat 21 Nov 15:00 GMT (not selected for UK TV) - premierleague.com/en/news/4725574 ; footballfixtures.org ; nbcsports.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 11,
+   "home_en": "Chelsea FC",
+   "away_en": "Leeds United FC",
+   "jst_date": "2026-11-22",
+   "jst_time": "00:00",
+   "source": "Sat 21 Nov 15:00 GMT (not selected for UK TV) - premierleague.com/en/news/4725574 ; nbcsports.com (10am ET)",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 11,
+   "home_en": "Coventry City FC",
+   "away_en": "Crystal Palace FC",
+   "jst_date": "2026-11-22",
+   "jst_time": "00:00",
+   "source": "Sat 21 Nov 15:00 GMT (not selected for UK TV) - premierleague.com/en/news/4725574 ; nbcsports.com (10am ET)",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 11,
+   "home_en": "Tottenham Hotspur FC",
+   "away_en": "Ipswich Town FC",
+   "jst_date": "2026-11-22",
+   "jst_time": "00:00",
+   "source": "Sat 21 Nov 15:00 GMT (not selected for UK TV) - premierleague.com/en/news/4725574 ; sportsmole.co.uk 2026-27 TV schedule ; nbcsports.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 11,
+   "home_en": "Newcastle United FC",
+   "away_en": "Arsenal FC",
+   "jst_date": "2026-11-22",
+   "jst_time": "02:30",
+   "source": "Sat 21 Nov 17:30 GMT, Sky Sports - premierleague.com/en/news/4725574 ; sportsmole.co.uk ; skysports.com/13590457",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 11,
+   "home_en": "Hull City AFC",
+   "away_en": "Brighton & Hove Albion FC",
+   "jst_date": "2026-11-22",
+   "jst_time": "23:00",
+   "source": "Sun 22 Nov 14:00 GMT, Sky Sports - premierleague.com/en/news/4725574 ; sportsmole.co.uk ; skysports.com/13590457",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 11,
+   "home_en": "Liverpool FC",
+   "away_en": "Manchester United FC",
+   "jst_date": "2026-11-23",
+   "jst_time": "01:30",
+   "source": "Sun 22 Nov 16:30 GMT, Sky Sports - premierleague.com/en/news/4725574 ; skysports.com/13590457 ; liverpool.tokyo (11/23 01:30 JST)",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PL",
+   "matchday": 11,
+   "home_en": "Brentford FC",
+   "away_en": "Everton FC",
+   "jst_date": "2026-11-24",
+   "jst_time": "05:00",
+   "source": "Mon 23 Nov 20:00 GMT, Sky Sports - premierleague.com/en/news/4725574 ; brentfordfc.com match page (20261123) ; virginmedia.com Sky Sports listing",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 10,
+   "home_en": "Deportivo Alavés",
+   "away_en": "Málaga CF",
+   "jst_date": "2026-10-24",
+   "jst_time": "04:00",
+   "source": "Fri 23 Oct 21:00 CEST - sport-flash.com mx calendar 2026-10-23 (1:00 PM MX = 21:00 CEST) ; voetbalwedden.net (23 Oct 19:00 UTC) ; sport-flash Mendizorroza venue page (ven. 23 oct 2026)",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 10,
+   "home_en": "Rayo Vallecano de Madrid",
+   "away_en": "Elche CF",
+   "jst_date": "2026-10-24",
+   "jst_time": "21:00",
+   "source": "Sat 24 Oct 14:00 CEST - laliga.com match page temporada-2026-2027-laliga-ea-sports-rayo-vallecano-elche-cf-10 (SAB 24.10.2026 12:00 UTC) ; sport-flash.com es calendar 2026-10-24 (14:00)",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 10,
+   "home_en": "Athletic Club",
+   "away_en": "Getafe CF",
+   "jst_date": "2026-10-25",
+   "jst_time": "22:00",
+   "source": "Sun 25 Oct 14:00 CET - laliga.com match page temporada-2026-2027-laliga-ea-sports-athletic-club-getafe-cf-10 (SUN 25.10.2026 13:00 UTC) ; sport-flash.com mx 2026-10-25 (7:00 AM MX) ; sport-flash general calendar (14:00)",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 10,
+   "home_en": "RC Celta de Vigo",
+   "away_en": "Real Betis Balompié",
+   "jst_date": "2026-10-26",
+   "jst_time": "00:15",
+   "source": "Sun 25 Oct 16:15 CET - laliga.com match page temporada-2026-2027-laliga-ea-sports-rc-celta-real-betis-10 (SUN 25.10.2026 15:15 UTC) ; sport-flash.com (16:15 / mx 9:15 AM)",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 10,
+   "home_en": "Real Sociedad de Fútbol",
+   "away_en": "Levante UD",
+   "jst_date": "2026-10-26",
+   "jst_time": "02:30",
+   "source": "Sun 25 Oct 18:30 CET - sport-flash.com mx 2026-10-25 (11:30 AM MX = 17:30 UTC = 18:30 CET) ; hellotickets.com (6:30pm, 25 Oct, Anoeta)",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 10,
+   "home_en": "FC Barcelona",
+   "away_en": "Real Madrid CF",
+   "jst_date": "2026-10-26",
+   "jst_time": "05:00",
+   "source": "Sun 25 Oct 21:00 CET (El Clásico) - fcbarcelona.es 'El horario del Clásico de Liga en el Spotify Camp Nou, confirmado' ; realmadrid.com 'El Barcelona-Real Madrid se jugará el domingo 25 de octubre a las 21:00 h' (01-09-2026)",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 11,
+   "home_en": "Real Racing Club de Santander",
+   "away_en": "Real Madrid CF",
+   "jst_date": "2026-11-02",
+   "jst_time": "00:15",
+   "source": "Sun 1 Nov 16:15 CET, Orange TV/DAZN - realmadrid.com 'El Racing de Santander-Real Madrid se jugará el domingo 1 de noviembre a las 16:15 h' (03-10-2026)",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 10,
+   "home_en": "Real Racing Club de Santander",
+   "away_en": "RCD Espanyol de Barcelona",
+   "jst_date": "2026-10-24",
+   "jst_time": "23:15",
+   "source": "laliga.com decima jornada 2026-27 (Sat 24 Oct 16:15 CEST); eldesmarque.com; cope.es",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 10,
+   "home_en": "Valencia CF",
+   "away_en": "Villarreal CF",
+   "jst_date": "2026-10-25",
+   "jst_time": "01:30",
+   "source": "laliga.com decima jornada 2026-27 (Sat 24 Oct 18:30 CEST); eldesmarque.com; cope.es",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 10,
+   "home_en": "Club Atlético de Madrid",
+   "away_en": "RC Deportivo La Coruña",
+   "jst_date": "2026-10-25",
+   "jst_time": "04:00",
+   "source": "laliga.com decima jornada 2026-27 (Sat 24 Oct 21:00 CEST); eldesmarque.com; cope.es",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 10,
+   "home_en": "Sevilla FC",
+   "away_en": "CA Osasuna",
+   "jst_date": "2026-10-27",
+   "jst_time": "05:00",
+   "source": "laliga.com decima jornada 2026-27 (Mon 26 Oct 21:00 CET); cope.es; eldesmarque.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 11,
+   "home_en": "Villarreal CF",
+   "away_en": "RCD Espanyol de Barcelona",
+   "jst_date": "2026-10-31",
+   "jst_time": "05:00",
+   "source": "laliga.com/noticias/horarios-de-la-undecima-jornada-de-laliga-ea-sports-2026-27 (Fri 30 Oct 21:00 CET); eldesmarque.com 2026-10-03; cope.es 2026-10-03",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 11,
+   "home_en": "Levante UD",
+   "away_en": "Club Atlético de Madrid",
+   "jst_date": "2026-10-31",
+   "jst_time": "22:00",
+   "source": "laliga.com undecima jornada 2026-27 (Sat 31 Oct 14:00 CET); eldesmarque.com; cope.es; valenciaplaza.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 11,
+   "home_en": "Rayo Vallecano de Madrid",
+   "away_en": "RC Celta de Vigo",
+   "jst_date": "2026-11-01",
+   "jst_time": "00:15",
+   "source": "laliga.com undecima jornada 2026-27 (Sat 31 Oct 16:15 CET); eldesmarque.com; cope.es",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 11,
+   "home_en": "Real Betis Balompié",
+   "away_en": "Málaga CF",
+   "jst_date": "2026-11-01",
+   "jst_time": "02:30",
+   "source": "laliga.com undecima jornada 2026-27 (Sat 31 Oct 18:30 CET); malagacf.com official; eldesmarque.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 11,
+   "home_en": "FC Barcelona",
+   "away_en": "Deportivo Alavés",
+   "jst_date": "2026-11-01",
+   "jst_time": "05:00",
+   "source": "laliga.com undecima jornada 2026-27 (Sat 31 Oct 21:00 CET); eldesmarque.com; cope.es",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 11,
+   "home_en": "Getafe CF",
+   "away_en": "Sevilla FC",
+   "jst_date": "2026-11-01",
+   "jst_time": "22:00",
+   "source": "laliga.com undecima jornada 2026-27 (Sun 1 Nov 14:00 CET); eldesmarque.com 2026-10-03 (transcription of official release; only one secondary source found)",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 11,
+   "home_en": "Elche CF",
+   "away_en": "Valencia CF",
+   "jst_date": "2026-11-02",
+   "jst_time": "02:30",
+   "source": "laliga.com undecima jornada 2026-27 (Sun 1 Nov 18:30 CET); deportevalenciano.com; diariofranjiverde.com; valenciaplaza.com; eldesmarque.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 11,
+   "home_en": "Athletic Club",
+   "away_en": "Real Sociedad de Fútbol",
+   "jst_date": "2026-11-02",
+   "jst_time": "05:00",
+   "source": "laliga.com undecima jornada 2026-27 (Sun 1 Nov 21:00 CET); eldesmarque.com; cope.es",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "PD",
+   "matchday": 11,
+   "home_en": "RC Deportivo La Coruña",
+   "away_en": "CA Osasuna",
+   "jst_date": "2026-11-03",
+   "jst_time": "05:00",
+   "source": "laliga.com undecima jornada 2026-27 (Mon 2 Nov 21:00 CET); eldesmarque.com; cope.es",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 12,
+   "home_en": "Juventus FC",
+   "away_en": "Venezia FC",
+   "jst_date": "2026-11-22",
+   "jst_time": "20:30",
+   "source": "VARIATION: moved from Mon 23 Nov 20:45 to Sun 22 Nov 12:30 CET - veneziafc.it comunicato; sportmediaset variazioni 12a; tuttoveneziasport; juveoggi",
+   "prev": "2026-11-23T19:45:00Z"
+  },
+  {
+   "league": "SA",
+   "matchday": 12,
+   "home_en": "Bologna FC 1909",
+   "away_en": "Udinese Calcio",
+   "jst_date": "2026-11-22",
+   "jst_time": "23:00",
+   "source": "VARIATION: from 18:00 to Sun 22 Nov 15:00 CET - sportmediaset variazioni 12a; napolimagazine; bolognasportnews 12a-19a",
+   "prev": "2026-11-22T17:00:00Z"
+  },
+  {
+   "league": "SA",
+   "matchday": 12,
+   "home_en": "US Sassuolo Calcio",
+   "away_en": "Genoa CFC",
+   "jst_date": "2026-11-22",
+   "jst_time": "23:00",
+   "source": "VARIATION: from 12:30 to Sun 22 Nov 15:00 CET - sportmediaset; sassuolonews.net; pianetagenoa1893.net",
+   "prev": "2026-11-22T11:30:00Z"
+  },
+  {
+   "league": "SA",
+   "matchday": 12,
+   "home_en": "AC Milan",
+   "away_en": "Frosinone Calcio",
+   "jst_date": "2026-11-23",
+   "jst_time": "02:00",
+   "source": "VARIATION: from 15:00 to Sun 22 Nov 18:00 CET (Prefettura di Milano) - frosinonecalcio.com comunicato; acmilan.com (IT) 12a-19a; tuttofrosinone; sportmediaset",
+   "prev": "2026-11-22T14:00:00Z"
+  },
+  {
+   "league": "SA",
+   "matchday": 12,
+   "home_en": "AC Monza",
+   "away_en": "ACF Fiorentina",
+   "jst_date": "2026-11-24",
+   "jst_time": "04:45",
+   "source": "VARIATION: from 18:30 to Mon 23 Nov 20:45 CET - ansa.it 25/09/2026; sportmediaset variazioni 12a; forzamonza.it programma 12a-18a",
+   "prev": "2026-11-23T17:30:00Z"
+  },
+  {
+   "league": "SA",
+   "matchday": 13,
+   "home_en": "Venezia FC",
+   "away_en": "Bologna FC 1909",
+   "jst_date": "2026-11-28",
+   "jst_time": "04:45",
+   "source": "Fri 27 Nov 20:45 CET, DAZN/Sky - legaseriea.it 'Anticipi e posticipi fino alla fine del girone di andata' (25/09/2026); dazn.com; tuttoveneziasport; bolognasportnews",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 13,
+   "home_en": "Frosinone Calcio",
+   "away_en": "Parma Calcio 1913",
+   "jst_date": "2026-11-28",
+   "jst_time": "23:00",
+   "source": "Sat 28 Nov 15:00 CET, DAZN - legaseriea.it; frosinonecalcio.com; sportparma.com; dazn.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 13,
+   "home_en": "Torino FC",
+   "away_en": "SS Lazio",
+   "jst_date": "2026-11-29",
+   "jst_time": "02:00",
+   "source": "Sat 28 Nov 18:00 CET, DAZN - legaseriea.it; dazn.com; noibiancocelesti.com; sport.virgilio.it Torino",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 13,
+   "home_en": "FC Internazionale Milano",
+   "away_en": "Genoa CFC",
+   "jst_date": "2026-11-29",
+   "jst_time": "04:45",
+   "source": "Sat 28 Nov 20:45 CET, DAZN/Sky - legaseriea.it; fcinter1908.it; calciogenoa.it; dazn.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 13,
+   "home_en": "Udinese Calcio",
+   "away_en": "ACF Fiorentina",
+   "jst_date": "2026-11-29",
+   "jst_time": "20:30",
+   "source": "Sun 29 Nov 12:30 CET, DAZN - legaseriea.it; dazn.com; sportal.it; laviola.it",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 13,
+   "home_en": "US Sassuolo Calcio",
+   "away_en": "SSC Napoli",
+   "jst_date": "2026-11-29",
+   "jst_time": "23:00",
+   "source": "Sun 29 Nov 15:00 CET, DAZN - legaseriea.it; dazn.com; sassuolonews.net; calcionapoli1926.it",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 13,
+   "home_en": "AS Roma",
+   "away_en": "AC Monza",
+   "jst_date": "2026-11-30",
+   "jst_time": "02:00",
+   "source": "Sun 29 Nov 18:00 CET - legaseriea.it; forzaroma.info; forzamonza.it; laroma24.it",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 13,
+   "home_en": "Como 1907",
+   "away_en": "Juventus FC",
+   "jst_date": "2026-11-30",
+   "jst_time": "04:45",
+   "source": "Sun 29 Nov 20:45 CET, DAZN/Sky - legaseriea.it; juventus.com; ansa.it; sport.sky.it",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 13,
+   "home_en": "US Lecce",
+   "away_en": "Atalanta BC",
+   "jst_date": "2026-12-01",
+   "jst_time": "02:30",
+   "source": "Mon 30 Nov 18:30 CET, DAZN - legaseriea.it; dazn.com; pianetalecce.it; calcioefinanza.it",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 13,
+   "home_en": "Cagliari Calcio",
+   "away_en": "AC Milan",
+   "jst_date": "2026-12-01",
+   "jst_time": "04:45",
+   "source": "Mon 30 Nov 20:45 CET, DAZN - legaseriea.it; cagliaricalcio.com; acmilan.com; dazn.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 14,
+   "home_en": "Bologna FC 1909",
+   "away_en": "AS Roma",
+   "jst_date": "2026-12-05",
+   "jst_time": "04:45",
+   "source": "Fri 4 Dec 20:45 CET, DAZN/Sky - legaseriea.it; forzaroma.info; bolognasportnews.it; sport.sky.it",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 14,
+   "home_en": "AC Monza",
+   "away_en": "Como 1907",
+   "jst_date": "2026-12-05",
+   "jst_time": "23:00",
+   "source": "Sat 5 Dec 15:00 CET, DAZN - legaseriea.it; forzamonza.it; sportal.it; calciodangolo.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 14,
+   "home_en": "Frosinone Calcio",
+   "away_en": "FC Internazionale Milano",
+   "jst_date": "2026-12-06",
+   "jst_time": "02:00",
+   "source": "Sat 5 Dec 18:00 CET, DAZN - legaseriea.it; frosinonecalcio.com; fcinter1908.it; napolita.it",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 14,
+   "home_en": "SSC Napoli",
+   "away_en": "US Lecce",
+   "jst_date": "2026-12-06",
+   "jst_time": "04:45",
+   "source": "Sat 5 Dec 20:45 CET, DAZN/Sky - legaseriea.it; pianetalecce.it; calcionapoli1926.it; dazn.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 14,
+   "home_en": "Genoa CFC",
+   "away_en": "Torino FC",
+   "jst_date": "2026-12-06",
+   "jst_time": "20:30",
+   "source": "Sun 6 Dec 12:30 CET, DAZN - legaseriea.it; dazn.com; calciogenoa.it; sport.virgilio.it Torino",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 14,
+   "home_en": "SS Lazio",
+   "away_en": "Atalanta BC",
+   "jst_date": "2026-12-06",
+   "jst_time": "23:00",
+   "source": "Sun 6 Dec 15:00 CET, DAZN - legaseriea.it; cittaceleste.it; calcioefinanza.it; goal.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 14,
+   "home_en": "Juventus FC",
+   "away_en": "Udinese Calcio",
+   "jst_date": "2026-12-07",
+   "jst_time": "02:00",
+   "source": "Sun 6 Dec 18:00 CET, DAZN/Sky - legaseriea.it; juventus.com; dazn.com; sport.sky.it",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 14,
+   "home_en": "AC Milan",
+   "away_en": "Parma Calcio 1913",
+   "jst_date": "2026-12-07",
+   "jst_time": "04:45",
+   "source": "Sun 6 Dec 20:45 CET, DAZN - legaseriea.it; acmilan.com; sportparma.com; allmilan.it; milannews24",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 14,
+   "home_en": "Venezia FC",
+   "away_en": "US Sassuolo Calcio",
+   "jst_date": "2026-12-08",
+   "jst_time": "02:30",
+   "source": "Mon 7 Dec 18:30 CET, DAZN - legaseriea.it; tuttoveneziasport.it; sassuolonews.net; calciodangolo.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 14,
+   "home_en": "ACF Fiorentina",
+   "away_en": "Cagliari Calcio",
+   "jst_date": "2026-12-08",
+   "jst_time": "04:45",
+   "source": "Mon 7 Dec 20:45 CET, DAZN/Sky - legaseriea.it; cagliaricalcio.com; calciocasteddu.it; laviola.it",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 15,
+   "home_en": "Udinese Calcio",
+   "away_en": "Frosinone Calcio",
+   "jst_date": "2026-12-12",
+   "jst_time": "04:45",
+   "source": "Fri 11 Dec 20:45 CET, DAZN - legaseriea.it; frosinonecalcio.com; dazn.com; goal.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 15,
+   "home_en": "Cagliari Calcio",
+   "away_en": "Venezia FC",
+   "jst_date": "2026-12-12",
+   "jst_time": "23:00",
+   "source": "Sat 12 Dec 15:00 CET, DAZN - legaseriea.it; cagliaricalcio.com; tuttoveneziasport.it; trivenetogoal.it",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 15,
+   "home_en": "US Lecce",
+   "away_en": "US Sassuolo Calcio",
+   "jst_date": "2026-12-13",
+   "jst_time": "02:00",
+   "source": "Sat 12 Dec 18:00 CET, DAZN - legaseriea.it; pianetalecce.it; sassuolonews.net; calciocasteddu.it",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 15,
+   "home_en": "Como 1907",
+   "away_en": "Bologna FC 1909",
+   "jst_date": "2026-12-13",
+   "jst_time": "04:45",
+   "source": "Sat 12 Dec 20:45 CET, DAZN/Sky - legaseriea.it; bolognasportnews.it; calciocasteddu.it; dazn.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 15,
+   "home_en": "SS Lazio",
+   "away_en": "AS Roma",
+   "jst_date": "2026-12-13",
+   "jst_time": "20:30",
+   "source": "Sun 13 Dec 12:30 CET, DAZN - legaseriea.it; ansa.it; sportmediaset; laroma24.it; noibiancocelesti.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 15,
+   "home_en": "FC Internazionale Milano",
+   "away_en": "Torino FC",
+   "jst_date": "2026-12-13",
+   "jst_time": "23:00",
+   "source": "Sun 13 Dec 15:00 CET, DAZN - legaseriea.it; fcinter1908.it; dazn.com; sport.virgilio.it Torino",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 15,
+   "home_en": "Parma Calcio 1913",
+   "away_en": "ACF Fiorentina",
+   "jst_date": "2026-12-14",
+   "jst_time": "02:00",
+   "source": "Sun 13 Dec 18:00 CET, DAZN/Sky - legaseriea.it; sportparma.com; sportal.it; direttacalciomercato.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 15,
+   "home_en": "SSC Napoli",
+   "away_en": "AC Milan",
+   "jst_date": "2026-12-14",
+   "jst_time": "04:45",
+   "source": "Sun 13 Dec 20:45 CET, DAZN - legaseriea.it; ansa.it; napolimagazine; acmilan.com; spaziocalcio.it",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 15,
+   "home_en": "Atalanta BC",
+   "away_en": "Genoa CFC",
+   "jst_date": "2026-12-15",
+   "jst_time": "02:30",
+   "source": "Mon 14 Dec 18:30 CET, DAZN - legaseriea.it; dazn.com; calciogenoa.it; sportal.it; leggo.it (genoacfc.it lists Monday 18:30 with a '12 dicembre' date typo)",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "SA",
+   "matchday": 15,
+   "home_en": "Juventus FC",
+   "away_en": "AC Monza",
+   "jst_date": "2026-12-15",
+   "jst_time": "04:45",
+   "source": "Mon 14 Dec 20:45 CET, DAZN/Sky - legaseriea.it; juventus.com; forzamonza.it; dazn.com",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "J1",
+   "matchday": 20,
+   "home": "京都サンガF.C.",
+   "away": "ファジアーノ岡山",
+   "jst_date": "2026-12-19",
+   "jst_time": "13:00",
+   "venue": "サンガスタジアム by KYOCERA",
+   "source": "time_decided: https://www.sanga-fc.jp/news/detail/21194 (「2026/27明治安田Ｊ１リーグ」試合日程決定のお知らせ 9/4更新) / https://www.sanga-fc.jp/game / https://www.fagiano-okayama.com/game/schedule-game/2026-27/",
+   "prev": "時刻未定"
+  },
+  {
+   "league": "J1",
+   "matchday": 10,
+   "home": "ファジアーノ岡山",
+   "away": "ヴィッセル神戸",
+   "jst_date": "2026-10-18",
+   "jst_time": "13:55",
+   "venue": "ＪＦＥ晴れの国スタジアム",
+   "source": "time_decided: https://www.fagiano-okayama.com/game/schedule-game/2026-27/ / https://www.fagiano-okayama.com/news/202609291701/ (2026-09-29付 10月18日神戸戦告知)",
+   "prev": "2026-10-18T04:55:00Z"
+  }
+ ]
+}
